@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echoserver
+  namespace: develop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: echoserver
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: echoserver
+    spec:
+      containers:
+        - image: envoyproxy/envoy
+          name: envoy
+          envFrom:
+            - secretRef:
+                name: envoy-${ENVOY_ID}
+---
+apiVersion: mumoshu.github.io/v1alpha1
+kind: AWSSecret
+metadata:
+  name: docker-hub
+  namespace: develop
+spec:
+  stringDataFrom:
+    secretsManagerSecretRef:
+      secretId: docker-hub-dockerconfigjson/staging
+      versionId: cb4ba21c-9e84-4b12-ac78-5fe7569a73de
+  type: kubernetes.io/dockerconfigjson

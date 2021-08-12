@@ -1,0 +1,95 @@
+# resolve-aws-secret-version
+
+This is an action to resolve version IDs of `AWSSecret` in a manifest.
+It is designed for https://github.com/mumoshu/aws-secret-operator.
+
+
+## Inputs
+
+- `manifest`
+  - Path to manifest
+  - You can set files as a multi-line string
+- `in-place`
+  - By default, it writes manifest(s) by in-place
+  - If set to `false`, it writes a resolved manifest to a temporary file
+
+
+## Example
+
+Here is an example workflow:
+
+```yaml
+      - uses: int128/kustomize-action@v1
+        id: kustomize
+        with:
+          kustomization: path/to/kustomization.yaml
+      - uses: ./quipper/deploy-actions/resolve-aws-secret-version
+        id: resolve-secret
+        with:
+          manifest: ${{ steps.kustomize.outputs.files }}
+```
+
+When the below manifest is given,
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-service
+spec:
+  template:
+    spec:
+      containers:
+        - image: nginx
+          envFrom:
+            - secretRef:
+                name: my-service-${AWS_SECRETS_MANAGER_VERSION_ID}
+---
+apiVersion: mumoshu.github.io/v1alpha1
+kind: AWSSecret
+metadata:
+  name: my-service-${AWS_SECRETS_MANAGER_VERSION_ID}
+spec:
+  stringDataFrom:
+    secretsManagerSecretRef:
+      secretId: my-service/develop
+      versionId: ${AWS_SECRETS_MANAGER_VERSION_ID}
+```
+
+This action replaces a placeholder in `versionId` field with the current version ID.
+In this example, it replaces `${AWS_SECRETS_MANAGER_VERSION_ID}` with the current one.
+
+Here are some rules:
+
+- If a manifest does not contain any `AWSSecret`, do nothing
+- If `versionId` field is not placeholder in form of `${...}`, it is ignored
+
+Finally this action writes the below manifest to a temporary file:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-service
+spec:
+  template:
+    spec:
+      containers:
+        - image: nginx
+          envFrom:
+            - secretRef:
+                name: my-service-c7ea50c5-b2be-4970-bf90-2237bef3b4cf
+---
+apiVersion: mumoshu.github.io/v1alpha1
+kind: AWSSecret
+metadata:
+  name: my-service-c7ea50c5-b2be-4970-bf90-2237bef3b4cf
+spec:
+  stringDataFrom:
+    secretsManagerSecretRef:
+      secretId: my-service/develop
+      versionId: c7ea50c5-b2be-4970-bf90-2237bef3b4cf
+```
+
+This action accepts multi-line paths.
+If 2 or more manifests are given, this action processes them and sets the output paths as a multi-line string.
