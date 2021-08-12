@@ -10,7 +10,7 @@ test('run', async () => {
 
   const inputs = {
     manifestPaths: [`${__dirname}/fixtures/input-with-awssecret-placeholder.yaml`],
-    inPlace: false,
+    writeInPlace: false,
   }
   const outputs = await run(inputs)
   expect(outputs.manifestPaths.length).toBe(1)

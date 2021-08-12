@@ -3,7 +3,7 @@ import { resolveAsTemporaryFile, resolveInplace } from './resolve'
 
 type Inputs = {
   manifestPaths: string[]
-  inPlace: boolean
+  writeInPlace: boolean
 }
 
 type Outputs = {
@@ -13,7 +13,7 @@ type Outputs = {
 export const run = async (inputs: Inputs): Promise<Outputs> => {
   const manifestPaths: string[] = []
   for (const manifest of inputs.manifestPaths) {
-    if (inputs.inPlace) {
+    if (inputs.writeInPlace) {
       await resolveInplace(manifest, awsSecretsManager)
       manifestPaths.push(manifest)
     } else {

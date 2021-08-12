@@ -1,10 +1,10 @@
 name: resolve-aws-secret-version
 description: resolve AWSSecret versionId placeholders in a manifest
 inputs:
-  manifest:
+  manifests:
     description: multi-line string of path(s) to manifest(s)
     required: true
-  in-place:
+  write-in-place:
     description: write manifest(s) by in-place
     required: true
     default: 'true'
