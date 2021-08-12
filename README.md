@@ -1,20 +1,6 @@
-# typescript-actions-monorepo
+# monorepo-deploy-actions
 
-This is a template of monorepo for GitHub Actions written in TypeScript.
-Ready to develop on Visual Studio Code.
-
-It is based on https://github.com/actions/typescript-action.
-
-## Features
-
-- Configuration for both yarn and vscode
-  - [Yarn Workspaces](https://classic.yarnpkg.com/en/docs/workspaces/)
-  - TypeScript
-  - Jest
-  - ESLint
-  - Prettier
-- Continuous update of dependencies using Renovate
-- Automated release
+This is a collection of GitHub Actions to deploy monorepo Microservices in GitOps way.
 
 
 ## Actions
