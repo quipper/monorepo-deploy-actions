@@ -1,4 +1,4 @@
-import aws from 'aws-sdk'
+import * as aws from 'aws-sdk'
 import * as awsSecretsManager from '../src/awsSecretsManager'
 
 const secretsManagerMock = {
@@ -16,6 +16,7 @@ test('getCurrentVersionId returns the current version id', async () => {
   secretsManagerMock.listSecretVersionIds.mockReturnValue({
     // this is an actual payload of the command:
     // $ aws secretsmanager list-secret-version-ids --secret-id tara-content/develop-tara
+    // eslint-disable-next-line @typescript-eslint/require-await
     promise: async (): Promise<aws.SecretsManager.ListSecretVersionIdsResponse> => ({
       Versions: [
         {

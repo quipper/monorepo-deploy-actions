@@ -28,6 +28,6 @@ metadata:
 spec:
   stringDataFrom:
     secretsManagerSecretRef:
-      secretId: docker-hub-dockerconfigjson/staging
-      versionId: cb4ba21c-9e84-4b12-ac78-5fe7569a73de
+      secretId: docker-hub-credentials
+      versionId: 2eb0efcf-14ee-4526-b8ce-971ec82b3aca
   type: kubernetes.io/dockerconfigjson

@@ -17,5 +17,7 @@
     "aws-sdk": "2.966.0",
     "js-yaml": "4.1.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.2"
+  }
 }

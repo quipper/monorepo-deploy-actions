@@ -6,7 +6,10 @@ test('the placeholder is replaced with the current version id', async () => {
   const manager = { getCurrentVersionId: jest.fn() }
   manager.getCurrentVersionId.mockResolvedValue('c7ea50c5-b2be-4970-bf90-2237bef3b4cf')
 
-  const outputPath = await resolveAsTemporaryFile(`${__dirname}/fixtures/input-with-awssecret-placeholder.yaml`, manager)
+  const outputPath = await resolveAsTemporaryFile(
+    `${__dirname}/fixtures/input-with-awssecret-placeholder.yaml`,
+    manager
+  )
   const output = (await fs.readFile(outputPath)).toString()
   const expected = (await fs.readFile(`${__dirname}/fixtures/expected-with-awssecret-placeholder.yaml`)).toString()
   expect(output).toBe(expected)
@@ -43,8 +46,8 @@ metadata:
 spec:
   stringDataFrom:
     secretsManagerSecretRef:
-      secretId: docker-hub-dockerconfigjson/staging
-      versionId: cb4ba21c-9e84-4b12-ac78-5fe7569a73de
+      secretId: docker-hub-credentials
+      versionId: 2eb0efcf-14ee-4526-b8ce-971ec82b3aca
   type: kubernetes.io/dockerconfigjson
 `
   const output = await resolve(manifest, manager)

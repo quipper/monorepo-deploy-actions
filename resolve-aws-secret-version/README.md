@@ -6,12 +6,10 @@ It is designed for https://github.com/mumoshu/aws-secret-operator.
 
 ## Inputs
 
-- `manifest`
-  - Path to manifest
-  - You can set files as a multi-line string
-- `in-place`
-  - By default, it writes manifest(s) by in-place
-  - If set to `false`, it writes a resolved manifest to a temporary file
+Name | Type | Description
+-----|------|------------
+`manifest` | multiline string | Path to manifest(s)
+`in-place` | boolean | Default to `true`. If set to `false`, this action writes a resolved manifest to a temporary file
 
 
 ## Example
@@ -19,11 +17,12 @@ It is designed for https://github.com/mumoshu/aws-secret-operator.
 Here is an example workflow:
 
 ```yaml
+    steps:
       - uses: int128/kustomize-action@v1
         id: kustomize
         with:
           kustomization: path/to/kustomization.yaml
-      - uses: ./quipper/deploy-actions/resolve-aws-secret-version
+      - uses: quipper/monorepo-deploy-actions/resolve-aws-secret-version@v1
         id: resolve-secret
         with:
           manifest: ${{ steps.kustomize.outputs.files }}
