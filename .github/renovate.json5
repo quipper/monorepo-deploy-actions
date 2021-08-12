@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "labels": [
+    "r:{{depName}}",
+    "r:{{depName}}/{{newVersion}}"
+  ],
+  "packageRules": [
+    {
+      "additionalBranchPrefix": "{{packageFileDir}}-",
+      "commitMessageSuffix": "({{packageFileDir}})",
+      "matchUpdateTypes": ["minor", "patch", "pin"],
+      "automerge": true
+    }
+  ]
+}

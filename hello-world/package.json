@@ -1,0 +1,19 @@
+{
+  "name": "hello-world-action",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Hello World action",
+  "main": "lib/src/main.js",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write **/*.ts",
+    "format-check": "prettier --check **/*.ts",
+    "lint": "eslint **/*.ts",
+    "package": "ncc build --source-map --license licenses.txt",
+    "test": "jest",
+    "ci:package": "yarn build && yarn package"
+  },
+  "dependencies": {
+    "@actions/core": "1.4.0"
+  }
+}
