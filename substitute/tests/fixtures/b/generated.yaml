@@ -1,0 +1,4 @@
+# fixture
+name: b
+namespace: ${NAMESPACE}
+image: ${DOCKER_IMAGE}

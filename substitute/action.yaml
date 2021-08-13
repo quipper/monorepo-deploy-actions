@@ -1,0 +1,15 @@
+name: substitute
+description: substitute variable(s) in manifest(s)
+inputs:
+  manifests:
+    description: multi-line string of path(s) to manifest(s)
+    required: true
+  path-patterns:
+    description: multi-line string of path pattern(s)
+    required: false
+  variables:
+    description: multi-line string of variable(s) in form of KEY=VALUE
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
