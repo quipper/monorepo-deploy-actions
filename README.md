@@ -8,6 +8,7 @@ This is a collection of GitHub Actions to deploy monorepo Microservices in GitOp
 | Name | Description | Status
 |------|-------------|-------
 | [resolve-aws-secret-version](resolve-aws-secret-version) | Resolve AWSSecret versionId placeholders in a manifest | [![resolve-aws-secret-version](https://github.com/quipper/monorepo-deploy-actions/typescript-actions-monorepo/actions/workflows/resolve-aws-secret-version.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/resolve-aws-secret-version.yaml)
+| [substitute](substitute) | Substitute variable(s) in manifest(s) | [![substitute](https://github.com/quipper/monorepo-deploy-actions/typescript-actions-monorepo/actions/workflows/substitute.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/substitute.yaml)
 
 
 ## Release strategy
