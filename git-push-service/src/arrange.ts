@@ -32,10 +32,14 @@ export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
     const applicationManifest = generateApplicationManifest({
       name: `${inputs.namespace}--${service}`,
       project: inputs.project,
-      namespace: inputs.namespace,
-      repository: inputs.destinationRepository,
-      branch: inputs.branch,
-      path: `services/${service}`,
+      source: {
+        repository: inputs.destinationRepository,
+        branch: inputs.branch,
+        path: `services/${service}`,
+      },
+      destination: {
+        namespace: inputs.namespace,
+      },
     })
     await putApplicationManifest(applicationManifest, inputs.workspace, inputs.namespace, service, inputs.overwrite)
   }

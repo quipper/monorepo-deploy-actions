@@ -90,7 +90,7 @@ test('overwrite event if a file exists', async () => {
 
 const readContent = async (f: string) => (await fs.readFile(f)).toString()
 
-const applicationA = `
+const applicationA = `\
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -112,7 +112,7 @@ spec:
       prune: true
 `
 
-const applicationB = `
+const applicationB = `\
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
