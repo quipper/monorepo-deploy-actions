@@ -1,10 +1,11 @@
 import { promises as fs } from 'fs'
 import * as core from '@actions/core'
+import * as glob from '@actions/glob'
 import * as match from './match'
 
 interface Inputs {
-  manifests: string[]
-  pathPatterns: string[]
+  files: string
+  pathVariablesPattern?: string
   variables: Map<string, string>
 }
 
@@ -19,16 +20,22 @@ export const parseVariables = (variables: string[]): Map<string, string> => {
 }
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  const regexps = match.compilePathPatternsToRegexp(inputs.pathPatterns)
-  for (const f of inputs.manifests) {
-    const pathVariables = match.exec(regexps, f)
-    if (pathVariables.size > 0) {
-      core.info(`matched path variable(s) ${[...pathVariables.entries()].map(([k, v]) => `${k} => ${v}`).join()}`)
-    }
+  let pathVariablesPattern
+  if (inputs.pathVariablesPattern) {
+    pathVariablesPattern = new match.PathVariablesPattern(inputs.pathVariablesPattern)
+  }
+
+  const files = await glob.create(inputs.files, { matchDirectories: false })
+  for await (const f of files.globGenerator()) {
     core.info(`reading ${f}`)
     const inputManifest = (await fs.readFile(f)).toString()
     let outputManifest = replace(inputManifest, inputs.variables)
-    outputManifest = replace(outputManifest, pathVariables)
+
+    if (pathVariablesPattern) {
+      const pathVariables = pathVariablesPattern.match(f)
+      outputManifest = replace(outputManifest, pathVariables)
+    }
+
     core.info(`writing to ${f}`)
     await fs.writeFile(f, outputManifest, { encoding: 'utf-8' })
   }

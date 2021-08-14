@@ -1,14 +1,14 @@
 name: substitute
-description: substitute variable(s) in manifest(s)
+description: substitute variable(s) in file(s)
 inputs:
-  manifests:
-    description: multi-line string of path(s) to manifest(s)
+  files:
+    description: glob pattern(s) to file(s) in form of multiline string
     required: true
   path-patterns:
-    description: multi-line string of path pattern(s)
+    description: path variable(s) pattern
     required: false
   variables:
-    description: multi-line string of variable(s) in form of KEY=VALUE
+    description: variable(s) in form of multiline string with KEY=VALUE
     required: true
 runs:
   using: 'node12'
