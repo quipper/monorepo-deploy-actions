@@ -59,3 +59,5 @@ To build and push a manifest of service:
           overlay: develop
           namespace: develop
 ```
+
+You need to include variable `${service}` in `manifests-pattern` to infer a service name from manifest path.
