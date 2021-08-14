@@ -1,6 +1,6 @@
 import * as yaml from 'js-yaml'
 
-type Application = {
+export type Application = {
   name: string
   project: string
   source: {
