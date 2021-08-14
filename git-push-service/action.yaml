@@ -1,0 +1,30 @@
+name: git-push-service
+description: push manifest(s) to deploy service(s)
+inputs:
+  manifests:
+    description: glob pattern(s) to manifest(s) in multi-line string
+    required: true
+  manifests-pattern:
+    description: path pattern to determine a service name
+    required: true
+  overlay:
+    description: overlay name
+    required: true
+  namespace:
+    description: namespace name
+    required: true
+  destination-repository:
+    description: destination repository
+    required: true
+    default: ${{ github.repository }}
+  overwrite:
+    description: overwrite manifest(s) if it exists
+    required: true
+    default: 'true'
+  token:
+    description: GitHub token
+    required: true
+    default: ${{ github.token }}
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
