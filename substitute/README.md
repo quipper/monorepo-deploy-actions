@@ -18,15 +18,15 @@ To build manifests and substitute variables:
           manifests: ${{ steps.kustomize.outputs.files }}
           path-patterns: ${{ steps.kustomize.outputs.directory }}/:service_name/**
           variables: |
-            DOCKER_IMAGE=${{ steps.ecr.outputs.registry }}/tararepo/${service_name}:develop
+            DOCKER_IMAGE=${{ steps.ecr.outputs.registry }}/${service_name}:develop
             NAMESPACE=${{ steps.config.outputs.namespace }}
 ```
 
-You can add variables(s) in form of `KEY=VALUE`.
+`variables` must be a multiline string in form of `KEY=VALUE`.
 
 ### Path pattern
 
-If you set `path-patterns`, this action tests each manifest path and extracts path variable(s).
-You can use path variable(s) in `variables`.
+If you set `path-patterns`, this action tests each manifest path and sets the path variable(s).
+You can use the path variable(s) in `variables`.
 
 A path variable must starts with `:` and be alphabet, number or underscore, i.e. `a-zA-Z0-9_`.
