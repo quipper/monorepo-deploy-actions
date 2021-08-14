@@ -1,0 +1,68 @@
+name: git-push-service
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - git-push-service/**
+      - '*.json'
+      - e2e-test/**
+      - .github/workflows/git-push-service.yaml
+  pull_request:
+    branches: [main]
+    paths:
+      - git-push-service/**
+      - '*.json'
+      - e2e-test/**
+      - .github/workflows/git-push-service.yaml
+
+jobs:
+  ts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: git-push-service
+    steps:
+      - uses: actions/checkout@v2
+      - id: yarn-cache-dir
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.yarn-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn
+      - run: yarn lint
+      - run: yarn format-check
+      - run: yarn test
+      - run: yarn build
+      - run: yarn package
+
+      - run: ${{ github.workspace }}/.github/e2e-test-config.sh
+        id: config
+      - uses: ./git-push-service
+        with:
+          manifests: |
+            ${{ github.workspace }}/git-push-service/tests/fixtures/a/generated.yaml
+            ${{ github.workspace }}/git-push-service/tests/fixtures/b/generated.yaml
+          manifests-pattern: |
+            ${{ github.workspace }}/git-push-service/tests/fixtures/${service}/**
+          overlay: ${{ steps.config.outputs.overlay }}
+          namespace: ${{ steps.config.outputs.namespace }}
+
+      - uses: actions/checkout@v2
+        with:
+          ref: ns/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}
+          path: git-push-service/actual
+      - run: find actual -type f
+      - run: test -f actual/applications/${{ steps.config.outputs.namespace }}--a.yaml
+      - run: test -f actual/applications/${{ steps.config.outputs.namespace }}--b.yaml
+      - run: test -f actual/services/a/generated.yaml
+      - run: test -f actual/services/b/generated.yaml
+      - name: clean up the branch
+        continue-on-error: true
+        if: always()
+        run: |
+          git push origin --delete refs/heads/ns/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}
