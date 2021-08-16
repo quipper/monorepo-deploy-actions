@@ -1,8 +1,9 @@
+import * as glob from '@actions/glob'
 import * as awsSecretsManager from './awsSecretsManager'
 import { resolveAsTemporaryFile, resolveInplace } from './resolve'
 
 type Inputs = {
-  manifestPaths: string[]
+  manifests: string
   writeInPlace: boolean
 }
 
@@ -11,8 +12,9 @@ type Outputs = {
 }
 
 export const run = async (inputs: Inputs): Promise<Outputs> => {
+  const manifests = await glob.create(inputs.manifests, { matchDirectories: false })
   const manifestPaths: string[] = []
-  for (const manifest of inputs.manifestPaths) {
+  for await (const manifest of manifests.globGenerator()) {
     if (inputs.writeInPlace) {
       await resolveInplace(manifest, awsSecretsManager)
       manifestPaths.push(manifest)

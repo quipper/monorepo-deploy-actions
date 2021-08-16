@@ -8,7 +8,7 @@ It is designed for https://github.com/mumoshu/aws-secret-operator.
 
 Name | Type | Description
 -----|------|------------
-`manifests` | multiline string | Path to manifest(s)
+`manifests` | multiline string | Glob pattern(s) to manifest(s)
 `write-in-place` | boolean | Default to `true`. If set to `false`, this action writes a resolved manifest to a temporary file
 
 
@@ -25,7 +25,7 @@ Here is an example workflow:
       - uses: quipper/monorepo-deploy-actions/resolve-aws-secret-version@v1
         id: resolve-secret
         with:
-          manifests: ${{ steps.kustomize.outputs.files }}
+          manifests: ${{ steps.kustomize.outputs.directory }}/**/*.yaml
 ```
 
 When the below manifest is given,

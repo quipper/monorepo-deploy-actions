@@ -9,7 +9,7 @@ test('run', async () => {
   getCurrentVersionId.mockResolvedValue('c7ea50c5-b2be-4970-bf90-2237bef3b4cf')
 
   const inputs = {
-    manifestPaths: [`${__dirname}/fixtures/input-with-awssecret-placeholder.yaml`],
+    manifests: `${__dirname}/fixtures/input-with-awssecret-placeholder.yaml`,
     writeInPlace: false,
   }
   const outputs = await run(inputs)
