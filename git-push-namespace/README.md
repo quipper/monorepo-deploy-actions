@@ -9,7 +9,7 @@ Name | Type | Description
 -----|------|------------
 `overlay` | string | Name of overlay
 `namespace` | multiline string | Name of namespace
-`destination-repository` | string | Destination repository (default to `github.repository`)
+`destination-repository` | string | Destination repository
 `destination-branch` | string | Destination branch (default to `main`)
 `token` | string | GitHub token (default to `github.token`)
 

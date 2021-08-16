@@ -12,7 +12,7 @@ Name | Type | Description
 `overlay` | string | Name of overlay
 `namespace` | string | Name of namespace
 `service` | string | Name of service
-`destination-repository` | string | Destination repository (default to `github.repository`)
+`destination-repository` | string | Destination repository
 `overwrite` | boolean | Overwrite manifest(s) if it exists (default to true)
 `token` | string | GitHub token (default to `github.token`)
 

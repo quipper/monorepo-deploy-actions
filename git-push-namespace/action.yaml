@@ -10,7 +10,6 @@ inputs:
   destination-repository:
     description: destination repository
     required: true
-    default: ${{ github.repository }}
   destination-branch:
     description: destination branch
     required: true
