@@ -6,13 +6,16 @@ inputs:
     required: true
   manifests-pattern:
     description: path pattern to determine a service name
-    required: true
+    required: false
   overlay:
     description: overlay name
     required: true
   namespace:
     description: namespace name
     required: true
+  service:
+    description: service name
+    required: false
   destination-repository:
     description: destination repository
     required: true

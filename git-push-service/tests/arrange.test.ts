@@ -4,27 +4,23 @@ import * as path from 'path'
 import { arrangeManifests } from '../src/arrange'
 import { PathVariablesPattern } from '../src/match'
 
-test('arrange manifests successfully', async () => {
+test('arrange a manifest', async () => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-action-'))
 
   await arrangeManifests({
     workspace,
-    manifests: [path.join(__dirname, `fixtures/a/generated.yaml`), path.join(__dirname, `fixtures/b/generated.yaml`)],
-    manifestsPattern: new PathVariablesPattern(`${__dirname}/fixtures/\${service}/**`),
+    manifests: [path.join(__dirname, `fixtures/a/generated.yaml`)],
     branch: `ns/project/overlay/namespace`,
     namespace: 'namespace',
+    service: 'a',
     project: 'project',
     destinationRepository: 'octocat/manifests',
     overwrite: false,
   })
 
   expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
-  expect(await readContent(path.join(workspace, `applications/namespace--b.yaml`))).toBe(applicationB)
   expect(await readContent(path.join(workspace, `services/a/generated.yaml`))).toBe(
     await readContent(path.join(__dirname, `fixtures/a/generated.yaml`))
-  )
-  expect(await readContent(path.join(workspace, `services/b/generated.yaml`))).toBe(
-    await readContent(path.join(__dirname, `fixtures/b/generated.yaml`))
   )
 })
 
@@ -41,9 +37,9 @@ test('do not overwrite if a file exists', async () => {
   await arrangeManifests({
     workspace,
     manifests: [path.join(__dirname, `fixtures/a/generated.yaml`), path.join(__dirname, `fixtures/b/generated.yaml`)],
-    manifestsPattern: new PathVariablesPattern(`${__dirname}/fixtures/\${service}/**`),
     branch: `ns/project/overlay/namespace`,
     namespace: 'namespace',
+    service: new PathVariablesPattern(`${__dirname}/fixtures/\${service}/**`),
     project: 'project',
     destinationRepository: 'octocat/manifests',
     overwrite: false,
@@ -70,9 +66,9 @@ test('overwrite event if a file exists', async () => {
   await arrangeManifests({
     workspace,
     manifests: [path.join(__dirname, `fixtures/a/generated.yaml`), path.join(__dirname, `fixtures/b/generated.yaml`)],
-    manifestsPattern: new PathVariablesPattern(`${__dirname}/fixtures/\${service}/**`),
     branch: `ns/project/overlay/namespace`,
     namespace: 'namespace',
+    service: new PathVariablesPattern(`${__dirname}/fixtures/\${service}/**`),
     project: 'project',
     destinationRepository: 'octocat/manifests',
     overwrite: true,

@@ -5,26 +5,39 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as git from './git'
 import * as glob from '@actions/glob'
-import { arrangeManifests } from './arrange'
+import { arrangeManifests, Service } from './arrange'
 import { PathVariablesPattern } from './match'
 
 type Inputs = {
   manifests: string
-  manifestsPattern: string
+  manifestsPattern?: string
   overlay: string
   namespace: string
+  service?: string
   destinationRepository: string
   overwrite: boolean
   token: string
 }
 
+const parseService = (inputs: Inputs): Service => {
+  if (inputs.manifestsPattern !== undefined) {
+    return new PathVariablesPattern(inputs.manifestsPattern)
+  } else if (inputs.service !== undefined) {
+    return inputs.service
+  } else {
+    throw new Error(`either service or manifests-pattern must be set`)
+  }
+}
+
 export const run = async (inputs: Inputs): Promise<void> => {
-  const manifests = await (await glob.create(inputs.manifests, { matchDirectories: false })).glob()
+  const service = parseService(inputs)
+  const globber = await glob.create(inputs.manifests, { matchDirectories: false })
+  const manifests = await globber.glob()
 
   const maxRetry = 3
   const waitMs = 3000
   for (let i = 0; i < maxRetry; i++) {
-    if (await push(manifests, inputs)) {
+    if (await push(manifests, service, inputs)) {
       return
     }
     core.warning(`fast-forward failed, retrying after ${waitMs}ms`)
@@ -33,7 +46,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
   throw new Error(`fast-forward failed ${maxRetry} times`)
 }
 
-const push = async (manifests: string[], inputs: Inputs): Promise<boolean> => {
+const push = async (manifests: string[], service: Service, inputs: Inputs): Promise<boolean> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-service-action-'))
   core.info(`created workspace at ${workspace}`)
 
@@ -50,7 +63,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<boolean> => {
   await arrangeManifests({
     workspace,
     manifests,
-    manifestsPattern: new PathVariablesPattern(inputs.manifestsPattern),
+    service,
     namespace: inputs.namespace,
     project,
     branch,
