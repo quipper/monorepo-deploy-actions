@@ -1,19 +1,6 @@
 import { promises as fs } from 'fs'
 import * as os from 'os'
-import { resolve, resolveAsTemporaryFile, resolveInplace } from '../src/resolve'
-
-test('the placeholder is replaced with the current version id', async () => {
-  const manager = { getCurrentVersionId: jest.fn() }
-  manager.getCurrentVersionId.mockResolvedValue('c7ea50c5-b2be-4970-bf90-2237bef3b4cf')
-
-  const outputPath = await resolveAsTemporaryFile(
-    `${__dirname}/fixtures/input-with-awssecret-placeholder.yaml`,
-    manager
-  )
-  const output = (await fs.readFile(outputPath)).toString()
-  const expected = (await fs.readFile(`${__dirname}/fixtures/expected-with-awssecret-placeholder.yaml`)).toString()
-  expect(output).toBe(expected)
-})
+import { resolve, resolveInplace } from '../src/resolve'
 
 test('the placeholder is replaced with the current version id by in-place', async () => {
   const manager = { getCurrentVersionId: jest.fn() }
