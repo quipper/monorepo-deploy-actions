@@ -1,0 +1,24 @@
+name: git-push-namespace
+description: push manifest(s) to deploy namespace
+inputs:
+  overlay:
+    description: overlay name
+    required: true
+  namespace:
+    description: namespace name
+    required: true
+  destination-repository:
+    description: destination repository
+    required: true
+    default: ${{ github.repository }}
+  destination-branch:
+    description: destination branch
+    required: true
+    default: main
+  token:
+    description: GitHub token
+    required: true
+    default: ${{ github.token }}
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
