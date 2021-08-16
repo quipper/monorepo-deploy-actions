@@ -1,26 +1,9 @@
-import * as os from 'os'
 import { promises as fs } from 'fs'
 import * as core from '@actions/core'
 import * as yaml from 'js-yaml'
 
 interface AWSSecretsManager {
   getCurrentVersionId(secretId: string): Promise<string>
-}
-
-// resolve placeholders of AWSSecret to the current version IDs and write the result to a temporary file
-export const resolveAsTemporaryFile = async (
-  inputManifestPath: string,
-  manager: AWSSecretsManager
-): Promise<string> => {
-  core.info(`reading ${inputManifestPath}`)
-  const inputManifest = (await fs.readFile(inputManifestPath)).toString()
-  const outputManifest = await resolve(inputManifest, manager)
-
-  const tempdir = await fs.mkdtemp(`${os.tmpdir()}/resolve-aws-secret-version-action-`)
-  const outputManifestPath = `${tempdir}/resolved.yaml`
-  core.info(`writing to ${outputManifestPath}`)
-  await fs.writeFile(outputManifestPath, outputManifest, { encoding: 'utf-8' })
-  return outputManifestPath
 }
 
 // resolve placeholders of AWSSecret to the current version IDs and write in-place

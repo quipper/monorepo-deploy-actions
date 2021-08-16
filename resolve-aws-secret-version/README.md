@@ -9,7 +9,6 @@ It is designed for https://github.com/mumoshu/aws-secret-operator.
 Name | Type | Description
 -----|------|------------
 `manifests` | multiline string | Glob pattern(s) to manifest(s)
-`write-in-place` | boolean | Default to `true`. If set to `false`, this action writes a resolved manifest to a temporary file
 
 
 ## Example
@@ -63,7 +62,7 @@ Here are some rules:
 - If a manifest does not contain any `AWSSecret`, do nothing
 - If `versionId` field is not placeholder in form of `${...}`, it is ignored
 
-Finally this action writes the below manifest to a temporary file:
+Finally this action writes the below manifest:
 
 ```yaml
 apiVersion: apps/v1

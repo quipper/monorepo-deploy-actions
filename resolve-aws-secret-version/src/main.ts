@@ -4,10 +4,8 @@ import { run } from './run'
 async function main(): Promise<void> {
   const inputs = {
     manifests: core.getInput('manifests', { required: true }),
-    writeInPlace: core.getBooleanInput('write-in-place', { required: true }),
   }
-  const outputs = await run(inputs)
-  core.setOutput('path', outputs.manifestPaths.join('\n'))
+  await run(inputs)
 }
 
 main().catch((error) => core.setFailed(error))
