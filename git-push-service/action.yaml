@@ -19,7 +19,6 @@ inputs:
   destination-repository:
     description: destination repository
     required: true
-    default: ${{ github.repository }}
   overwrite:
     description: overwrite manifest(s) if it exists
     required: true

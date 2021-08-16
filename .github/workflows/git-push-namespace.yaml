@@ -48,6 +48,7 @@ jobs:
         with:
           overlay: ${{ steps.config.outputs.overlay }}
           namespace: ${{ steps.config.outputs.namespace }}
+          destination-repository: ${{ github.repository }}
           destination-branch: e2e-test-fixture/${{ steps.config.outputs.namespace }}
 
       - uses: actions/checkout@v2
