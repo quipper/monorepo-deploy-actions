@@ -60,7 +60,7 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
   core.endGroup()
 
   core.startGroup(`arrange manifests into workspace ${workspace}`)
-  await arrangeManifests({
+  const services = await arrangeManifests({
     workspace,
     manifests,
     service,
@@ -78,11 +78,18 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
     return true
   }
   return await core.group(`push branch ${branch}`, async () => {
-    const message = `Create namespace ${inputs.namespace}\n\n${commitMessageFooter}`
+    const message = `${commitMessage(inputs.namespace, services)}\n\n${commitMessageFooter}`
     await git.commit(workspace, message)
     const code = await git.pushByFastForward(workspace, branch)
     return code === 0
   })
+}
+
+const commitMessage = (namespace: string, services: string[]) => {
+  if (services.length === 1) {
+    return `Add service ${namespace}/${services[0]}`
+  }
+  return `Add ${services.length} services to namespace ${namespace}`
 }
 
 const commitMessageFooter = [
