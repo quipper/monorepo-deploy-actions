@@ -16,11 +16,11 @@ interface Inputs {
 
 export const run = async (inputs: Inputs): Promise<void> => {
   const maxRetry = 3
-  const waitMs = 3000
   for (let i = 0; i < maxRetry; i++) {
     if (await push(inputs)) {
       return
     }
+    const waitMs = Math.floor(5000 * Math.random())
     core.warning(`fast-forward failed, retrying after ${waitMs}ms`)
     await new Promise((resolve) => setTimeout(resolve, waitMs))
   }
