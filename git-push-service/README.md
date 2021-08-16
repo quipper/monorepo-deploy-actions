@@ -11,9 +11,12 @@ Name | Type | Description
 `manifests-pattern` | string | Path pattern to determine a service name
 `overlay` | string | Name of overlay
 `namespace` | string | Name of namespace
+`service` | string | Name of service
 `destination-repository` | string | Destination repository (default to `github.repository`)
 `overwrite` | boolean | Overwrite manifest(s) if it exists (default to true)
 `token` | string | GitHub token (default to `github.token`)
+
+Either `service` or `manifests-pattern` must be set.
 
 
 ## Getting Started
@@ -52,6 +55,25 @@ To build and push a manifest of service:
         id: kustomize
         with:
           kustomization: foo/kubernetes/overlays/develop/kustomization.yaml
+      - uses: quipper/monorepo-deploy-actions/git-push-service@v1
+        with:
+          manifests: ${{ steps.kustomize.outputs.directory }}/**
+          overlay: develop
+          namespace: develop
+          service: foo
+```
+
+
+### Deploy multiple services
+
+To build and push multiple manifests of services:
+
+```yaml
+    steps:
+      - uses: int128/kustomize-action@v1
+        id: kustomize
+        with:
+          kustomization: '*/kubernetes/overlays/develop/kustomization.yaml'
       - uses: quipper/monorepo-deploy-actions/git-push-service@v1
         with:
           manifests: ${{ steps.kustomize.outputs.directory }}/**

@@ -8,24 +8,22 @@ import { PathVariablesPattern } from './match'
 type Inputs = {
   workspace: string
   manifests: string[]
-  manifestsPattern: PathVariablesPattern
   namespace: string
+  service: Service
   project: string
   branch: string
   destinationRepository: string
   overwrite: boolean
 }
 
+export type Service = PathVariablesPattern | string
+
 export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
   await io.mkdirP(`${inputs.workspace}/applications`)
 
   for (const f of inputs.manifests) {
-    // infer the service name from path
-    const service = inputs.manifestsPattern.match(f).get('service')
-    if (service === undefined) {
-      throw new Error(`could not determine service name from path ${f}`)
-    }
-    core.info(`service ${service}`)
+    const service = inferServiceFromPath(f, inputs.service)
+    core.info(`add service ${service}`)
 
     await copyGeneratedManifest(f, inputs.workspace, service, inputs.overwrite)
 
@@ -46,6 +44,17 @@ export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
       inputs.overwrite
     )
   }
+}
+
+const inferServiceFromPath = (f: string, s: Service): string => {
+  if (typeof s === 'string') {
+    return s
+  }
+  const n = s.match(f).get('service')
+  if (n === undefined) {
+    throw new Error(`could not determine service name from path ${f}`)
+  }
+  return n
 }
 
 const copyGeneratedManifest = async (source: string, workspace: string, service: string, overwrite: boolean) => {
