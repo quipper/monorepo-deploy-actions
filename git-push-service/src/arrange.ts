@@ -18,12 +18,14 @@ type Inputs = {
 
 export type Service = PathVariablesPattern | string
 
-export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
+export const arrangeManifests = async (inputs: Inputs): Promise<string[]> => {
   await io.mkdirP(`${inputs.workspace}/applications`)
 
+  const services = new Set<string>()
   for (const f of inputs.manifests) {
     const service = inferServiceFromPath(f, inputs.service)
     core.info(`add service ${service}`)
+    services.add(service)
 
     await copyGeneratedManifest(f, inputs.workspace, service, inputs.overwrite)
 
@@ -44,6 +46,7 @@ export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
       inputs.overwrite
     )
   }
+  return [...services]
 }
 
 const inferServiceFromPath = (f: string, s: Service): string => {
