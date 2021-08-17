@@ -1,0 +1,57 @@
+name: git-delete-namespace-application
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - git-delete-namespace-application/**
+      - '*.json'
+      - .github/workflows/git-delete-namespace-application.yaml
+  pull_request:
+    branches: [main]
+    paths:
+      - git-delete-namespace-application/**
+      - '*.json'
+      - .github/workflows/git-delete-namespace-application.yaml
+
+jobs:
+  ts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: git-delete-namespace-application
+    steps:
+      - uses: actions/checkout@v2
+      - id: yarn-cache-dir
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.yarn-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn
+      - run: yarn lint
+      - run: yarn format-check
+      - run: yarn test
+      - run: yarn build
+      - run: yarn package
+
+      - run: bash e2e-test-setup.sh
+      - uses: ./git-delete-namespace-application
+        id: retain
+        with:
+          retain-pull-request-numbers: |
+            100
+            102
+          overlay: staging
+          namespace-prefix: pr-
+          destination-repository: ${{ github.repository }}
+          destination-branch: e2e-test-fixture-${{ github.run_id }}
+      - run: test "${{ steps.retain.outputs.deleted-pull-request-numbers }}" -eq 101
+      - name: Clean up the branch
+        continue-on-error: true
+        if: always()
+        run: |
+          git push origin --delete refs/heads/e2e-test-fixture-${{ github.run_id }}
