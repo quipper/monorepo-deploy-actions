@@ -8,14 +8,10 @@ jest.mock('aws-sdk', () => ({
   SecretsManager: jest.fn(() => secretsManagerMock),
 }))
 
-beforeEach(() => {
-  jest.clearAllMocks()
-})
-
 test('getCurrentVersionId returns the current version id', async () => {
   secretsManagerMock.listSecretVersionIds.mockReturnValue({
     // this is an actual payload of the command:
-    // $ aws secretsmanager list-secret-version-ids --secret-id tara-content/develop-tara
+    // $ aws secretsmanager list-secret-version-ids --secret-id microservice/develop
     // eslint-disable-next-line @typescript-eslint/require-await
     promise: async (): Promise<aws.SecretsManager.ListSecretVersionIdsResponse> => ({
       Versions: [
@@ -32,8 +28,8 @@ test('getCurrentVersionId returns the current version id', async () => {
           CreatedDate: new Date('2020-12-17T14:47:00.020000+09:00'),
         },
       ],
-      ARN: 'arn:aws:secretsmanager:ap-northeast-1:123456789012:secret:tara-content/develop-tara-3zcyRx',
-      Name: 'tara-content/develop-tara',
+      ARN: 'arn:aws:secretsmanager:ap-northeast-1:123456789012:secret:microservice/develop-3zcyRx',
+      Name: 'microservice/develop',
     }),
   })
 
