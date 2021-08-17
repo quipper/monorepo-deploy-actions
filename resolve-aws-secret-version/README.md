@@ -33,7 +33,7 @@ When the below manifest is given,
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-service
+  name: microservice
 spec:
   template:
     spec:
@@ -41,16 +41,16 @@ spec:
         - image: nginx
           envFrom:
             - secretRef:
-                name: my-service-${AWS_SECRETS_MANAGER_VERSION_ID}
+                name: microservice-${AWS_SECRETS_MANAGER_VERSION_ID}
 ---
 apiVersion: mumoshu.github.io/v1alpha1
 kind: AWSSecret
 metadata:
-  name: my-service-${AWS_SECRETS_MANAGER_VERSION_ID}
+  name: microservice-${AWS_SECRETS_MANAGER_VERSION_ID}
 spec:
   stringDataFrom:
     secretsManagerSecretRef:
-      secretId: my-service/develop
+      secretId: microservice/develop
       versionId: ${AWS_SECRETS_MANAGER_VERSION_ID}
 ```
 
@@ -68,7 +68,7 @@ Finally this action writes the below manifest:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-service
+  name: microservice
 spec:
   template:
     spec:
@@ -76,16 +76,16 @@ spec:
         - image: nginx
           envFrom:
             - secretRef:
-                name: my-service-c7ea50c5-b2be-4970-bf90-2237bef3b4cf
+                name: microservice-c7ea50c5-b2be-4970-bf90-2237bef3b4cf
 ---
 apiVersion: mumoshu.github.io/v1alpha1
 kind: AWSSecret
 metadata:
-  name: my-service-c7ea50c5-b2be-4970-bf90-2237bef3b4cf
+  name: microservice-c7ea50c5-b2be-4970-bf90-2237bef3b4cf
 spec:
   stringDataFrom:
     secretsManagerSecretRef:
-      secretId: my-service/develop
+      secretId: microservice/develop
       versionId: c7ea50c5-b2be-4970-bf90-2237bef3b4cf
 ```
 
