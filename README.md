@@ -3,6 +3,95 @@
 This is a set of GitHub Actions to deploy microservices in a mono-repository (monorepo).
 
 
+## Motivation
+
+TODO
+
+
+## Design
+
+### Concept
+
+This assumes that a monorepo contains a set of microservices including Kubernetes manifests, for example,
+
+```
+monorepo
+├── backend
+|   ├── sources...
+|   └── kubernetes
+|       ├── base
+|       └── overlays
+|           ├── develop
+|           |   └── kustomization.yaml
+|           └── staging
+|               └── kustomization.yaml
+├── frontend
+|   ├── sources...
+|   └── kubernetes
+|       └── overlays
+|           └── ...
+└── ...
+```
+
+We deploy a set of services from a branch to a namespace.
+For example,
+
+- `develop` branch is deployed using `develop` overlay to `develop` namespace
+- A pull request is deployed using `staging` overlay to an ephemeral namespace like `pr-12345`
+
+Consequently, a structure of monorepo is below.
+
+```
+monorepo
+└── ${service}
+    └── kubernetes
+        └── overlays
+            └── ${overlay}
+                └── kustomization.yaml
+```
+
+Glossary:
+
+- `overlay` represents a manifest to deploy to namespace(s), e.g. `staging`
+- `namespace` represents a namespace in Kubernetes cluster
+- `service` represents a name of microservice, e.g., `backend` or `frontend`
+
+
+### Destination repository
+
+This stores a set of generated manifests into a repository.
+
+It adopts [App of Apps pattern of Argo CD](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/) for deployment of multiple namespaces:
+
+```
+${source-repository-name}  (Application)
+└── ${overlay}  (Application)
+    └── ${namespace}  (Application)
+        └── ${service}  (Application)
+```
+
+It stores an Application manifest to a destination repository as follows:
+
+```
+destination-repository  (branch: main)
+└── ${source-repository-name}
+    └── ${overlay}
+        └── ${namespace}.yaml  (Application)
+```
+
+It also stores a set of generated manifest and Application manifest per a service as follows:
+
+```
+destination-repository  (branch: ns/${source-repository}/${overlay}/${namespace})
+├── applications
+|   └── ${namespace}--${service}.yaml  (Application)
+└── services
+    └── ${service}
+        └── generated.yaml
+```
+
+
+
 ## Actions
 
 | Name | Description | Status
