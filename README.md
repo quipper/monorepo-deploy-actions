@@ -8,11 +8,11 @@ This is a set of GitHub Actions to deploy microservices in a mono-repository (mo
 TODO
 
 
-## Design
+## Concept
 
-### Concept
+### Structure of monorepo
 
-This assumes that a monorepo contains a set of microservices including Kubernetes manifests, for example,
+In Quipper, our monorepo contains a set of microservices with Kubernetes manifests, for example,
 
 ```
 monorepo
@@ -33,13 +33,24 @@ monorepo
 └── ...
 ```
 
+We adopt this strcuture for the following advantages:
+
+- An owner of microservice (i.e. product team) has strong ownership for both application and manifest
+- We can change both application and manifest in a pull request
+
 We deploy a set of services from a branch to a namespace.
 For example,
 
-- `develop` branch is deployed using `develop` overlay to `develop` namespace
-- A pull request is deployed using `staging` overlay to an ephemeral namespace like `pr-12345`
+- When `develop` branch is pushed,
+    - Build a Docker image from `develop` branch
+    - Run kustomize build against `develop` overlay
+    - Deploy to `develop` namespace
+- When a pull request is created,
+    - Build a Docker image from head branch
+    - Run kustomize build against `staging` overlay
+    - Deploy to an ephemeral namespace like `pr-12345`
 
-Consequently, a structure of monorepo is below.
+Consequently, a structure of monorepo is like below.
 
 ```
 monorepo
@@ -50,18 +61,11 @@ monorepo
                 └── kustomization.yaml
 ```
 
-Glossary:
 
-- `overlay` represents a manifest to deploy to namespace(s), e.g. `staging`
-- `namespace` represents a namespace in Kubernetes cluster
-- `service` represents a name of microservice, e.g., `backend` or `frontend`
+### Structure of Argo CD Applications
 
-
-### Destination repository
-
-This stores a set of generated manifests into a repository.
-
-It adopts [App of Apps pattern of Argo CD](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/) for deployment of multiple namespaces:
+We adopt [App of Apps pattern of Argo CD](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/) for deployment hierarchy.
+To deploy multiple microservices (which are built from an overlay) to a namespace, we creates the following applications into Argo CD:
 
 ```
 ${source-repository-name}  (Application)
@@ -70,7 +74,22 @@ ${source-repository-name}  (Application)
         └── ${service}  (Application)
 ```
 
-It stores an Application manifest to a destination repository as follows:
+Here are the definitions of words.
+
+Name | Description | Example
+-----|-------------|--------
+`source-repository-name` | name of source repository | `monorepo`
+`overlay` | name of overlay to build with Kustomize | `staging`
+`namespace` | namespace to deploy into a cluster | `pr-12345`
+`service` | name of microservice | `backend` or `frontend`
+
+
+### Destination repository
+
+We stores generated manifests into a repository.
+Argo CD syncs between the repository and cluster.
+
+main branch of the repository contains Application manifests.
 
 ```
 destination-repository  (branch: main)
@@ -79,7 +98,7 @@ destination-repository  (branch: main)
         └── ${namespace}.yaml  (Application)
 ```
 
-It also stores a set of generated manifest and Application manifest per a service as follows:
+A namespace branch contains a set of generated manifest and Application manifest per a service.
 
 ```
 destination-repository  (branch: ns/${source-repository}/${overlay}/${namespace})
