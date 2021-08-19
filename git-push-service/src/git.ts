@@ -55,5 +55,5 @@ export const commit = async (cwd: string, message: string): Promise<void> => {
 }
 
 export const pushByFastForward = async (cwd: string, branch: string): Promise<number> => {
-  return await exec.exec('git', ['push', 'origin', `HEAD:${branch}`], { cwd, ignoreReturnCode: true })
+  return await exec.exec('git', ['push', 'origin', `HEAD:refs/heads/${branch}`], { cwd, ignoreReturnCode: true })
 }
