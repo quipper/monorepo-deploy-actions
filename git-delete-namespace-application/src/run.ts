@@ -21,7 +21,7 @@ type Outputs = {
 }
 
 export const run = async (inputs: Inputs): Promise<Outputs> => {
-  const maxRetry = 3
+  const maxRetry = 5
   for (let i = 0; i < maxRetry; i++) {
     // eventually fast-forward fails because another job updates the ref
     const result = await push(inputs)
@@ -29,7 +29,7 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
       return result
     }
 
-    const waitMs = Math.floor(5000 * Math.random())
+    const waitMs = Math.floor(10000 * Math.random())
     core.warning(`retry after ${waitMs}ms: ${result.message}`)
     await new Promise((resolve) => setTimeout(resolve, waitMs))
   }
