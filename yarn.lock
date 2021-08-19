@@ -24,7 +24,7 @@
     "@octokit/plugin-paginate-rest" "^2.13.3"
     "@octokit/plugin-rest-endpoint-methods" "^5.1.1"
 
-"@actions/glob@^0.2.0":
+"@actions/glob@0.2.0", "@actions/glob@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@actions/glob/-/glob-0.2.0.tgz#38e939ebd7c18ded5b8eee642583875f195cae63"
   integrity sha512-mqE2a7I66kxcvsdwxs/filQwZsq25IfktMaviGfDB51v6Q3bvxnV7mFsZnvYtLhqGZbPxwBnH8AD3UYaOWb//w==
@@ -866,7 +866,7 @@
     jest-diff "^26.0.0"
     pretty-format "^26.0.0"
 
-"@types/js-yaml@^4.0.2":
+"@types/js-yaml@4.0.2":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-4.0.2.tgz#4117a7a378593a218e9d6f0ef44ce6d5d9edf7fa"
   integrity sha512-KbeHS/Y4R+k+5sWXEYzAZKuB1yQlZtEghuhRxrVRLaqhtoG5+26JwQsa4HyS3AWX8v1Uwukma5HheduUDskasA==
