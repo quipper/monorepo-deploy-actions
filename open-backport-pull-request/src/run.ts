@@ -15,6 +15,9 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const baseBranch = inputs.baseBranch
   const octokit = getOctokit(inputs.githubToken)
 
+  core.setOutput('base-branch', baseBranch)
+  core.setOutput('head-branch', headBranch)
+
   if (await hasDiff({ headBranch, baseBranch, octokit, context })) {
     const pullRequestUrl = await openPullRequest({
       headBranch,

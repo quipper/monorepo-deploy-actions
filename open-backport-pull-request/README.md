@@ -41,5 +41,7 @@ jobs:
 ## Outputs
 
 | Name               | Description
-|--------------------|-------------------------------
+|--------------------|--------------------------------------------
 | `pull-request-url` | URL of the opened Pull Request
+| `base-branch`      | The base branch of the opened Pull Request 
+| `head-branch`      | The head branch of the opened Pull Request
