@@ -39,6 +39,8 @@ jobs:
       - run: yarn package
 
       - run: bash e2e-test-setup.sh
+        env:
+          BRANCH_NAME: e2e/git-delete-namespace-application/${{ github.run_number }}
       - uses: ./git-delete-namespace-application
         id: retain
         with:
@@ -48,10 +50,10 @@ jobs:
           overlay: staging
           namespace-prefix: pr-
           destination-repository: ${{ github.repository }}
-          destination-branch: e2e-test-fixture-${{ github.run_id }}
+          destination-branch: e2e/git-delete-namespace-application/${{ github.run_number }}
       - run: test "${{ steps.retain.outputs.deleted-pull-request-numbers }}" -eq 101
       - name: Clean up the branch
         continue-on-error: true
         if: always()
         run: |
-          git push origin --delete refs/heads/e2e-test-fixture-${{ github.run_id }}
+          git push origin --delete refs/heads/e2e/git-delete-namespace-application/${{ github.run_number }}

@@ -14,4 +14,4 @@ git add .
 git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 git config user.name 'github-actions[bot]'
 git commit -m "e2e-test-fixture for ${GITHUB_REF}"
-git push origin "HEAD:refs/heads/e2e-test-fixture-${GITHUB_RUN_ID}"
+git push origin "HEAD:refs/heads/${BRANCH_NAME}"
