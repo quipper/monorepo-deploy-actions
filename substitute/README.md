@@ -46,7 +46,7 @@ A path variable key must be alphabet, number or underscore, i.e. `a-zA-Z0-9_`.
 
 For example, when the following file is given,
 
-If you set `path-patterns`, this action tests each manifest path and sets the path variable(s).
+If you set `path-variables-pattern`, this action tests each manifest path and sets the path variable(s).
 You can use the path variable(s) in `variables`.
 
 finally path variable `service` is set to `foo`.
