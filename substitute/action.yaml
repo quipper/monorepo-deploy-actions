@@ -4,7 +4,7 @@ inputs:
   files:
     description: glob pattern(s) to file(s) in form of multiline string
     required: true
-  path-patterns:
+  path-variables-pattern:
     description: path variable(s) pattern
     required: false
   variables:
