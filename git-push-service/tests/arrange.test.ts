@@ -14,6 +14,7 @@ test('arrange a manifest', async () => {
     namespace: 'namespace',
     service: 'a',
     project: 'project',
+    applicationAnnotations: ['github.ref=refs/heads/main'],
     destinationRepository: 'octocat/manifests',
     overwrite: false,
   })
@@ -41,6 +42,7 @@ test('do not overwrite if a file exists', async () => {
     namespace: 'namespace',
     service: new PathVariablesPattern(`${__dirname}/fixtures/\${service}/**`),
     project: 'project',
+    applicationAnnotations: ['github.ref=refs/heads/main'],
     destinationRepository: 'octocat/manifests',
     overwrite: false,
   })
@@ -70,6 +72,7 @@ test('overwrite event if a file exists', async () => {
     namespace: 'namespace',
     service: new PathVariablesPattern(`${__dirname}/fixtures/\${service}/**`),
     project: 'project',
+    applicationAnnotations: ['github.ref=refs/heads/main'],
     destinationRepository: 'octocat/manifests',
     overwrite: true,
   })
@@ -94,6 +97,8 @@ metadata:
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+  annotations:
+    github.ref: refs/heads/main
 spec:
   project: project
   source:
@@ -116,6 +121,8 @@ metadata:
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+  annotations:
+    github.ref: refs/heads/main
 spec:
   project: project
   source:

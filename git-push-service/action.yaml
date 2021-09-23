@@ -16,6 +16,9 @@ inputs:
   service:
     description: service name
     required: false
+  application-annotations:
+    description: annotations of application in form of NAME=VALUE
+    required: false
   destination-repository:
     description: destination repository
     required: true

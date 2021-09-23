@@ -12,6 +12,7 @@ type Inputs = {
   service: Service
   project: string
   branch: string
+  applicationAnnotations: string[]
   destinationRepository: string
   overwrite: boolean
 }
@@ -41,6 +42,7 @@ export const arrangeManifests = async (inputs: Inputs): Promise<string[]> => {
         destination: {
           namespace: inputs.namespace,
         },
+        annotations: inputs.applicationAnnotations,
       },
       inputs.workspace,
       inputs.overwrite
