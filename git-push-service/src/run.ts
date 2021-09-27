@@ -14,6 +14,7 @@ type Inputs = {
   overlay: string
   namespace: string
   service?: string
+  applicationAnnotations: string[]
   destinationRepository: string
   overwrite: boolean
   token: string
@@ -67,6 +68,7 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
     namespace: inputs.namespace,
     project,
     branch,
+    applicationAnnotations: inputs.applicationAnnotations,
     destinationRepository: inputs.destinationRepository,
     overwrite: inputs.overwrite,
   })

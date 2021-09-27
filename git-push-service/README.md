@@ -12,6 +12,7 @@ Name | Type | Description
 `overlay` | string | Name of overlay
 `namespace` | string | Name of namespace
 `service` | string | Name of service
+`application-annotations` | multiline string | Annotations to add to an Application (default to empty)
 `destination-repository` | string | Destination repository
 `overwrite` | boolean | Overwrite manifest(s) if it exists (default to true)
 `token` | string | GitHub token (default to `github.token`)
@@ -37,6 +38,7 @@ It generates an `Application` manifest with the following properties:
 - metadata
   - name: `${namespace}--${service}`
   - namespace: `argocd`
+  - annotations: if given
 - source
   - repoURL: `https://github.com/${destination-repository}.git`
   - targetRevision: `ns/${project}/${overlay}/${namespace}`
