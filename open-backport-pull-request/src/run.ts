@@ -73,11 +73,16 @@ const openPullRequest = async (params: openPullRequestParams): Promise<string | 
   } catch (err) {
     console.error(err)
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    if (typeof err === 'object' && err.status === 422) {
+    if (isUnprocessableEntityError(err)) {
       core.warning('Pull Request already exists')
     } else {
       core.error('Unknown failure: ${err.message}')
     }
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isUnprocessableEntityError = (err: any): boolean => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  return typeof err === 'object' && 'status' in err && err.status === 422
 }
