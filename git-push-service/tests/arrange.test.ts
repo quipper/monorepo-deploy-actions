@@ -49,15 +49,17 @@ test('do not overwrite if a file exists', async () => {
     overwrite: false,
   })
 
-  expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe('dummy-application-manifest')
+  // application manifest is always overwritten
+  expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
   expect(await readContent(path.join(workspace, `applications/namespace--b.yaml`))).toBe(applicationB)
+  // generated manifest is not overwritten
   expect(await readContent(path.join(workspace, `services/a/generated.yaml`))).toBe('dummy-generated-manifest')
   expect(await readContent(path.join(workspace, `services/b/generated.yaml`))).toBe(
     await readContent(path.join(__dirname, `fixtures/b/generated.yaml`))
   )
 })
 
-test('overwrite event if a file exists', async () => {
+test('overwrite even if a file exists', async () => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-action-'))
 
   // put dummy files

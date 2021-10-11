@@ -36,6 +36,8 @@ export const arrangeManifests = async (inputs: Inputs): Promise<string[]> => {
 
     await copyGeneratedManifest(f, `${inputs.workspace}/${generatedManifestPath}`, inputs.overwrite)
 
+    // Always overwrite an application manifest.
+    // When a pull request is updated, an application manifest already exists and needs to be updated to the new sha.
     await putApplicationManifest(
       {
         name: `${inputs.namespace}--${service}`,
@@ -50,8 +52,7 @@ export const arrangeManifests = async (inputs: Inputs): Promise<string[]> => {
         },
         annotations: inputs.applicationAnnotations,
       },
-      inputs.workspace,
-      inputs.overwrite
+      inputs.workspace
     )
   }
   return [...services]
@@ -78,12 +79,8 @@ const copyGeneratedManifest = async (source: string, destinationDir: string, ove
   await io.cp(source, destination)
 }
 
-const putApplicationManifest = async (application: Application, workspace: string, overwrite: boolean) => {
+const putApplicationManifest = async (application: Application, workspace: string) => {
   const destination = `${workspace}/applications/${application.name}.yaml`
-  if (!overwrite && (await exists(destination))) {
-    core.info(`application manifest already exists at ${destination}`)
-    return
-  }
   core.info(`writing to ${destination}`)
   const content = generateApplicationManifest(application)
   await fs.writeFile(destination, content)
