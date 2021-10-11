@@ -4,6 +4,8 @@ import * as path from 'path'
 import { arrangeManifests } from '../src/arrange'
 import { PathVariablesPattern } from '../src/match'
 
+const readContent = async (f: string) => (await fs.readFile(f)).toString()
+
 test('arrange a manifest', async () => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-action-'))
 
@@ -87,8 +89,6 @@ test('overwrite event if a file exists', async () => {
   )
 })
 
-const readContent = async (f: string) => (await fs.readFile(f)).toString()
-
 const applicationA = `\
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -136,3 +136,49 @@ spec:
     automated:
       prune: true
 `
+
+describe('transient namespace', () => {
+  test('arrange a manifest', async () => {
+    const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-action-'))
+
+    await arrangeManifests({
+      workspace,
+      manifests: [path.join(__dirname, `fixtures/a/generated.yaml`)],
+      branch: `ns/project/overlay/namespace`,
+      namespace: 'namespace',
+      service: 'a',
+      project: 'project',
+      applicationAnnotations: [],
+      destinationRepository: 'octocat/manifests',
+      overwrite: false,
+      transient: { sha: '0123456789abcdef0123456789abcdef01234567' },
+    })
+
+    expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
+    expect(
+      await readContent(path.join(workspace, `sha/0123456789abcdef0123456789abcdef01234567/services/a/generated.yaml`))
+    ).toBe(await readContent(path.join(__dirname, `fixtures/a/generated.yaml`)))
+  })
+
+  const applicationA = `\
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: namespace--a
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: project
+  source:
+    repoURL: https://github.com/octocat/manifests.git
+    targetRevision: ns/project/overlay/namespace
+    path: sha/0123456789abcdef0123456789abcdef01234567/services/a
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: namespace
+  syncPolicy:
+    automated:
+      prune: true
+`
+})

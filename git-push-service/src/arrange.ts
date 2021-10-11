@@ -15,9 +15,12 @@ type Inputs = {
   applicationAnnotations: string[]
   destinationRepository: string
   overwrite: boolean
+  transient?: Transient
 }
 
 export type Service = PathVariablesPattern | string
+
+export type Transient = { sha: string }
 
 export const arrangeManifests = async (inputs: Inputs): Promise<string[]> => {
   await io.mkdirP(`${inputs.workspace}/applications`)
@@ -28,7 +31,10 @@ export const arrangeManifests = async (inputs: Inputs): Promise<string[]> => {
     core.info(`add service ${service}`)
     services.add(service)
 
-    await copyGeneratedManifest(f, inputs.workspace, service, inputs.overwrite)
+    const generatedManifestPath =
+      inputs.transient !== undefined ? `sha/${inputs.transient.sha}/services/${service}` : `services/${service}`
+
+    await copyGeneratedManifest(f, `${inputs.workspace}/${generatedManifestPath}`, inputs.overwrite)
 
     await putApplicationManifest(
       {
@@ -37,7 +43,7 @@ export const arrangeManifests = async (inputs: Inputs): Promise<string[]> => {
         source: {
           repository: inputs.destinationRepository,
           branch: inputs.branch,
-          path: `services/${service}`,
+          path: generatedManifestPath,
         },
         destination: {
           namespace: inputs.namespace,
@@ -62,13 +68,13 @@ const inferServiceFromPath = (f: string, s: Service): string => {
   return n
 }
 
-const copyGeneratedManifest = async (source: string, workspace: string, service: string, overwrite: boolean) => {
-  const destination = `${workspace}/services/${service}/${path.basename(source)}`
+const copyGeneratedManifest = async (source: string, destinationDir: string, overwrite: boolean) => {
+  const destination = `${destinationDir}/${path.basename(source)}`
   if (!overwrite && (await exists(destination))) {
     core.info(`generated manifest already exists at ${destination}`)
     return
   }
-  await io.mkdirP(`${workspace}/services/${service}`)
+  await io.mkdirP(destinationDir)
   await io.cp(source, destination)
 }
 

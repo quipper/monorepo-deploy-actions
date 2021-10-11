@@ -17,6 +17,8 @@ type Inputs = {
   applicationAnnotations: string[]
   destinationRepository: string
   overwrite: boolean
+  transient: boolean
+  prebuilt: boolean
   token: string
 }
 
@@ -53,12 +55,19 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
 
   const [owner, repo] = inputs.destinationRepository.split('/')
   const project = github.context.repo.repo
-  const branch = `ns/${project}/${inputs.overlay}/${inputs.namespace}`
+  const branch = inputs.prebuilt
+    ? `ns/${project}/${inputs.overlay}/prebuilt/${github.context.ref}`
+    : `ns/${project}/${inputs.overlay}/${inputs.namespace}`
 
   core.startGroup(`checkout branch ${branch} if exist`)
   await git.init(workspace, owner, repo, inputs.token)
   await git.checkoutIfExist(workspace, branch)
   core.endGroup()
+
+  let transient
+  if (inputs.transient) {
+    transient = { sha: github.context.sha }
+  }
 
   core.startGroup(`arrange manifests into workspace ${workspace}`)
   const services = await arrangeManifests({
@@ -71,6 +80,7 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
     applicationAnnotations: inputs.applicationAnnotations,
     destinationRepository: inputs.destinationRepository,
     overwrite: inputs.overwrite,
+    transient,
   })
   core.endGroup()
 
