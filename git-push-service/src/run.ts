@@ -68,6 +68,11 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
   if (inputs.transient) {
     transient = { sha: github.context.sha }
   }
+  const applicationAnnotations = [
+    ...inputs.applicationAnnotations,
+    `github.ref=${github.context.ref}`,
+    `github.sha=${github.context.sha}`,
+  ]
 
   core.startGroup(`arrange manifests into workspace ${workspace}`)
   const services = await arrangeManifests({
@@ -77,7 +82,7 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
     namespace: inputs.namespace,
     project,
     branch,
-    applicationAnnotations: inputs.applicationAnnotations,
+    applicationAnnotations,
     destinationRepository: inputs.destinationRepository,
     overwrite: inputs.overwrite,
     transient,
