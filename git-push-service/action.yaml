@@ -26,6 +26,14 @@ inputs:
     description: overwrite manifest(s) if it exists
     required: true
     default: 'true'
+  transient:
+    description: prepend sha to the generated manifest path
+    required: true
+    default: 'false'
+  prebuilt:
+    description: push prebuilt manifest
+    required: true
+    default: 'false'
   token:
     description: GitHub token
     required: true
