@@ -58,7 +58,7 @@ const push = async (inputs: Inputs): Promise<Outputs | Error> => {
     return { deletedPullRequestNumbers: [] }
   }
   return await core.group(`push branch ${inputs.destinationBranch}`, async () => {
-    const message = `Delete ${deletedPullRequestNumbers.length} applications\n\n${commitMessageFooter}`
+    const message = `git-delete-namespace-application: delete ${deletedPullRequestNumbers.length} applications\n\n${commitMessageFooter}`
     await git.commit(workspace, message)
 
     if (inputs.dryRun) {
