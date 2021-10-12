@@ -17,7 +17,6 @@ type Inputs = {
   applicationAnnotations: string[]
   destinationRepository: string
   overwrite: boolean
-  transient: boolean
   prebuilt: boolean
   token: string
 }
@@ -64,10 +63,6 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
   await git.checkoutIfExist(workspace, branch)
   core.endGroup()
 
-  let transient
-  if (inputs.transient) {
-    transient = { sha: github.context.sha }
-  }
   const applicationAnnotations = [
     ...inputs.applicationAnnotations,
     `github.ref=${github.context.ref}`,
@@ -85,7 +80,6 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
     applicationAnnotations,
     destinationRepository: inputs.destinationRepository,
     overwrite: inputs.overwrite,
-    transient,
   })
   core.endGroup()
 

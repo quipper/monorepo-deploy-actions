@@ -15,12 +15,9 @@ type Inputs = {
   applicationAnnotations: string[]
   destinationRepository: string
   overwrite: boolean
-  transient?: Transient
 }
 
 export type Service = PathVariablesPattern | string
-
-export type Transient = { sha: string }
 
 export const arrangeManifests = async (inputs: Inputs): Promise<string[]> => {
   await io.mkdirP(`${inputs.workspace}/applications`)
@@ -31,8 +28,7 @@ export const arrangeManifests = async (inputs: Inputs): Promise<string[]> => {
     core.info(`add service ${service}`)
     services.add(service)
 
-    const generatedManifestPath =
-      inputs.transient !== undefined ? `sha/${inputs.transient.sha}/services/${service}` : `services/${service}`
+    const generatedManifestPath = `services/${service}`
 
     await copyGeneratedManifest(f, `${inputs.workspace}/${generatedManifestPath}`, inputs.overwrite)
 
