@@ -15,7 +15,6 @@ Name | Type | Description
 `application-annotations` | multiline string | Annotations to add to an Application (default to empty)
 `destination-repository` | string | Destination repository
 `overwrite` | boolean | Overwrite manifest(s) if it exists (default to true)
-`transient` | boolean | Prepend `github.sha` to the generated manifest path (default to false)
 `prebuilt` | boolean | Push prebuilt manifest (default to false)
 `token` | string | GitHub token (default to `github.token`)
 
@@ -124,7 +123,6 @@ jobs:
           overlay: pr
           namespace: pr-1
           service: foo
-          transient: true
           overwrite: false
 ```
 
@@ -136,11 +134,9 @@ This action pushes the following files into a destination repository:
 destination-repository (branch: ns/${project}/${overlay}/${namespace})
 ├── applications
 |   └── ${namespace}--${service}.yaml
-└── sha
-    └── ${sha}
-        └── services
-            └── ${service}
-                └── generated.yaml
+└── services
+    └── ${service}
+        └── generated.yaml
 ```
 
 It generates an `Application` manifest with the following properties:
@@ -152,7 +148,7 @@ It generates an `Application` manifest with the following properties:
 - source
   - repoURL: `https://github.com/${destination-repository}.git`
   - targetRevision: `ns/${project}/${overlay}/${namespace}`
-  - path: `sha/${sha}/services/${service}`
+  - path: `services/${service}`
 - destination
   - namespace: `${namespace}`
 
@@ -173,7 +169,6 @@ To push a manifest:
           overlay: pr
           namespace: pr-1
           service: foo
-          transient: true
 ```
 
 This action pushes the following files into a destination repository:
@@ -182,11 +177,9 @@ This action pushes the following files into a destination repository:
 destination-repository (branch: ns/${project}/${overlay}/${namespace})
 ├── applications
 |   └── ${namespace}--${service}.yaml
-└── sha
-    └── ${sha}
-        └── services
-            └── ${service}
-                └── generated.yaml
+└── services
+    └── ${service}
+        └── generated.yaml
 ```
 
 It generates an `Application` manifest with the following properties:
@@ -198,6 +191,6 @@ It generates an `Application` manifest with the following properties:
 - source
   - repoURL: `https://github.com/${destination-repository}.git`
   - targetRevision: `ns/${project}/${overlay}/${namespace}`
-  - path: `sha/${sha}/services/${service}`
+  - path: `services/${service}`
 - destination
   - namespace: `${namespace}`

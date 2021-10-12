@@ -11,7 +11,6 @@ async function main(): Promise<void> {
     applicationAnnotations: core.getMultilineInput('application-annotations'),
     destinationRepository: core.getInput('destination-repository', { required: true }),
     overwrite: core.getBooleanInput('overwrite', { required: true }),
-    transient: core.getBooleanInput('transient', { required: true }),
     prebuilt: core.getBooleanInput('prebuilt', { required: true }),
     token: core.getInput('token', { required: true }),
   })
