@@ -55,7 +55,7 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
   const [owner, repo] = inputs.destinationRepository.split('/')
   const project = github.context.repo.repo
   const branch = inputs.prebuilt
-    ? `ns/${project}/${inputs.overlay}/prebuilt/${github.context.ref}`
+    ? `prebuilt/${project}/${inputs.overlay}/${github.context.ref}`
     : `ns/${project}/${inputs.overlay}/${inputs.namespace}`
 
   core.startGroup(`checkout branch ${branch} if exist`)
