@@ -1,0 +1,102 @@
+import { promises as fs } from 'fs'
+import * as core from '@actions/core'
+import * as io from '@actions/io'
+import { Application, generateApplicationManifest } from './application'
+
+type Inputs = {
+  workspace: string
+  prebuiltDirectory: string
+  namespace: string
+  project: string
+  branch: string
+  context: {
+    sha: string
+    ref: string
+  }
+  destinationRepository: string
+}
+
+export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
+  await io.mkdirP(`${inputs.workspace}/applications`)
+  await io.mkdirP(`${inputs.workspace}/services`)
+
+  const prebuiltServicesDirectory = `${inputs.prebuiltDirectory}/services`
+  const prebuiltServices = (await fs.readdir(prebuiltServicesDirectory, { withFileTypes: true }))
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+
+  for (const service of prebuiltServices) {
+    if (await determineIfServiceIsAlreadyPushedAtSHA(inputs.workspace, inputs.namespace, service, inputs.context.sha)) {
+      continue
+    }
+
+    core.info(`copy the generated manifest of service ${service}`)
+    await io.cp(`${inputs.prebuiltDirectory}/services/${service}`, `${inputs.workspace}/services`, { recursive: true })
+
+    await putApplicationManifest(
+      {
+        name: `${inputs.namespace}--${service}`,
+        project: inputs.project,
+        source: {
+          repository: inputs.destinationRepository,
+          branch: inputs.branch,
+          path: `services/${service}`,
+        },
+        destination: {
+          namespace: inputs.namespace,
+        },
+        annotations: [
+          `github.ref=${inputs.context.ref}`,
+          `github.sha=${inputs.context.sha}`,
+          'github.action=git-push-services-from-prebuilt',
+        ],
+      },
+      inputs.workspace
+    )
+  }
+}
+
+const determineIfServiceIsAlreadyPushedAtSHA = async (
+  workspace: string,
+  namespace: string,
+  service: string,
+  sha: string
+) => {
+  const applicationManifestPath = `${workspace}/applications/${namespace}--${service}.yaml`
+  const applicationManifest = await readContent(applicationManifestPath)
+  if (applicationManifest === undefined) {
+    core.info(`application manifest ${applicationManifestPath} does not exist`)
+    return false
+  }
+
+  const shaAnnotation = `github.sha: ${sha}`
+  if (applicationManifest.indexOf(shaAnnotation) > -1) {
+    core.info(`application manifest ${applicationManifestPath} has annotation "${shaAnnotation}"`)
+    return true
+  }
+
+  core.info(`application manifest ${applicationManifestPath} does not have annotation "${shaAnnotation}"`)
+  return false
+}
+
+const readContent = async (f: string): Promise<string | undefined> => {
+  try {
+    const b = await fs.readFile(f)
+    return b.toString()
+  } catch (error) {
+    if (typeof error === 'object' && error !== null && 'code' in error) {
+      const e = error as { code: string }
+      if (e.code === 'ENOENT') {
+        return
+      }
+    }
+    throw error
+  }
+}
+
+const putApplicationManifest = async (application: Application, workspace: string) => {
+  const destination = `${workspace}/applications/${application.name}.yaml`
+  core.info(`writing to ${destination}`)
+  const content = generateApplicationManifest(application)
+  await fs.writeFile(destination, content)
+}
