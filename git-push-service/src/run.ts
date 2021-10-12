@@ -67,6 +67,7 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
     ...inputs.applicationAnnotations,
     `github.ref=${github.context.ref}`,
     `github.sha=${github.context.sha}`,
+    `github.action=git-push-service`,
   ]
 
   core.startGroup(`arrange manifests into workspace ${workspace}`)
@@ -98,9 +99,9 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
 
 const commitMessage = (namespace: string, services: string[]) => {
   if (services.length === 1) {
-    return `Add service ${namespace}/${services[0]}`
+    return `git-push-service: add ${namespace}/${services[0]} to namespace ${namespace}`
   }
-  return `Add ${services.length} services to namespace ${namespace}`
+  return `git-push-service: add ${services.length} services to namespace ${namespace}`
 }
 
 const commitMessageFooter = [
