@@ -1,0 +1,24 @@
+name: git-push-services-from-prebuilt
+description: push manifests to deploy services from prebuilt manifests
+
+inputs:
+  prebuilt-directory:
+    description: path to directory of prebuilt manifests
+    required: true
+  overlay:
+    description: overlay name
+    required: true
+  namespace:
+    description: namespace name
+    required: true
+  destination-repository:
+    description: destination repository
+    required: true
+  token:
+    description: GitHub token
+    required: true
+    default: ${{ github.token }}
+
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
