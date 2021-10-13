@@ -91,7 +91,7 @@ To push a prebuilt manifest:
 This action pushes the following file into a destination repository:
 
 ```
-destination-repository (branch: ns/${project}/${overlay}/prebuilt/${ref})
+destination-repository (branch: prebuilt/${project}/${overlay}/${ref})
 └── services
     └── ${service}
         └── generated.yaml
