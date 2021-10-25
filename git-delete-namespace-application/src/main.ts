@@ -14,4 +14,4 @@ const main = async (): Promise<void> => {
   core.setOutput('deleted-pull-request-numbers', outputs.deletedPullRequestNumbers.join('\n'))
 }
 
-main().catch((error) => core.setFailed(error))
+main().catch((e) => core.setFailed(e instanceof Error ? e.message : JSON.stringify(e)))

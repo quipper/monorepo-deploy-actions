@@ -8,4 +8,4 @@ async function main(): Promise<void> {
   await run(inputs)
 }
 
-main().catch((error) => core.setFailed(error))
+main().catch((e) => core.setFailed(e instanceof Error ? e.message : JSON.stringify(e)))
