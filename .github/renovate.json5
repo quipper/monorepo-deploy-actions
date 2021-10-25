@@ -1,17 +1,13 @@
 {
   "extends": [
-    "config:base"
-  ],
-  "labels": [
-    "r:{{depName}}",
-    "r:{{depName}}/{{newVersion}}"
+    "config:base",
+    "github>int128/typescript-action-renovate-config"
   ],
   "packageRules": [
     {
+      "matchPaths": ["*/**"],
       "additionalBranchPrefix": "{{packageFileDir}}-",
-      "commitMessageSuffix": "({{packageFileDir}})",
-      "matchUpdateTypes": ["minor", "patch", "pin"],
-      "automerge": true
+      "commitMessageSuffix": "({{packageFileDir}})"
     }
   ]
 }
