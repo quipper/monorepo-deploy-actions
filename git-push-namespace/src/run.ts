@@ -51,7 +51,7 @@ const push = async (inputs: Inputs): Promise<boolean> => {
     return true
   }
   return await core.group(`push branch ${inputs.destinationBranch}`, async () => {
-    const message = `git-push-namespace: add namespace ${inputs.namespace}\n\n${commitMessageFooter}`
+    const message = `Deploy namespace ${inputs.namespace}\n\n${commitMessageFooter}`
     await git.commit(workspace, message)
     const code = await git.pushByFastForward(workspace, inputs.destinationBranch)
     return code === 0
@@ -59,6 +59,8 @@ const push = async (inputs: Inputs): Promise<boolean> => {
 }
 
 const commitMessageFooter = [
+  'git-push-namespace',
   github.context.payload.pull_request?.html_url ?? '',
   `${github.context.payload.repository?.html_url ?? ''}/commit/${github.context.sha}`,
+  `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}`,
 ].join('\n')
