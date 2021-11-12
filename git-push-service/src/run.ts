@@ -99,12 +99,14 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
 
 const commitMessage = (namespace: string, services: string[]) => {
   if (services.length === 1) {
-    return `git-push-service: add ${namespace}/${services[0]} to namespace ${namespace}`
+    return `Deploy ${namespace}/${services[0]}`
   }
-  return `git-push-service: add ${services.length} services to namespace ${namespace}`
+  return `Deploy ${namespace} with ${services.length} services`
 }
 
 const commitMessageFooter = [
+  'git-push-service',
   github.context.payload.pull_request?.html_url ?? '',
   `${github.context.payload.repository?.html_url ?? ''}/commit/${github.context.sha}`,
+  `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}`,
 ].join('\n')
