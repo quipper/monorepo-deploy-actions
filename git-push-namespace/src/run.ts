@@ -60,7 +60,6 @@ const push = async (inputs: Inputs): Promise<boolean> => {
 
 const commitMessageFooter = [
   'git-push-namespace',
-  github.context.payload.pull_request?.html_url ?? '',
   `${github.context.payload.repository?.html_url ?? ''}/commit/${github.context.sha}`,
   `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}`,
 ].join('\n')
