@@ -5,40 +5,26 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as git from './git'
 import * as glob from '@actions/glob'
-import { arrangeManifests, Service } from './arrange'
-import { PathVariablesPattern } from './match'
+import { arrangeManifests } from './arrange'
 
 type Inputs = {
   manifests: string
-  manifestsPattern?: string
   overlay: string
   namespace: string
-  service?: string
+  service: string
   applicationAnnotations: string[]
   destinationRepository: string
-  overwrite: boolean
   prebuilt: boolean
   token: string
 }
 
-const parseService = (inputs: Inputs): Service => {
-  if (inputs.manifestsPattern !== undefined) {
-    return new PathVariablesPattern(inputs.manifestsPattern)
-  } else if (inputs.service !== undefined) {
-    return inputs.service
-  } else {
-    throw new Error(`either service or manifests-pattern must be set`)
-  }
-}
-
 export const run = async (inputs: Inputs): Promise<void> => {
-  const service = parseService(inputs)
   const globber = await glob.create(inputs.manifests, { matchDirectories: false })
   const manifests = await globber.glob()
 
   const maxRetry = 30
   for (let i = 0; i < maxRetry; i++) {
-    if (await push(manifests, service, inputs)) {
+    if (await push(manifests, inputs)) {
       return
     }
     const waitMs = Math.floor(3000 * Math.random())
@@ -48,7 +34,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
   throw new Error(`fast-forward failed ${maxRetry} times`)
 }
 
-const push = async (manifests: string[], service: Service, inputs: Inputs): Promise<boolean> => {
+const push = async (manifests: string[], inputs: Inputs): Promise<boolean> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-service-action-'))
   core.info(`created workspace at ${workspace}`)
 
@@ -74,13 +60,12 @@ const push = async (manifests: string[], service: Service, inputs: Inputs): Prom
   const services = await arrangeManifests({
     workspace,
     manifests,
-    service,
+    service: inputs.service,
     namespace: inputs.namespace,
     project,
     branch,
     applicationAnnotations,
     destinationRepository: inputs.destinationRepository,
-    overwrite: inputs.overwrite,
   })
   core.endGroup()
 
