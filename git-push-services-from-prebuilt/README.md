@@ -37,3 +37,27 @@ jobs:
           overlay: pr
           namespace: pr-1
 ```
+
+This action pushes the following files into a destination repository:
+
+```
+destination-repository (branch: ns/${project}/${overlay}/${namespace})
+├── applications
+|   └── ${namespace}--${service}.yaml
+└── services
+    └── ${service}
+        └── generated.yaml
+```
+
+It generates an `Application` manifest with the following properties:
+
+- metadata
+  - name: `${namespace}--${service}`
+  - namespace: `argocd`
+  - annotations: if given
+- source
+  - repoURL: `https://github.com/${destination-repository}.git`
+  - targetRevision: `ns/${project}/${overlay}/${namespace}`
+  - path: `services/${service}`
+- destination
+  - namespace: `${namespace}`

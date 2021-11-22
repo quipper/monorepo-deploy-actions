@@ -3,40 +3,35 @@ import * as path from 'path'
 import * as core from '@actions/core'
 import * as io from '@actions/io'
 import { Application, generateApplicationManifest } from './application'
-import { PathVariablesPattern } from './match'
 
 type Inputs = {
   workspace: string
   manifests: string[]
   namespace: string
-  service: Service
+  service: string
   project: string
   branch: string
   applicationAnnotations: string[]
   destinationRepository: string
-  overwrite: boolean
 }
-
-export type Service = PathVariablesPattern | string
 
 export const arrangeManifests = async (inputs: Inputs): Promise<string[]> => {
   await io.mkdirP(`${inputs.workspace}/applications`)
 
   const services = new Set<string>()
   for (const f of inputs.manifests) {
-    const service = inferServiceFromPath(f, inputs.service)
-    core.info(`add service ${service}`)
-    services.add(service)
+    core.info(`add service ${inputs.service}`)
+    services.add(inputs.service)
 
-    const generatedManifestPath = `services/${service}`
+    const generatedManifestPath = `services/${inputs.service}`
 
-    await copyGeneratedManifest(f, `${inputs.workspace}/${generatedManifestPath}`, inputs.overwrite)
+    await copyGeneratedManifest(f, `${inputs.workspace}/${generatedManifestPath}`)
 
     // Always overwrite an application manifest.
     // When a pull request is updated, an application manifest already exists and needs to be updated to the new sha.
     await putApplicationManifest(
       {
-        name: `${inputs.namespace}--${service}`,
+        name: `${inputs.namespace}--${inputs.service}`,
         project: inputs.project,
         source: {
           repository: inputs.destinationRepository,
@@ -54,23 +49,8 @@ export const arrangeManifests = async (inputs: Inputs): Promise<string[]> => {
   return [...services]
 }
 
-const inferServiceFromPath = (f: string, s: Service): string => {
-  if (typeof s === 'string') {
-    return s
-  }
-  const n = s.match(f).get('service')
-  if (n === undefined) {
-    throw new Error(`could not determine service name from path ${f}`)
-  }
-  return n
-}
-
-const copyGeneratedManifest = async (source: string, destinationDir: string, overwrite: boolean) => {
+const copyGeneratedManifest = async (source: string, destinationDir: string) => {
   const destination = `${destinationDir}/${path.basename(source)}`
-  if (!overwrite && (await exists(destination))) {
-    core.info(`generated manifest already exists at ${destination}`)
-    return
-  }
   await io.mkdirP(destinationDir)
   await io.cp(source, destination)
 }
@@ -80,13 +60,4 @@ const putApplicationManifest = async (application: Application, workspace: strin
   core.info(`writing to ${destination}`)
   const content = generateApplicationManifest(application)
   await fs.writeFile(destination, content)
-}
-
-const exists = async (s: string): Promise<boolean> => {
-  try {
-    await fs.access(s)
-    return true
-  } catch (error) {
-    return false
-  }
 }

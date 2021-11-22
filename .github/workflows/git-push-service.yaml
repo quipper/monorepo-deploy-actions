@@ -46,11 +46,17 @@ jobs:
         with:
           manifests: |
             ${{ github.workspace }}/git-push-service/tests/fixtures/a/generated.yaml
-            ${{ github.workspace }}/git-push-service/tests/fixtures/b/generated.yaml
-          manifests-pattern: |
-            ${{ github.workspace }}/git-push-service/tests/fixtures/${service}/**
           overlay: ${{ steps.config.outputs.overlay }}
           namespace: ${{ steps.config.outputs.namespace }}
+          service: a
+          destination-repository: ${{ github.repository }}
+      - uses: ./git-push-service
+        with:
+          manifests: |
+            ${{ github.workspace }}/git-push-service/tests/fixtures/b/generated.yaml
+          overlay: ${{ steps.config.outputs.overlay }}
+          namespace: ${{ steps.config.outputs.namespace }}
+          service: b
           destination-repository: ${{ github.repository }}
 
       - uses: actions/checkout@v2
