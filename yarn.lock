@@ -1160,10 +1160,10 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha1-x57Zf380y48robyXkLzDZkdLS3k=
 
-aws-sdk@2.1036.0:
-  version "2.1036.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1036.0.tgz#47f0d0a38b5bfbd4a7a382a6756a6aa7af627aad"
-  integrity sha512-K0f4uXL32ZdoPmWiuSQEAC5ae5v7gNmhjzoEB7VonE5E8l2umWsoU0Ahm8WPr14LgsvtkeyBuqBjphbxLz6hIw==
+aws-sdk@2.1037.0:
+  version "2.1037.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1037.0.tgz#f397aea0aa2b7a862be89240e68c8138c959fb3c"
+  integrity sha512-z1IfFFvKg1ZKikyExhLeiax0jIe/YwFrBjIUhcPjBfh+c4otvuqp9RBp2iyXt3GamhEkKoPyvd6a5K7IGsTBMw==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
