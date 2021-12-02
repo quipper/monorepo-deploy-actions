@@ -6,6 +6,7 @@ import * as github from '@actions/github'
 import * as git from './git'
 import * as glob from '@actions/glob'
 import { arrangeManifests } from './arrange'
+import { retry } from './retry'
 
 type Inputs = {
   manifests: string
@@ -22,19 +23,13 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const globber = await glob.create(inputs.manifests, { matchDirectories: false })
   const manifests = await globber.glob()
 
-  const maxRetry = 30
-  for (let i = 0; i < maxRetry; i++) {
-    if (await push(manifests, inputs)) {
-      return
-    }
-    const waitMs = Math.floor(3000 * Math.random())
-    core.warning(`fast-forward failed, retrying after ${waitMs}ms`)
-    await new Promise((resolve) => setTimeout(resolve, waitMs))
-  }
-  throw new Error(`fast-forward failed ${maxRetry} times`)
+  return await retry(async () => push(manifests, inputs), {
+    maxAttempts: 50,
+    waitMillisecond: 10000,
+  })
 }
 
-const push = async (manifests: string[], inputs: Inputs): Promise<boolean> => {
+const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-service-action-'))
   core.info(`created workspace at ${workspace}`)
 
@@ -72,13 +67,15 @@ const push = async (manifests: string[], inputs: Inputs): Promise<boolean> => {
   const status = await git.status(workspace)
   if (status === '') {
     core.info('nothing to commit')
-    return true
+    return
   }
   return await core.group(`push branch ${branch}`, async () => {
     const message = `${commitMessage(inputs.namespace, services)}\n\n${commitMessageFooter}`
     await git.commit(workspace, message)
     const code = await git.pushByFastForward(workspace, branch)
-    return code === 0
+    if (code > 0) {
+      return new Error(`failed to push branch ${branch} by fast-forward`)
+    }
   })
 }
 
