@@ -5,6 +5,7 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as git from './git'
 import { deletePullRequests } from './delete'
+import { retry } from './retry'
 
 type Inputs = {
   retain: string[]
@@ -20,21 +21,11 @@ type Outputs = {
   deletedPullRequestNumbers: string[]
 }
 
-export const run = async (inputs: Inputs): Promise<Outputs> => {
-  const maxRetry = 5
-  for (let i = 0; i < maxRetry; i++) {
-    // eventually fast-forward fails because another job updates the ref
-    const result = await push(inputs)
-    if ('deletedPullRequestNumbers' in result) {
-      return result
-    }
-
-    const waitMs = Math.floor(10000 * Math.random())
-    core.warning(`retry after ${waitMs}ms: ${result.message}`)
-    await new Promise((resolve) => setTimeout(resolve, waitMs))
-  }
-  throw new Error(`fast-forward failed ${maxRetry} times`)
-}
+export const run = async (inputs: Inputs): Promise<Outputs> =>
+  await retry(async () => await push(inputs), {
+    maxAttempts: 5,
+    waitMillisecond: 10000,
+  })
 
 const push = async (inputs: Inputs): Promise<Outputs | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'stop-pull-request-'))
@@ -69,7 +60,7 @@ const push = async (inputs: Inputs): Promise<Outputs | Error> => {
     if (code === 0) {
       return { deletedPullRequestNumbers }
     }
-    return new Error(`fast-forward failed with code ${code}`)
+    return new Error(`failed to push branch ${inputs.destinationBranch} by fast-forward`)
   })
 }
 
