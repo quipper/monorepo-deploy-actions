@@ -22,7 +22,7 @@ type Inputs = {
 
 export const run = async (inputs: Inputs): Promise<void> => {
   if (!inputs.service && !inputs.namespaceLevel) {
-    throw new Error('service must be set if not namespaceLevel')
+    throw new Error('service must be set if namespace-level is false')
   }
 
   const globber = await glob.create(inputs.manifests, { matchDirectories: false })

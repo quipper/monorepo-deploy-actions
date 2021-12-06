@@ -6,7 +6,7 @@ async function main(): Promise<void> {
     manifests: core.getInput('manifests', { required: true }),
     overlay: core.getInput('overlay', { required: true }),
     namespace: core.getInput('namespace', { required: true }),
-    service: core.getInput('service', { required: true }),
+    service: core.getInput('service'),
     namespaceLevel: core.getBooleanInput('namespace-level', { required: true }),
     applicationAnnotations: core.getMultilineInput('application-annotations'),
     destinationRepository: core.getInput('destination-repository', { required: true }),
