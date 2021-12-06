@@ -52,7 +52,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
   ]
 
   core.startGroup(`arrange manifests into workspace ${workspace}`)
-  const services = await arrangeManifests({
+  await arrangeManifests({
     workspace,
     manifests,
     service: inputs.service,
@@ -70,20 +70,13 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
     return
   }
   return await core.group(`push branch ${branch}`, async () => {
-    const message = `${commitMessage(inputs.namespace, services)}\n\n${commitMessageFooter}`
+    const message = `Deploy ${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
     await git.commit(workspace, message)
     const code = await git.pushByFastForward(workspace, branch)
     if (code > 0) {
       return new Error(`failed to push branch ${branch} by fast-forward`)
     }
   })
-}
-
-const commitMessage = (namespace: string, services: string[]) => {
-  if (services.length === 1) {
-    return `Deploy ${namespace}/${services[0]}`
-  }
-  return `Deploy ${namespace} with ${services.length} services`
 }
 
 const commitMessageFooter = [
