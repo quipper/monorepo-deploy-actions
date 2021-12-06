@@ -7,6 +7,7 @@ async function main(): Promise<void> {
     overlay: core.getInput('overlay', { required: true }),
     namespace: core.getInput('namespace', { required: true }),
     service: core.getInput('service', { required: true }),
+    namespaceLevel: core.getBooleanInput('namespace-level', { required: true }),
     applicationAnnotations: core.getMultilineInput('application-annotations'),
     destinationRepository: core.getInput('destination-repository', { required: true }),
     prebuilt: core.getBooleanInput('prebuilt', { required: true }),

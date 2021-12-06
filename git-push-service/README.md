@@ -11,6 +11,7 @@ Name | Type | Description
 `overlay` | string | Name of overlay
 `namespace` | string | Name of namespace
 `service` | string | Name of service
+`namespace-level` | boolean | Push the manifests to namespace level (default to false)
 `application-annotations` | multiline string | Annotations to add to an Application (default to empty)
 `destination-repository` | string | Destination repository
 `prebuilt` | boolean | Push prebuilt manifest (default to false)
@@ -94,13 +95,37 @@ destination-repository (branch: prebuilt/${project}/${overlay}/${ref})
 ```
 
 
-### Bootstrap a pull request using prebuilt manifests
+### Bootstrap a pull request
 
-When a pull request is opened, your workflow needs to build manifests from prebuilt manifests and push them.
+To push a manifest to the namespace level in App of Apps:
+
+```yaml
+    steps:
+      - uses: int128/kustomize-action@v1
+        id: kustomize
+        with:
+          kustomization: foo/kubernetes/overlays/pr/kustomization.yaml
+      - uses: quipper/monorepo-deploy-actions/git-push-service@v1
+        with:
+          manifests: ${{ steps.kustomize.outputs.files }}
+          overlay: pr
+          namespace: pr-1
+          namespace-level: true
+```
+
+This action pushes the following file into a destination repository:
+
+```
+destination-repository (branch: ns/${project}/${overlay}/${namespace})
+└── applications
+    └── generated.yaml
+```
+
+You also need to build the prebuilt manifests and push them.
 See [git-push-services-from-prebuilt action](../git-push-services-from-prebuilt) for more.
 
 
-### Push a manifest on pull request event
+### Push a manifest for pull request
 
 To push a manifest:
 

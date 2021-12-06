@@ -5,7 +5,7 @@ import { arrangeManifests } from '../src/arrange'
 
 const readContent = async (f: string) => (await fs.readFile(f)).toString()
 
-test('arrange a manifest', async () => {
+test('arrange a service manifest', async () => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-action-'))
 
   await arrangeManifests({
@@ -14,6 +14,7 @@ test('arrange a manifest', async () => {
     branch: `ns/project/overlay/namespace`,
     namespace: 'namespace',
     service: 'a',
+    namespaceLevel: false,
     project: 'project',
     applicationAnnotations: ['github.ref=refs/heads/main'],
     destinationRepository: 'octocat/manifests',
@@ -41,6 +42,7 @@ test('overwrite even if a file exists', async () => {
     branch: `ns/project/overlay/namespace`,
     namespace: 'namespace',
     service: 'a',
+    namespaceLevel: false,
     project: 'project',
     applicationAnnotations: ['github.ref=refs/heads/main'],
     destinationRepository: 'octocat/manifests',
@@ -75,3 +77,34 @@ spec:
     automated:
       prune: true
 `
+
+test('arrange a manifest into namespace level', async () => {
+  const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-action-'))
+
+  // put dummy files
+  await fs.mkdir(path.join(workspace, `applications`))
+  await fs.writeFile(path.join(workspace, `applications/pr-123--namespace.yaml`), 'fixture-application-manifest')
+  await fs.mkdir(path.join(workspace, `services`))
+  await fs.mkdir(path.join(workspace, `services/namespace`))
+  await fs.writeFile(path.join(workspace, `services/namespace/generated.yaml`), 'fixture-generated-manifest')
+
+  await arrangeManifests({
+    workspace,
+    manifests: [path.join(__dirname, `fixtures/a/generated.yaml`)],
+    branch: `ns/project/overlay/namespace`,
+    namespace: 'pr-123',
+    service: '',
+    namespaceLevel: true,
+    project: 'project',
+    applicationAnnotations: ['github.ref=refs/heads/main'],
+    destinationRepository: 'octocat/manifests',
+  })
+
+  expect(await readContent(path.join(workspace, `applications/generated.yaml`))).toBe(
+    await readContent(path.join(__dirname, `fixtures/a/generated.yaml`))
+  )
+
+  // make sure the old manifests are removed
+  await expect(fs.stat(path.join(workspace, `applications/pr-123--namespace.yaml`))).rejects.toThrowError()
+  await expect(fs.stat(path.join(workspace, `services/namespace/generated.yaml`))).rejects.toThrowError()
+})
