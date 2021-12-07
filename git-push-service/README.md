@@ -11,15 +11,18 @@ Name | Type | Description
 `overlay` | string | Name of overlay
 `namespace` | string | Name of namespace
 `service` | string | Name of service
+`namespace-level` | boolean | Push the manifests to namespace level (default to false)
 `application-annotations` | multiline string | Annotations to add to an Application (default to empty)
 `destination-repository` | string | Destination repository
 `prebuilt` | boolean | Push prebuilt manifest (default to false)
 `token` | string | GitHub token (default to `github.token`)
 
 
-## Deploy a branch
+## Use-cases
 
-To push a manifest on push event of a branch:
+### Push a manifest of a service
+
+To push a manifest of a service:
 
 ```yaml
     steps:
@@ -29,13 +32,13 @@ To push a manifest on push event of a branch:
           kustomization: foo/kubernetes/overlays/develop/kustomization.yaml
       - uses: quipper/monorepo-deploy-actions/git-push-service@v1
         with:
-          manifests: ${{ steps.kustomize.outputs.directory }}/**
+          manifests: ${{ steps.kustomize.outputs.files }}
           overlay: develop
           namespace: develop
           service: foo
 ```
 
-This action pushes the following files into a destination repository:
+It pushes the following files into a destination repository:
 
 ```
 destination-repository (branch: ns/${project}/${overlay}/${namespace})
@@ -60,16 +63,36 @@ It generates an `Application` manifest with the following properties:
   - namespace: `${namespace}`
 
 
-## Deploy a pull request
+### Push a manifest to the namespace level
 
-This section explains how to deploy a pull request.
+To push a manifest to the namespace level in App of Apps hierarchy:
+
+```yaml
+    steps:
+      - uses: int128/kustomize-action@v1
+        id: kustomize
+        with:
+          kustomization: deploy/namespace/kubernetes/overlays/pr/kustomization.yaml
+      - uses: quipper/monorepo-deploy-actions/git-push-service@v1
+        with:
+          manifests: ${{ steps.kustomize.outputs.files }}
+          overlay: pr
+          namespace: pr-1
+          namespace-level: true
+```
+
+It pushes the following file into a destination repository:
+
+```
+destination-repository (branch: ns/${project}/${overlay}/${namespace})
+└── applications
+    └── generated.yaml
+```
 
 
-### Push a prebuilt manifest on push event
+### Push a manifest as a prebuilt one
 
-Before deploying a pull request, you need to push a prebuilt manifest on push event of the default branch.
-
-To push a prebuilt manifest:
+To push a manifest as a prebuilt manifest:
 
 ```yaml
       - uses: int128/kustomize-action@v1
@@ -84,7 +107,7 @@ To push a prebuilt manifest:
           prebuilt: true
 ```
 
-This action pushes the following file into a destination repository:
+It pushes the following file into a destination repository:
 
 ```
 destination-repository (branch: prebuilt/${project}/${overlay}/${ref})
@@ -93,51 +116,4 @@ destination-repository (branch: prebuilt/${project}/${overlay}/${ref})
         └── generated.yaml
 ```
 
-
-### Bootstrap a pull request using prebuilt manifests
-
-When a pull request is opened, your workflow needs to build manifests from prebuilt manifests and push them.
-See [git-push-services-from-prebuilt action](../git-push-services-from-prebuilt) for more.
-
-
-### Push a manifest on pull request event
-
-To push a manifest:
-
-```yaml
-    steps:
-      - uses: int128/kustomize-action@v1
-        id: kustomize
-        with:
-          kustomization: foo/kubernetes/overlays/pr/kustomization.yaml
-      - uses: quipper/monorepo-deploy-actions/git-push-service@v1
-        with:
-          manifests: ${{ steps.kustomize.outputs.directory }}/**
-          overlay: pr
-          namespace: pr-1
-          service: foo
-```
-
-This action pushes the following files into a destination repository:
-
-```
-destination-repository (branch: ns/${project}/${overlay}/${namespace})
-├── applications
-|   └── ${namespace}--${service}.yaml
-└── services
-    └── ${service}
-        └── generated.yaml
-```
-
-It generates an `Application` manifest with the following properties:
-
-- metadata
-  - name: `${namespace}--${service}`
-  - namespace: `argocd`
-  - annotations: if given
-- source
-  - repoURL: `https://github.com/${destination-repository}.git`
-  - targetRevision: `ns/${project}/${overlay}/${namespace}`
-  - path: `services/${service}`
-- destination
-  - namespace: `${namespace}`
+You can build the prebuilt manifest using [git-push-services-from-prebuilt action](../git-push-services-from-prebuilt).
