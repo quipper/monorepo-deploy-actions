@@ -3,7 +3,15 @@
     "config:base",
     "github>int128/typescript-action-renovate-config"
   ],
+
+  "automerge": true,
+  "platformAutomerge": true,
+
   "packageRules": [
+    {
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
     {
       "matchPaths": ["*/**"],
       "additionalBranchPrefix": "{{packageFileDir}}-",
