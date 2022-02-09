@@ -61,3 +61,18 @@ It generates an `Application` manifest with the following properties:
   - path: `services/${service}`
 - destination
   - namespace: `${namespace}`
+
+
+## Caveat
+
+`git-push-service` and `git-push-services-from-prebuilt` may run concurrently.
+If an application manifest of a service already exists, this action does not overwrite the service.
+
+Both actions should perform the deploy as follows:
+
+1. When a pull request is created,
+    - `git-push-services-from-prebuilt` pushes the prebuilt manifest
+    - `git-push-service` overwrites the manifest
+1. When the pull request is synchronized,
+    - `git-push-services-from-prebuilt` does nothing
+    - `git-push-service` overwrites the manifest

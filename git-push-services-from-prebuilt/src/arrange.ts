@@ -26,7 +26,11 @@ export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
     .map((e) => e.name)
 
   for (const service of prebuiltServices) {
-    if (await determineIfServiceIsAlreadyPushedAtSHA(inputs.workspace, inputs.namespace, service, inputs.context.sha)) {
+    // Since both git-push-service and git-push-services-from-prebuilt are running concurrently,
+    // don't overwrite a manifest to prebuilt.
+    const applicationManifestPath = `${inputs.workspace}/applications/${inputs.namespace}--${service}.yaml`
+    if (await exists(applicationManifestPath)) {
+      core.info(`service ${service} already exists at ${applicationManifestPath}`)
       continue
     }
 
@@ -56,38 +60,15 @@ export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
   }
 }
 
-const determineIfServiceIsAlreadyPushedAtSHA = async (
-  workspace: string,
-  namespace: string,
-  service: string,
-  sha: string
-) => {
-  const applicationManifestPath = `${workspace}/applications/${namespace}--${service}.yaml`
-  const applicationManifest = await readContent(applicationManifestPath)
-  if (applicationManifest === undefined) {
-    core.info(`application manifest ${applicationManifestPath} does not exist`)
-    return false
-  }
-
-  const shaAnnotation = `github.sha: ${sha}`
-  if (applicationManifest.indexOf(shaAnnotation) > -1) {
-    core.info(`application manifest ${applicationManifestPath} has annotation "${shaAnnotation}"`)
-    return true
-  }
-
-  core.info(`application manifest ${applicationManifestPath} does not have annotation "${shaAnnotation}"`)
-  return false
-}
-
-const readContent = async (f: string): Promise<string | undefined> => {
+const exists = async (f: string): Promise<boolean> => {
   try {
-    const b = await fs.readFile(f)
-    return b.toString()
+    await fs.access(f)
+    return true
   } catch (error) {
     if (typeof error === 'object' && error !== null && 'code' in error) {
       const e = error as { code: string }
       if (e.code === 'ENOENT') {
-        return
+        return false
       }
     }
     throw error
