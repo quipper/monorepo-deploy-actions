@@ -28,22 +28,11 @@ test('if workspace is empty', async () => {
   )
 })
 
-test('if workspace has a service with different sha', async () => {
+test('if service A is already pushed', async () => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-services-from-prebuilt-'))
 
-  // put a service which is pushed by the job of old sha
   await fs.mkdir(path.join(workspace, `applications`))
-  await fs.writeFile(
-    path.join(workspace, `applications/namespace--a.yaml`),
-    `\
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  annotations:
-    github.ref: refs/heads/main
-    github.sha: another_sha
-`
-  )
+  await fs.writeFile(path.join(workspace, `applications/namespace--a.yaml`), 'dummy-generated-application')
   await fs.mkdir(path.join(workspace, `services`))
   await fs.mkdir(path.join(workspace, `services/a`))
   await fs.writeFile(path.join(workspace, `services/a/generated.yaml`), 'dummy-generated-manifest')
@@ -58,42 +47,12 @@ metadata:
     destinationRepository: 'octocat/manifests',
   })
 
-  expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
-  expect(await readContent(path.join(workspace, `services/a/generated.yaml`))).toBe(
-    await readContent(path.join(__dirname, `fixtures/prebuilt/services/a/generated.yaml`))
-  )
-})
-
-test('if workspace has a service with current sha', async () => {
-  const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-services-from-prebuilt-'))
-
-  // put a service which is pushed by the job of old sha
-  await fs.mkdir(path.join(workspace, `applications`))
-  const dummyApplication = `\
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  annotations:
-    github.ref: refs/heads/main
-    github.sha: current_sha
-`
-  await fs.writeFile(path.join(workspace, `applications/namespace--a.yaml`), dummyApplication)
-  await fs.mkdir(path.join(workspace, `services`))
-  await fs.mkdir(path.join(workspace, `services/a`))
-  await fs.writeFile(path.join(workspace, `services/a/generated.yaml`), 'dummy-generated-manifest')
-
-  await arrangeManifests({
-    workspace,
-    branch: `ns/project/overlay/namespace`,
-    namespace: 'namespace',
-    project: 'project',
-    context: { sha: 'current_sha', ref: 'refs/heads/main' },
-    prebuiltDirectory: path.join(__dirname, `fixtures/prebuilt`),
-    destinationRepository: 'octocat/manifests',
-  })
-
-  expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(dummyApplication)
+  expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe('dummy-generated-application')
   expect(await readContent(path.join(workspace, `services/a/generated.yaml`))).toBe('dummy-generated-manifest')
+  expect(await readContent(path.join(workspace, `applications/namespace--b.yaml`))).toBe(applicationB)
+  expect(await readContent(path.join(workspace, `services/b/generated.yaml`))).toBe(
+    await readContent(path.join(__dirname, `fixtures/prebuilt/services/b/generated.yaml`))
+  )
 })
 
 const applicationA = `\
