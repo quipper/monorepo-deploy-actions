@@ -38,7 +38,9 @@ jobs:
 
       - run: ${{ github.workspace }}/.github/e2e-test-config.sh
         id: config
-      - run: git push origin HEAD:refs/heads/e2e/git-push-namespace/${{ github.run_number }}
+      - run: bash e2e-test-setup.sh
+        env:
+          BRANCH_NAME: e2e/git-push-namespace/${{ github.run_number }}
 
       - uses: ./git-push-namespace
         with:
