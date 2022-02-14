@@ -47,6 +47,7 @@ jobs:
           namespace-prefix: pr-
           destination-repository: ${{ github.repository }}
           destination-branch: e2e/git-delete-namespace-application/${{ github.run_number }}
+
       - run: test "${{ steps.retain.outputs.deleted-pull-request-numbers }}" -eq 101
       - name: Clean up the branch
         continue-on-error: true

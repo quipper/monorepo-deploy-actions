@@ -36,7 +36,7 @@ jobs:
       - run: yarn build
       - run: yarn package
 
-      - run: ${{ github.workspace }}/.github/e2e-test-config.sh
+      - run: bash ${{ github.workspace }}/.github/e2e-test-config.sh
         id: config
       - run: bash e2e-test-setup.sh
         env:
