@@ -11,5 +11,5 @@ inputs:
     description: variable(s) in form of multiline string with KEY=VALUE
     required: true
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'

@@ -29,5 +29,5 @@ outputs:
   deleted-pull-request-numbers:
     description: multiline string of list of deleted pull request numbers
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
