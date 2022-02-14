@@ -125,8 +125,14 @@ destination-repository  (branch: ns/${source-repository}/${overlay}/${namespace}
 | [open-backport-pull-request](open-backport-pull-request) | Open Backport Pull Requests from a specific branch | [![open-backport-pull-request](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/open-backport-pull-request.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/open-backport-pull-request.yaml)
 
 
-## Release strategy
+## Development
 
-When you merge a pull request into `main` branch, the workflow will release it to a release tag (such as `v1`, defined in [`release` workflow](.github/workflows/release.yaml)).
-A release tag is shipped with `dist` files.
-`main` branch is not for production because it does not contain `dist` files.
+### Release workflow
+
+When a pull request is merged into main branch, a new minor release is created by GitHub Actions.
+See https://github.com/int128/release-typescript-action for details.
+
+### Dependency update
+
+You can enable Renovate to update the dependencies.
+See https://github.com/int128/typescript-action-renovate-config for details.
