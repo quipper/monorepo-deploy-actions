@@ -34,9 +34,24 @@ jobs:
       - run: yarn build
       - run: yarn package
 
-      - run: bash e2e-test-setup.sh
-        env:
-          BRANCH_NAME: e2e/git-delete-namespace-application/${{ github.run_number }}
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }} # avoid "shallow update not allowed" error
+          path: e2e-test-fixture
+      - name: Set up a fixture branch
+        working-directory: e2e-test-fixture
+        run: |
+          mkdir -vp monorepo-deploy-actions/staging
+          cd monorepo-deploy-actions/staging
+          date > pr-100.yaml
+          date > pr-101.yaml
+          date > pr-102.yaml
+          git add .
+          git config user.email 'github-actions@github.com'
+          git config user.name 'github-actions'
+          git commit -m "e2e-test-fixture for ${GITHUB_REF}"
+          git push origin "HEAD:refs/heads/e2e/git-delete-namespace-application/${{ github.run_number }}"
+
       - uses: ./git-delete-namespace-application
         id: retain
         with:
@@ -47,9 +62,11 @@ jobs:
           namespace-prefix: pr-
           destination-repository: ${{ github.repository }}
           destination-branch: e2e/git-delete-namespace-application/${{ github.run_number }}
+
       - run: test "${{ steps.retain.outputs.deleted-pull-request-numbers }}" -eq 101
+
       - name: Clean up the branch
         continue-on-error: true
         if: always()
         run: |
-          git push origin --delete refs/heads/e2e/git-delete-namespace-application/${{ github.run_number }}
+          git push origin --delete "refs/heads/e2e/git-delete-namespace-application/${{ github.run_number }}"

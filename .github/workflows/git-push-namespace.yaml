@@ -36,9 +36,16 @@ jobs:
       - run: yarn build
       - run: yarn package
 
-      - run: ${{ github.workspace }}/.github/e2e-test-config.sh
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }} # avoid "shallow update not allowed" error
+          path: e2e-test-fixture
+      - name: Set up a fixture branch
+        working-directory: e2e-test-fixture
+        run: git push origin "HEAD:refs/heads/e2e/git-push-namespace/${{ github.run_number }}"
+
+      - run: bash ${{ github.workspace }}/.github/e2e-test-config.sh
         id: config
-      - run: git push origin HEAD:refs/heads/e2e/git-push-namespace/${{ github.run_number }}
 
       - uses: ./git-push-namespace
         with:
@@ -53,8 +60,9 @@ jobs:
           path: git-push-namespace/actual
       - run: find actual -type f
       - run: test -f actual/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}.yaml
-      - name: clean up the branch
+
+      - name: Clean up the branch
         continue-on-error: true
         if: always()
         run: |
-          git push origin --delete refs/heads/e2e/git-push-namespace/${{ github.run_number }}
+          git push origin --delete "refs/heads/e2e/git-push-namespace/${{ github.run_number }}"
