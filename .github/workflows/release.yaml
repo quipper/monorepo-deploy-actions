@@ -2,11 +2,13 @@ name: release
 
 on:
   pull_request:
-    branches: [main]
     paths:
       - .github/workflows/release.yaml
   push:
-    branches: [main]
+    branches:
+      - main
+    tags:
+      - v*
 
 jobs:
   tag:
@@ -19,7 +21,4 @@ jobs:
           cache: yarn
       - run: yarn
       - run: yarn workspaces run ci:package
-      - if: github.event_name == 'push'
-        uses: ./.github/actions/release
-        with:
-          tag-name: v1
+      - uses: int128/release-typescript-action@v1
