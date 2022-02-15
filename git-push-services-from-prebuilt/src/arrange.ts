@@ -26,11 +26,12 @@ export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
     .map((e) => e.name)
 
   for (const service of prebuiltServices) {
-    // Since both git-push-service and git-push-services-from-prebuilt are running concurrently,
-    // don't overwrite a manifest to prebuilt.
-    const applicationManifestPath = `${inputs.workspace}/applications/${inputs.namespace}--${service}.yaml`
-    if (await exists(applicationManifestPath)) {
-      core.info(`service ${service} already exists at ${applicationManifestPath}`)
+    // Since git-push-service and git-push-services-from-prebuilt run concurrently,
+    // don't overwrite if the service was pushed by git-push-service.
+    //
+    // If the service was pushed by git-push-services-from-prebuilt,
+    // it needs to overwrite it to follow the latest manifest.
+    if (await determineIfPushedByGitPushService(inputs.workspace, inputs.namespace, service)) {
       continue
     }
 
@@ -49,26 +50,39 @@ export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
         destination: {
           namespace: inputs.namespace,
         },
-        annotations: [
-          `github.ref=${inputs.context.ref}`,
-          `github.sha=${inputs.context.sha}`,
-          'github.action=git-push-services-from-prebuilt',
-        ],
+        annotations: ['github.action=git-push-services-from-prebuilt'],
       },
       inputs.workspace
     )
   }
 }
 
-const exists = async (f: string): Promise<boolean> => {
+const determineIfPushedByGitPushService = async (workspace: string, namespace: string, service: string) => {
+  const applicationManifestPath = `${workspace}/applications/${namespace}--${service}.yaml`
+  const applicationManifest = await readContent(applicationManifestPath)
+  if (applicationManifest === undefined) {
+    core.info(`application manifest ${applicationManifestPath} does not exist`)
+    return false
+  }
+
+  if (applicationManifest.indexOf('github.action: git-push-services-from-prebuilt') > -1) {
+    core.info(`application manifest ${applicationManifestPath} was pushed from prebuilt`)
+    return false
+  }
+
+  core.info(`application manifest ${applicationManifestPath} was pushed from git-push-service`)
+  return true
+}
+
+const readContent = async (f: string): Promise<string | undefined> => {
   try {
-    await fs.access(f)
-    return true
+    const b = await fs.readFile(f)
+    return b.toString()
   } catch (error) {
     if (typeof error === 'object' && error !== null && 'code' in error) {
       const e = error as { code: string }
       if (e.code === 'ENOENT') {
-        return false
+        return
       }
     }
     throw error
