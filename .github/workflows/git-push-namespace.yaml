@@ -24,7 +24,7 @@ jobs:
       run:
         working-directory: git-push-namespace
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -36,7 +36,7 @@ jobs:
       - run: yarn build
       - run: yarn package
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref }} # avoid "shallow update not allowed" error
           path: e2e-test-fixture
@@ -54,7 +54,7 @@ jobs:
           destination-repository: ${{ github.repository }}
           destination-branch: e2e/git-push-namespace/${{ github.run_number }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: e2e/git-push-namespace/${{ github.run_number }}
           path: git-push-namespace/actual

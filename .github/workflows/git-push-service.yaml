@@ -24,7 +24,7 @@ jobs:
       run:
         working-directory: git-push-service
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -55,7 +55,7 @@ jobs:
           namespace-level: true
           destination-repository: ${{ github.repository }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ns/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}
           path: git-push-service/actual
