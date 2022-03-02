@@ -22,7 +22,7 @@ jobs:
       run:
         working-directory: git-delete-namespace-application
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -34,7 +34,7 @@ jobs:
       - run: yarn build
       - run: yarn package
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref }} # avoid "shallow update not allowed" error
           path: e2e-test-fixture
