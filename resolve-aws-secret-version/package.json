@@ -15,7 +15,7 @@
   "dependencies": {
     "@actions/core": "1.6.0",
     "@actions/glob": "0.2.0",
-    "aws-sdk": "2.1084.0",
+    "aws-sdk": "2.1085.0",
     "js-yaml": "4.1.0"
   },
   "devDependencies": {
