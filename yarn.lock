@@ -46,6 +46,14 @@
     "@actions/core" "^1.2.6"
     minimatch "^3.0.4"
 
+"@actions/glob@0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@actions/glob/-/glob-0.2.1.tgz#763e9ba97244dba35609f5c9fc2bf46b9bc5f494"
+  integrity sha512-OqseGbxR8vVikg6rfdKST21GX3QYGq2Nz7/gX3UxZb2Mw1ujJ2S3U5CsYUvYHwxbYguU+HNhfE3930oo5nprXQ==
+  dependencies:
+    "@actions/core" "^1.2.6"
+    minimatch "^3.0.4"
+
 "@actions/http-client@^1.0.11":
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/@actions/http-client/-/http-client-1.0.11.tgz#c58b12e9aa8b159ee39e7dd6cbd0e91d905633c0"
