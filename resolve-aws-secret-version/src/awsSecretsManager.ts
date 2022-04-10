@@ -1,9 +1,9 @@
-import * as aws from 'aws-sdk'
+import { ListSecretVersionIdsCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
 
 // get the current version id for the secret
 export const getCurrentVersionId = async (secretId: string): Promise<string> => {
-  const secretsManager = new aws.SecretsManager()
-  const versionIds = await secretsManager.listSecretVersionIds({ SecretId: secretId }).promise()
+  const client = new SecretsManagerClient({})
+  const versionIds = await client.send(new ListSecretVersionIdsCommand({ SecretId: secretId }))
   if (versionIds.Versions === undefined) {
     throw new Error(`SecretsManager returned Versions=undefined for secret ${secretId}`)
   }
