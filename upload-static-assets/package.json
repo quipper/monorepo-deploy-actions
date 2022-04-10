@@ -1,0 +1,19 @@
+{
+  "name": "upload-static-assets",
+  "version": "0.0.0",
+  "private": true,
+  "main": "lib/src/main.js",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write **/*.ts",
+    "format-check": "prettier --check **/*.ts",
+    "lint": "eslint **/*.ts",
+    "package": "ncc build --source-map --license licenses.txt",
+    "test": "jest",
+    "ci:package": "yarn build && yarn package"
+  },
+  "dependencies": {
+    "@actions/core": "1.6.0",
+    "@aws-sdk/client-s3": "^3.67.0"
+  }
+}

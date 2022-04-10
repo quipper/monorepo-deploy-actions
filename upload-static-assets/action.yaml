@@ -1,0 +1,9 @@
+name: upload-static-assets
+description: Upload static assets from Docker image to S3 bucket
+inputs:
+  aws-bucket:
+    description: example input
+    required: true
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
