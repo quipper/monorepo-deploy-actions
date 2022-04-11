@@ -15,10 +15,11 @@
   "dependencies": {
     "@actions/core": "1.6.0",
     "@actions/glob": "0.2.1",
-    "aws-sdk": "2.1111.0",
+    "@aws-sdk/client-secrets-manager": "^3.67.0",
     "js-yaml": "4.1.0"
   },
   "devDependencies": {
-    "@types/js-yaml": "4.0.5"
+    "@types/js-yaml": "4.0.5",
+    "aws-sdk-client-mock": "^0.6.2"
   }
 }

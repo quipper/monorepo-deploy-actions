@@ -1,19 +1,14 @@
-import * as aws from 'aws-sdk'
+import { mockClient } from 'aws-sdk-client-mock'
+import { ListSecretVersionIdsCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
 import * as awsSecretsManager from '../src/awsSecretsManager'
 
-const secretsManagerMock = {
-  listSecretVersionIds: jest.fn(),
-}
-jest.mock('aws-sdk', () => ({
-  SecretsManager: jest.fn(() => secretsManagerMock),
-}))
+const secretsManagerMock = mockClient(SecretsManagerClient)
 
 test('getCurrentVersionId returns the current version id', async () => {
-  secretsManagerMock.listSecretVersionIds.mockReturnValue({
+  secretsManagerMock.on(ListSecretVersionIdsCommand, { SecretId: 'microservice/develop' }).resolves(
     // this is an actual payload of the command:
     // $ aws secretsmanager list-secret-version-ids --secret-id microservice/develop
-    // eslint-disable-next-line @typescript-eslint/require-await
-    promise: async (): Promise<aws.SecretsManager.ListSecretVersionIdsResponse> => ({
+    {
       Versions: [
         {
           VersionId: 'cf06c560-f2c1-4150-a322-0d2120f7c12e',
@@ -30,10 +25,9 @@ test('getCurrentVersionId returns the current version id', async () => {
       ],
       ARN: 'arn:aws:secretsmanager:ap-northeast-1:123456789012:secret:microservice/develop-3zcyRx',
       Name: 'microservice/develop',
-    }),
-  })
+    }
+  )
 
-  const versionId = await awsSecretsManager.getCurrentVersionId('my-secret/develop')
-  expect(secretsManagerMock.listSecretVersionIds).toBeCalled()
+  const versionId = await awsSecretsManager.getCurrentVersionId('microservice/develop')
   expect(versionId).toBe('cf06c560-f2c1-4150-a322-0d2120f7c12e')
 })
