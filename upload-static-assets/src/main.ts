@@ -3,7 +3,10 @@ import { run } from './run'
 
 const main = async (): Promise<void> => {
   await run({
-    name: core.getInput('name', { required: true }),
+    bucketName: core.getInput('bucket-name', { required: true }),
+    bucketPrefix: core.getInput('bucket-prefix', { required: true }),
+    dockerImage: core.getInput('docker-image', { required: true }),
+    dockerImagePath: core.getInput('docker-image-path', { required: true }),
   })
 }
 
