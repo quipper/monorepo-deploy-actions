@@ -15,7 +15,7 @@
   "dependencies": {
     "@actions/core": "1.6.0",
     "@actions/glob": "0.3.0",
-    "@aws-sdk/client-secrets-manager": "3.74.0",
+    "@aws-sdk/client-secrets-manager": "3.75.0",
     "js-yaml": "4.1.0"
   },
   "devDependencies": {
