@@ -1,0 +1,24 @@
+name: upload-static-assets
+description: upload static assets from Docker image to S3 bucket
+
+inputs:
+  source-image:
+    description: source of Docker image
+    required: true
+  source-path:
+    description: source path in the Docker image
+    required: true
+  bucket-uri:
+    description: URI of the destination bucket, e.g. s3://bucket/dir
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - id: main
+      shell: bash
+      run: ${{ github.action_path }}/main.sh
+      env:
+        SOURCE_IMAGE: ${{ inputs.source-image }}
+        SOURCE_PATH: ${{ inputs.source-path }}
+        BUCKET_URI: ${{ inputs.bucket-uri }}
