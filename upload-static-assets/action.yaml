@@ -17,7 +17,7 @@ runs:
   steps:
     - id: main
       shell: bash
-      run: ${{ github.action_path }}/main.sh
+      run: exec bash ${{ github.action_path }}/main.sh
       env:
         SOURCE_IMAGE: ${{ inputs.source-image }}
         SOURCE_PATH: ${{ inputs.source-path }}
