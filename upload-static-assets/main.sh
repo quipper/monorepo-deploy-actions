@@ -9,7 +9,7 @@ docker rm "$container_id"
 
 find "$content_dir" -type f
 
-docker run --rm amazon/aws-cli:2 --version
+docker run --rm amazon/aws-cli:latest --version
 docker run --rm \
   -v /tmp:/tmp \
   -e AWS_ACCESS_KEY_ID \
