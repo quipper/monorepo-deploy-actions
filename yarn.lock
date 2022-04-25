@@ -9,6 +9,13 @@
   dependencies:
     "@actions/http-client" "^1.0.11"
 
+"@actions/core@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@actions/core/-/core-1.7.0.tgz#f179a5a0bf5c1102d89b8cf1712825e763feaee4"
+  integrity sha512-7fPSS7yKOhTpgLMbw7lBLc1QJWvJBBAgyTX2PEhagWcKK8t0H8AKCoPMfnrHqIm5cRYH4QFPqD1/ruhuUE7YcQ==
+  dependencies:
+    "@actions/http-client" "^1.0.11"
+
 "@actions/core@^1.2.6":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@actions/core/-/core-1.4.0.tgz#cf2e6ee317e314b03886adfeb20e448d50d6e524"
