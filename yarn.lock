@@ -31,6 +31,16 @@
     "@octokit/plugin-paginate-rest" "^2.17.0"
     "@octokit/plugin-rest-endpoint-methods" "^5.13.0"
 
+"@actions/github@5.0.2":
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/@actions/github/-/github-5.0.2.tgz#ae2ff4c42bab7bbc620f23c6e549c12f5919f531"
+  integrity sha512-+5a9gntqJhqn3bind2TT2xMp+7H6drlr5JPygyJvr6K8lSOs7qRF02doABmMbJKz+dy04wJVG5bBLCodPoTfaQ==
+  dependencies:
+    "@actions/http-client" "^2.0.0"
+    "@octokit/core" "^3.6.0"
+    "@octokit/plugin-paginate-rest" "^2.17.0"
+    "@octokit/plugin-rest-endpoint-methods" "^5.13.0"
+
 "@actions/glob@0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@actions/glob/-/glob-0.3.0.tgz#beb5282a8cd936baadbe99fbb1ccd5eaf2d1fc28"
