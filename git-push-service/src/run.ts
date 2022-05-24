@@ -5,9 +5,9 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as git from './git'
 import * as glob from '@actions/glob'
-import { RequestError } from '@octokit/request-error'
 import { arrangeManifests } from './arrange'
 import { retry } from './retry'
+import { updateBranchByPullRequest } from './pull'
 
 type Inputs = {
   manifests: string
@@ -47,7 +47,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
 
   core.startGroup(`checkout branch ${branch} if exist`)
   await git.init(workspace, owner, repo, inputs.token)
-  await git.checkoutIfExist(workspace, branch)
+  const branchNotExist = (await git.checkoutIfExist(workspace, branch)) > 0
   core.endGroup()
 
   const applicationAnnotations = [
@@ -79,36 +79,24 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
   const message = `Deploy ${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
   await git.commit(workspace, message)
 
-  // push the branch via a pull request
-  const topicBranch = `git-push-service--${inputs.namespace}--${inputs.service}--${Date.now()}`
-  const code = await core.group(`push branch ${topicBranch}`, () => git.pushByFastForward(workspace, topicBranch))
-  if (code > 0) {
-    return new Error(`failed to push branch ${topicBranch} by fast-forward`)
+  if (branchNotExist) {
+    const code = await core.group(`push a new branch ${branch}`, () => git.pushByFastForward(workspace, branch))
+    if (code > 0) {
+      return new Error(`failed to push a new branch ${branch} by fast-forward`)
+    }
+    return
   }
 
-  const octokit = github.getOctokit(inputs.token)
-  core.info(`creating a pull request from ${topicBranch} into ${branch}`)
-  const { data: pull } = await octokit.rest.pulls.create({
+  core.info(`updating branch ${branch} by a pull request`)
+  return await updateBranchByPullRequest({
     owner,
     repo,
-    base: branch,
-    head: topicBranch,
+    branch,
+    workspace,
+    namespace: inputs.namespace,
+    service: inputs.service,
+    token: inputs.token,
   })
-  core.info(`created ${pull.html_url}`)
-  try {
-    const { data: merge } = await octokit.rest.pulls.merge({
-      owner,
-      repo,
-      pull_number: pull.number,
-      merge_method: 'squash',
-    })
-    core.info(`merged ${pull.html_url} as ${merge.sha}`)
-  } catch (e) {
-    if (e instanceof RequestError && e.status === 422) {
-      return e // retry when merge was failed
-    }
-    throw e
-  }
 }
 
 const commitMessageFooter = [
