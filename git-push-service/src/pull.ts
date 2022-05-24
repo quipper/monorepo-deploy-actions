@@ -49,5 +49,7 @@ export const updateBranchByPullRequest = async (inputs: Inputs): Promise<void | 
       return e // retry when merge was failed
     }
     throw e
+  } finally {
+    await git.deleteRef(inputs.workspace, topicBranch)
   }
 }
