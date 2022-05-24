@@ -6,6 +6,8 @@ import { RequestError } from '@octokit/request-error'
 type Inputs = {
   owner: string
   repo: string
+  title: string
+  body: string
   branch: string
   workspace: string
   namespace: string
@@ -29,6 +31,8 @@ export const updateBranchByPullRequest = async (inputs: Inputs): Promise<void | 
     repo: inputs.repo,
     base: inputs.branch,
     head: topicBranch,
+    title: inputs.title,
+    body: inputs.body,
   })
   core.info(`created ${pull.html_url}`)
 

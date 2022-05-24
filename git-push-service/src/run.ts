@@ -91,6 +91,8 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
   return await updateBranchByPullRequest({
     owner,
     repo,
+    title: `Deploy ${inputs.namespace}/${inputs.service}`,
+    body: commitMessageFooter,
     branch,
     workspace,
     namespace: inputs.namespace,
