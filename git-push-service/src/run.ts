@@ -18,6 +18,7 @@ type Inputs = {
   applicationAnnotations: string[]
   destinationRepository: string
   prebuilt: boolean
+  viaPullRequest: boolean
   token: string
 }
 
@@ -79,6 +80,14 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
   const message = `Deploy ${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
   await git.commit(workspace, message)
 
+  if (!inputs.viaPullRequest) {
+    const code = await core.group(`push a new branch ${branch}`, () => git.pushByFastForward(workspace, branch))
+    if (code > 0) {
+      return new Error(`failed to push a new branch ${branch} by fast-forward`)
+    }
+    return
+  }
+
   if (branchNotExist) {
     const code = await core.group(`push a new branch ${branch}`, () => git.pushByFastForward(workspace, branch))
     if (code > 0) {
@@ -87,6 +96,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
     return
   }
 
+  core.warning(`experimental feature: update a branch via a pull request`)
   core.info(`updating branch ${branch} by a pull request`)
   return await updateBranchByPullRequest({
     owner,
