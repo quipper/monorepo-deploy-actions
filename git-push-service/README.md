@@ -124,5 +124,8 @@ You can build the prebuilt manifest using [git-push-services-from-prebuilt actio
 
 ### Update a branch via a pull request (experimental)
 
-You can update a branch via a pull request.
-It would avoid retries of fast-forward.
+You can set `via-pull-request` flag to update a branch via a pull request.
+It brings the following benefits:
+
+- It would avoid the retries of fast-forward when many jobs are running concurrently
+- You can revert a change of manifest by clicking "Revert" button in a pull request
