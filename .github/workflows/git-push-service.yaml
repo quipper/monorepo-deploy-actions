@@ -54,6 +54,7 @@ jobs:
           namespace: ${{ steps.config.outputs.namespace }}
           namespace-level: true
           destination-repository: ${{ github.repository }}
+          via-pull-request: true
 
       - uses: actions/checkout@v3
         with:

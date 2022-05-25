@@ -59,4 +59,4 @@ export const pushByFastForward = async (cwd: string, branch: string): Promise<nu
 }
 
 export const deleteRef = async (cwd: string, ref: string): Promise<number> =>
-  await exec.exec('git', ['push', '--delete', ref], { cwd, ignoreReturnCode: true })
+  await exec.exec('git', ['push', '--delete', 'origin', ref], { cwd, ignoreReturnCode: true })
