@@ -45,8 +45,12 @@ export const updateBranchByPullRequest = async (inputs: Inputs): Promise<void | 
     })
     core.info(`merged ${pull.html_url} as ${merge.sha}`)
   } catch (e) {
-    if (e instanceof RequestError && e.status === 422) {
-      return e // retry when merge was failed
+    if (e instanceof RequestError && e.status === 405) {
+      // retry when got a response of status 405 such as:
+      // - "Base branch was modified" error.
+      //   https://github.community/t/merging-via-rest-api-returns-405-base-branch-was-modified-review-and-try-the-merge-again/13787
+      // - The pull request is conflicted.
+      return e
     }
     throw e
   } finally {
