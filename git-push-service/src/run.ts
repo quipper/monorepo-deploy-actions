@@ -7,6 +7,7 @@ import * as git from './git'
 import * as glob from '@actions/glob'
 import { arrangeManifests } from './arrange'
 import { retry } from './retry'
+import { updateBranchByPullRequest } from './pull'
 
 type Inputs = {
   manifests: string
@@ -17,6 +18,7 @@ type Inputs = {
   applicationAnnotations: string[]
   destinationRepository: string
   prebuilt: boolean
+  viaPullRequest: boolean
   token: string
 }
 
@@ -46,7 +48,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
 
   core.startGroup(`checkout branch ${branch} if exist`)
   await git.init(workspace, owner, repo, inputs.token)
-  await git.checkoutIfExist(workspace, branch)
+  const branchNotExist = (await git.checkoutIfExist(workspace, branch)) > 0
   core.endGroup()
 
   const applicationAnnotations = [
@@ -75,13 +77,37 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
     core.info('nothing to commit')
     return
   }
-  return await core.group(`push branch ${branch}`, async () => {
-    const message = `Deploy ${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
-    await git.commit(workspace, message)
-    const code = await git.pushByFastForward(workspace, branch)
+  const message = `Deploy ${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
+  await git.commit(workspace, message)
+
+  if (!inputs.viaPullRequest) {
+    const code = await core.group(`push branch ${branch}`, () => git.pushByFastForward(workspace, branch))
     if (code > 0) {
       return new Error(`failed to push branch ${branch} by fast-forward`)
     }
+    return
+  }
+
+  if (branchNotExist) {
+    const code = await core.group(`push a new branch ${branch}`, () => git.pushByFastForward(workspace, branch))
+    if (code > 0) {
+      return new Error(`failed to push a new branch ${branch} by fast-forward`)
+    }
+    return
+  }
+
+  core.warning(`experimental feature: update a branch via a pull request`)
+  core.info(`updating branch ${branch} by a pull request`)
+  return await updateBranchByPullRequest({
+    owner,
+    repo,
+    title: `Deploy ${inputs.namespace}/${inputs.service}`,
+    body: commitMessageFooter,
+    branch,
+    workspace,
+    namespace: inputs.namespace,
+    service: inputs.service,
+    token: inputs.token,
   })
 }
 
