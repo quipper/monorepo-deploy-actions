@@ -81,9 +81,9 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
   await git.commit(workspace, message)
 
   if (!inputs.viaPullRequest) {
-    const code = await core.group(`push a new branch ${branch}`, () => git.pushByFastForward(workspace, branch))
+    const code = await core.group(`push branch ${branch}`, () => git.pushByFastForward(workspace, branch))
     if (code > 0) {
-      return new Error(`failed to push a new branch ${branch} by fast-forward`)
+      return new Error(`failed to push branch ${branch} by fast-forward`)
     }
     return
   }
