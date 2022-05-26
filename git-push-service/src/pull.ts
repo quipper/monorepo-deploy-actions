@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as git from './git'
-import { RequestError } from '@octokit/request-error'
+import { catchHttpStatus, retry } from './retry'
 
 type Inputs = {
   owner: string
@@ -36,23 +36,35 @@ export const updateBranchByPullRequest = async (inputs: Inputs): Promise<void | 
   })
   core.info(`created ${pull.html_url}`)
 
+  // GitHub merge API returns 405 in the following cases:
+  // - "Base branch was modified" error.
+  //   https://github.community/t/merging-via-rest-api-returns-405-base-branch-was-modified-review-and-try-the-merge-again/13787
+  //   Just retry the API invocation.
+  // - The pull request is conflicted.
+  //   Need to fetch and recreate a pull request again.
+  //
+  // We cannot distinguish the error because GitHub returns 405 for both.
+  // First this retries the merge API several times.
+  // If the error is not resolved, this returns the error to retry in the caller side.
   try {
-    const { data: merge } = await octokit.rest.pulls.merge({
-      owner: inputs.owner,
-      repo: inputs.repo,
-      pull_number: pull.number,
-      merge_method: 'squash',
+    return await catchHttpStatus(405, async () => {
+      return await retry(
+        async () =>
+          await catchHttpStatus(405, async () => {
+            const { data: merge } = await octokit.rest.pulls.merge({
+              owner: inputs.owner,
+              repo: inputs.repo,
+              pull_number: pull.number,
+              merge_method: 'squash',
+            })
+            core.info(`merged ${pull.html_url} as ${merge.sha}`)
+          }),
+        {
+          maxAttempts: 10,
+          waitMillisecond: 1000,
+        }
+      )
     })
-    core.info(`merged ${pull.html_url} as ${merge.sha}`)
-  } catch (e) {
-    if (e instanceof RequestError && e.status === 405) {
-      // retry when got a response of status 405 such as:
-      // - "Base branch was modified" error.
-      //   https://github.community/t/merging-via-rest-api-returns-405-base-branch-was-modified-review-and-try-the-merge-again/13787
-      // - The pull request is conflicted.
-      return e
-    }
-    throw e
   } finally {
     await git.deleteRef(inputs.workspace, topicBranch)
   }
