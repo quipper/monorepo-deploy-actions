@@ -30,8 +30,20 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const globber = await glob.create(inputs.manifests, { matchDirectories: false })
   const manifests = await globber.glob()
 
+  if (!inputs.viaPullRequest) {
+    // retry when fast-forward is failed
+    return await retry(async () => push(manifests, inputs), {
+      maxAttempts: 50,
+      waitMillisecond: 10000,
+    })
+  }
+
+  // Retry in the following cases:
+  // - Branch already exists, i.e., other job created the branch.
+  // - Pull request is conflicted.
+  //   This should not be happen if you enable the concurrency option in the workflow.
   return await retry(async () => push(manifests, inputs), {
-    maxAttempts: 50,
+    maxAttempts: 3,
     waitMillisecond: 10000,
   })
 }
