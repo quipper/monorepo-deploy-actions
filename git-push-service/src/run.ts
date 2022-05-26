@@ -90,7 +90,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
     return
   }
   const message = `Deploy ${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
-  await git.commit(workspace, message)
+  await core.group(`create a commit`, () => git.commit(workspace, message))
 
   if (!inputs.viaPullRequest) {
     const code = await core.group(`push branch ${branch}`, () => git.pushByFastForward(workspace, branch))
