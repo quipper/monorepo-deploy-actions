@@ -15,7 +15,7 @@ Name | Type | Description
 `application-annotations` | multiline string | Annotations to add to an Application (default to empty)
 `destination-repository` | string | Destination repository
 `prebuilt` | boolean | Push prebuilt manifest (default to false)
-`via-pull-request` | boolean | Update a branch via a pull request (default to false)
+`update-via-pull-request` | boolean | Update a branch via a pull request (default to false)
 `token` | string | GitHub token (default to `github.token`)
 
 
@@ -124,7 +124,7 @@ You can build the prebuilt manifest using [git-push-services-from-prebuilt actio
 
 ### Update a branch via a pull request (experimental)
 
-You can set `via-pull-request` flag to update a branch via a pull request.
+You can set `update-via-pull-request` flag to update a branch via a pull request.
 It brings the following benefits:
 
 - It would avoid the retries of fast-forward when many jobs are running concurrently

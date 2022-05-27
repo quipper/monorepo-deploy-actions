@@ -27,7 +27,7 @@ inputs:
     description: push prebuilt manifest
     required: true
     default: 'false'
-  via-pull-request:
+  update-via-pull-request:
     description: update a branch via a pull request
     required: true
     default: 'false'

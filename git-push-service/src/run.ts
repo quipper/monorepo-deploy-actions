@@ -18,7 +18,7 @@ type Inputs = {
   applicationAnnotations: string[]
   destinationRepository: string
   prebuilt: boolean
-  viaPullRequest: boolean
+  updateViaPullRequest: boolean
   token: string
 }
 
@@ -30,7 +30,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const globber = await glob.create(inputs.manifests, { matchDirectories: false })
   const manifests = await globber.glob()
 
-  if (!inputs.viaPullRequest) {
+  if (!inputs.updateViaPullRequest) {
     // retry when fast-forward is failed
     return await retry(async () => push(manifests, inputs), {
       maxAttempts: 50,
@@ -92,7 +92,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
   const message = `Deploy ${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
   await core.group(`create a commit`, () => git.commit(workspace, message))
 
-  if (!inputs.viaPullRequest) {
+  if (!inputs.updateViaPullRequest) {
     const code = await core.group(`push branch ${branch}`, () => git.pushByFastForward(workspace, branch))
     if (code > 0) {
       return new Error(`failed to push branch ${branch} by fast-forward`)
