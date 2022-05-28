@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: push-2400652162--a
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    github.ref: refs/heads/main
+    github.sha: 242d8fcf2dd6ec4c10233ba6cca8945ef3f8b850
+    github.action: git-push-service
+spec:
+  project: monorepo-deploy-actions
+  source:
+    repoURL: https://github.com/quipper/monorepo-deploy-actions.git
+    targetRevision: ns/monorepo-deploy-actions/main/push-2400652162
+    path: services/a
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: push-2400652162
+  syncPolicy:
+    automated:
+      prune: true
