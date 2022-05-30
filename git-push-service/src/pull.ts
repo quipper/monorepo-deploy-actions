@@ -10,6 +10,7 @@ type Inputs = {
   body: string
   branch: string
   workspace: string
+  project: string
   namespace: string
   service: string
   token: string
@@ -35,6 +36,15 @@ export const updateBranchByPullRequest = async (inputs: Inputs): Promise<void | 
     body: inputs.body,
   })
   core.info(`created ${pull.html_url}`)
+
+  core.info(`adding labels to #${pull.number}`)
+  await octokit.rest.issues.addLabels({
+    owner: inputs.owner,
+    repo: inputs.repo,
+    issue_number: pull.number,
+    labels: [`project:${inputs.project}`, `namespace:${inputs.namespace}`, `service:${inputs.service}`],
+  })
+  core.info(`added labels to #${pull.number}`)
 
   // GitHub merge API returns 405 in the following cases:
   // - "Base branch was modified" error.

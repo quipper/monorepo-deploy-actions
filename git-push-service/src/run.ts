@@ -89,7 +89,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
     core.info('nothing to commit')
     return
   }
-  const message = `Deploy ${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
+  const message = `Deploy ${project}/${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
   await core.group(`create a commit`, () => git.commit(workspace, message))
 
   if (!inputs.updateViaPullRequest) {
@@ -117,6 +117,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
     body: commitMessageFooter,
     branch,
     workspace,
+    project,
     namespace: inputs.namespace,
     service: inputs.service,
     token: inputs.token,
