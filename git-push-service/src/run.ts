@@ -108,7 +108,6 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
     return
   }
 
-  core.warning(`experimental feature: update a branch via a pull request`)
   core.info(`updating branch ${branch} by a pull request`)
   return await updateBranchByPullRequest({
     owner,
