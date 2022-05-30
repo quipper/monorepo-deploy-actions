@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: refs-pull-518-merge--a
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    github.ref: refs/pull/518/merge
+    github.sha: 34ce8eb53f8b15cbb151fdd86f260498685e16db
+    github.action: git-push-service
+spec:
+  project: monorepo-deploy-actions
+  source:
+    repoURL: https://github.com/quipper/monorepo-deploy-actions.git
+    targetRevision: ns/monorepo-deploy-actions/staging/refs-pull-518-merge
+    path: services/a
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: refs-pull-518-merge
+  syncPolicy:
+    automated:
+      prune: true
