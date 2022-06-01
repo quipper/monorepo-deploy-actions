@@ -15,7 +15,7 @@ Name | Type | Description
 `application-annotations` | multiline string | Annotations to add to an Application (default to empty)
 `destination-repository` | string | Destination repository
 `prebuilt` | boolean | Push prebuilt manifest (default to false)
-`update-via-pull-request` | boolean | Update a branch via a pull request (default to true)
+`update-via-pull-request` | boolean | Update a branch via a pull request (default to false)
 `token` | string | GitHub token (default to `github.token`)
 
 
@@ -124,10 +124,10 @@ You can build the prebuilt manifest using [git-push-services-from-prebuilt actio
 
 ### Update strategy of namespace branch
 
-This action updates a namespace branch via a pull request by default.
+This action updates a namespace branch via a pull request.
 It brings the following benefits:
 
 - It would avoid the retries of fast-forward when many jobs are running concurrently
 - You can revert a change of manifest by clicking "Revert" button in a pull request
 
-You can turn off this feature by `update-via-pull-request` flag.
+You can turn on this feature by `update-via-pull-request` flag.

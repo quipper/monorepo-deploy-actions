@@ -30,7 +30,7 @@ inputs:
   update-via-pull-request:
     description: update a branch via a pull request
     required: true
-    default: 'true'
+    default: 'false'
   token:
     description: GitHub token
     required: true
