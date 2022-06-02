@@ -19,6 +19,14 @@ Name | Type | Description
 `token` | string | GitHub token (default to `github.token`)
 
 
+## Outputs
+
+Name | Type | Description
+-----|------|------------
+`destination-pull-request-number` | number | Pull request number if created in the destination repository
+`destination-pull-request-url` | string | URL of pull request if created in the destination repository
+
+
 ## Use-cases
 
 ### Push a manifest of a service

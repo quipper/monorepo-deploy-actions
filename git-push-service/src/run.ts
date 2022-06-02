@@ -22,7 +22,12 @@ type Inputs = {
   token: string
 }
 
-export const run = async (inputs: Inputs): Promise<void> => {
+type Outputs = {
+  destinationPullRequestNumber?: number
+  destinationPullRequestUrl?: string
+}
+
+export const run = async (inputs: Inputs): Promise<Outputs> => {
   if (!inputs.service && !inputs.namespaceLevel) {
     throw new Error('service must be set if namespace-level is false')
   }
@@ -48,7 +53,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
   })
 }
 
-const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> => {
+const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-service-action-'))
   core.info(`created workspace at ${workspace}`)
 
@@ -87,7 +92,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
   const status = await git.status(workspace)
   if (status === '') {
     core.info('nothing to commit')
-    return
+    return {}
   }
   const message = `Deploy ${project}/${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
   await core.group(`create a commit`, () => git.commit(workspace, message))
@@ -97,7 +102,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
     if (code > 0) {
       return new Error(`failed to push branch ${branch} by fast-forward`)
     }
-    return
+    return {}
   }
 
   if (branchNotExist) {
@@ -105,7 +110,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<void | Error> 
     if (code > 0) {
       return new Error(`failed to push a new branch ${branch} by fast-forward`)
     }
-    return
+    return {}
   }
 
   core.info(`updating branch ${branch} by a pull request`)
