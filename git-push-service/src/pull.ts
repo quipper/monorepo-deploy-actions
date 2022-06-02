@@ -16,7 +16,12 @@ type Inputs = {
   token: string
 }
 
-export const updateBranchByPullRequest = async (inputs: Inputs): Promise<void | Error> => {
+type Outputs = {
+  destinationPullRequestNumber: number
+  destinationPullRequestUrl: string
+}
+
+export const updateBranchByPullRequest = async (inputs: Inputs): Promise<Outputs | Error> => {
   const topicBranch = `git-push-service--${inputs.namespace}--${inputs.service}--${Date.now()}`
   const code = await core.group(`push branch ${topicBranch}`, () =>
     git.pushByFastForward(inputs.workspace, topicBranch)
@@ -68,6 +73,10 @@ export const updateBranchByPullRequest = async (inputs: Inputs): Promise<void | 
               merge_method: 'squash',
             })
             core.info(`merged ${pull.html_url} as ${merge.sha}`)
+            return {
+              destinationPullRequestNumber: pull.number,
+              destinationPullRequestUrl: pull.html_url,
+            }
           }),
         {
           maxAttempts: 10,

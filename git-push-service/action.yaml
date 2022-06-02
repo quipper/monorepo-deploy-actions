@@ -1,5 +1,6 @@
 name: git-push-service
 description: push manifest(s) to deploy service(s)
+
 inputs:
   manifests:
     description: glob pattern(s) to manifest(s) in multi-line string
@@ -35,6 +36,13 @@ inputs:
     description: GitHub token
     required: true
     default: ${{ github.token }}
+
+outputs:
+  destination-pull-request-number:
+    description: pull request number if created
+  destination-pull-request-url:
+    description: URL of pull request if created
+
 runs:
   using: 'node16'
   main: 'dist/index.js'
