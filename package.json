@@ -18,7 +18,7 @@
     "@actions/core": "1.8.2"
   },
   "devDependencies": {
-    "@tsconfig/node16": "1.0.2",
+    "@tsconfig/node16": "1.0.3",
     "@types/jest": "28.1.1",
     "@types/node": "16.11.39",
     "@typescript-eslint/eslint-plugin": "5.27.1",
