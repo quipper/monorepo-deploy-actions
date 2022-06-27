@@ -2002,10 +2002,10 @@ array-union@^2.1.0:
   resolved "https://registry.yarnpkg.com/array-union/-/array-union-2.1.0.tgz#b798420adbeb1de828d84acd8a2e23d3efe85e8d"
   integrity sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==
 
-aws-sdk-client-mock@0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/aws-sdk-client-mock/-/aws-sdk-client-mock-0.6.2.tgz#2880d7a7a7e9fcaaf7abdfc01a0f6f22551bc654"
-  integrity sha512-0kH1cyfqGogp69vJitzVducx9q691vGOwg7wEG+DUegGlepjaeskp6YG4SJI0y5Vwh3vi+fP27YQTcWllv4GlQ==
+aws-sdk-client-mock@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk-client-mock/-/aws-sdk-client-mock-1.0.0.tgz#d52c70562ae0ff44ac07a4ef4611ff420681abff"
+  integrity sha512-qd7TJXI1nplTXNh8NdIEwFyHTnNRdUcGDUAEmWW55j9dZg6AGB9zgkzgu9yWCEkAWnpxRIc48ajE8H5FFeioVw==
   dependencies:
     "@types/sinon" "10.0.10"
     sinon "^11.1.1"
