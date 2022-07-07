@@ -34,6 +34,10 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
 
   const globber = await glob.create(inputs.manifests, { matchDirectories: false })
   const manifests = await globber.glob()
+  core.info(`found ${manifests.length} manifest(s) in ${inputs.manifests}`)
+  if (manifests.length === 0) {
+    return {}
+  }
 
   if (!inputs.updateViaPullRequest) {
     // retry when fast-forward is failed
