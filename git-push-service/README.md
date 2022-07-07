@@ -18,6 +18,8 @@ Name | Type | Description
 `update-via-pull-request` | boolean | Update a branch via a pull request (default to false)
 `token` | string | GitHub token (default to `github.token`)
 
+If `manifests` do not match anything, this action does nothing.
+
 
 ## Outputs
 
