@@ -12,6 +12,9 @@
         // update all action.yaml in single pull request
         "@types/node",
       ],
-    }
-  ]
+    },
+  ],
+  "reviewers": [
+    "team:sre",
+  ],
 }
