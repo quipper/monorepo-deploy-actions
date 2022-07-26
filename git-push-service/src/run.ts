@@ -107,7 +107,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
     if (code > 0) {
       return new Error(`failed to push branch ${branch} by fast-forward`)
     }
-    core.summary.addRaw(`Updated the branch`)
+    core.summary.addRaw(`Updated the branch: `)
     core.summary.addLink(branch, `${github.context.serverUrl}/${owner}/${repo}/tree/${branch}`)
     return {}
   }
@@ -117,7 +117,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
     if (code > 0) {
       return new Error(`failed to push a new branch ${branch} by fast-forward`)
     }
-    core.summary.addRaw(`Created a new branch`)
+    core.summary.addRaw(`Created a new branch: `)
     core.summary.addLink(branch, `${github.context.serverUrl}/${owner}/${repo}/tree/${branch}`)
     return {}
   }

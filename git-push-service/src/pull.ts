@@ -41,7 +41,7 @@ export const updateBranchByPullRequest = async (inputs: Inputs): Promise<Outputs
     body: inputs.body,
   })
   core.info(`created ${pull.html_url}`)
-  core.summary.addRaw(`Created a pull request`)
+  core.summary.addRaw(`Created a pull request: `)
   core.summary.addLink(`${inputs.owner}/${inputs.repo}#${pull.number}`, pull.html_url)
 
   core.info(`adding labels to #${pull.number}`)
