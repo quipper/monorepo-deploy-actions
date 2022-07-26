@@ -20,6 +20,7 @@ async function main(): Promise<void> {
   if (outputs.destinationPullRequestUrl !== undefined) {
     core.setOutput('destination-pull-request-url', outputs.destinationPullRequestUrl)
   }
+  await core.summary.write()
 }
 
 main().catch((e) => core.setFailed(e instanceof Error ? e.message : JSON.stringify(e)))
