@@ -41,8 +41,7 @@ export const updateBranchByPullRequest = async (inputs: Inputs): Promise<Outputs
     body: inputs.body,
   })
   core.info(`created ${pull.html_url}`)
-  core.summary.addHeading(inputs.title)
-  core.summary.addRaw(pull.html_url)
+  core.summary.addLink(`Pull Request ${inputs.owner}/${inputs.repo}#${pull.number}`, pull.html_url)
 
   core.info(`adding labels to #${pull.number}`)
   await octokit.rest.issues.addLabels({

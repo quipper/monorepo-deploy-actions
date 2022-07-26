@@ -99,6 +99,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
     return {}
   }
   const message = `Deploy ${project}/${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
+  core.summary.addHeading(`Deploy ${project}/${inputs.namespace}/${inputs.service}`)
   await core.group(`create a commit`, () => git.commit(workspace, message))
 
   if (!inputs.updateViaPullRequest) {
@@ -106,8 +107,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
     if (code > 0) {
       return new Error(`failed to push branch ${branch} by fast-forward`)
     }
-    core.summary.addHeading(`Pushed service ${inputs.service} into branch ${branch}`)
-    core.summary.addRaw(`${github.context.serverUrl}/${owner}/${repo}/tree/${branch}`)
+    core.summary.addLink(`Branch ${branch}`, `${github.context.serverUrl}/${owner}/${repo}/tree/${branch}`)
     return {}
   }
 
@@ -116,8 +116,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
     if (code > 0) {
       return new Error(`failed to push a new branch ${branch} by fast-forward`)
     }
-    core.summary.addHeading(`Pushed service ${inputs.service} into branch ${branch}`)
-    core.summary.addRaw(`${github.context.serverUrl}/${owner}/${repo}/tree/${branch}`)
+    core.summary.addLink(`Branch ${branch}`, `${github.context.serverUrl}/${owner}/${repo}/tree/${branch}`)
     return {}
   }
 
