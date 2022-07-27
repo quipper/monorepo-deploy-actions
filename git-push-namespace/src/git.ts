@@ -40,7 +40,7 @@ export const checkout = async (cwd: string, branch: string): Promise<void> => {
 
 export const status = async (cwd: string): Promise<string> => {
   const output = await exec.getExecOutput('git', ['status', '--porcelain'], { cwd })
-  return output.stdout
+  return output.stdout.trim()
 }
 
 export const commit = async (cwd: string, message: string): Promise<void> => {

@@ -43,7 +43,7 @@ export const checkoutIfExist = async (cwd: string, branch: string): Promise<numb
 
 export const status = async (cwd: string): Promise<string> => {
   const output = await exec.getExecOutput('git', ['status', '--porcelain'], { cwd })
-  return output.stdout
+  return output.stdout.trim()
 }
 
 export const commit = async (cwd: string, message: string): Promise<void> => {
