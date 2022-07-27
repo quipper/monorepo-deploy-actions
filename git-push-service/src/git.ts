@@ -42,9 +42,8 @@ export const checkoutIfExist = async (cwd: string, branch: string): Promise<numb
 }
 
 export const status = async (cwd: string): Promise<string> => {
-  const chunks: Buffer[] = []
-  await exec.exec('git', ['status', '--porcelain'], { cwd, listeners: { stdout: (b) => chunks.push(b) } })
-  return Buffer.concat(chunks).toString().trim()
+  const output = await exec.getExecOutput('git', ['status', '--porcelain'], { cwd })
+  return output.stdout.trim()
 }
 
 export const commit = async (cwd: string, message: string): Promise<void> => {
