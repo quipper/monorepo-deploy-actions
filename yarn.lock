@@ -128,10 +128,10 @@
     "@aws-sdk/types" "3.127.0"
     tslib "^2.3.1"
 
-"@aws-sdk/client-secrets-manager@3.150.0":
-  version "3.150.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-secrets-manager/-/client-secrets-manager-3.150.0.tgz#485c4594088bd9a223cc39b5c2b4eb53b3c10a85"
-  integrity sha512-mcl8pprkmU3+D1NiawaFANg26IVdpD+vSYInW/86Vk6oWSe9ty0GsolbZQfvYZs4Wa2nqcuTIBf9DnsgW9o+9Q==
+"@aws-sdk/client-secrets-manager@3.152.0":
+  version "3.152.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-secrets-manager/-/client-secrets-manager-3.152.0.tgz#d7b2c7d677d0adeb5b559a87f36e6bb34a6bf045"
+  integrity sha512-Khw/1UorrS//l2sKhpPHnEKE5UbfU0aRCZfgln3su+bZzOAYDTWhuJWMWbNmiQRoxExjs/xAZ973NvVSAf5gZQ==
   dependencies:
     "@aws-crypto/sha256-browser" "2.0.0"
     "@aws-crypto/sha256-js" "2.0.0"
