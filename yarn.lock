@@ -1718,7 +1718,7 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@sinonjs/fake-timers@^7.1.0", "@sinonjs/fake-timers@^7.1.2":
+"@sinonjs/fake-timers@^7.1.2":
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/@sinonjs/fake-timers/-/fake-timers-7.1.2.tgz#2524eae70c4910edccf99b2f4e6efc5894aff7b5"
   integrity sha512-iQADsW4LBMISqZ6Ci1dupJL9pprqwcVFTcOsEmQOEhW+KLCVn/Y4Jrvg2k19fIHCp+iFprriYPTdRcQR8NbUPg==
@@ -1843,12 +1843,17 @@
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.2.3.tgz#ef65165aea2924c9359205bf748865b8881753c0"
   integrity sha512-PijRCG/K3s3w1We6ynUKdxEc5AcuuH3NBmMDP8uvKVp6X43UY7NQlTzczakXP3DJR0F4dfNQIGjU2cUeRYs2AA==
 
-"@types/sinon@10.0.10":
-  version "10.0.10"
-  resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-10.0.10.tgz#f8acd72fbc2e87c4679f3e2c1ab3530dff1ab6e2"
-  integrity sha512-US5E539UfeL2DiWALzCyk0c4zKh6sCv86V/0lpda/afMJJ0oEm2SrKgedH5optvFWstnJ8e1MNYhLmPhAy4rvQ==
+"@types/sinon@^10.0.10":
+  version "10.0.13"
+  resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-10.0.13.tgz#60a7a87a70d9372d0b7b38cc03e825f46981fb83"
+  integrity sha512-UVjDqJblVNQYvVNUsj0PuYYw0ELRmgt1Nt5Vk0pT5f16ROGfcKJY8o1HVuMOJOpD727RrGB9EGvoaTQE5tgxZQ==
   dependencies:
-    "@sinonjs/fake-timers" "^7.1.0"
+    "@types/sinonjs__fake-timers" "*"
+
+"@types/sinonjs__fake-timers@*":
+  version "8.1.2"
+  resolved "https://registry.yarnpkg.com/@types/sinonjs__fake-timers/-/sinonjs__fake-timers-8.1.2.tgz#bf2e02a3dbd4aecaf95942ecd99b7402e03fad5e"
+  integrity sha512-9GcLXF0/v3t80caGs5p2rRfkB+a8VBGLJZVih6CNFkx8IZ994wiKKLSRs9nuFwk1HevWs/1mnUmkApGrSGsShA==
 
 "@types/stack-utils@^2.0.0":
   version "2.0.0"
@@ -2079,12 +2084,12 @@ array-union@^2.1.0:
   resolved "https://registry.yarnpkg.com/array-union/-/array-union-2.1.0.tgz#b798420adbeb1de828d84acd8a2e23d3efe85e8d"
   integrity sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==
 
-aws-sdk-client-mock@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk-client-mock/-/aws-sdk-client-mock-1.0.0.tgz#d52c70562ae0ff44ac07a4ef4611ff420681abff"
-  integrity sha512-qd7TJXI1nplTXNh8NdIEwFyHTnNRdUcGDUAEmWW55j9dZg6AGB9zgkzgu9yWCEkAWnpxRIc48ajE8H5FFeioVw==
+aws-sdk-client-mock@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk-client-mock/-/aws-sdk-client-mock-2.0.0.tgz#44058cf2550726612dfbbf9ddf81d9d8360313a0"
+  integrity sha512-yjC39Ud78Cgwu9jLc7LoFILT8xtyvR9doCfd8tjeqaOI4oQ5IeTaIYDezWpWKndmrjXZzVLw/odWKP1hpuvsVQ==
   dependencies:
-    "@types/sinon" "10.0.10"
+    "@types/sinon" "^10.0.10"
     sinon "^11.1.1"
     tslib "^2.1.0"
 
