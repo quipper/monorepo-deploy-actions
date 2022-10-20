@@ -128,14 +128,14 @@
     "@aws-sdk/types" "3.190.0"
     tslib "^2.3.1"
 
-"@aws-sdk/client-secrets-manager@3.190.0":
-  version "3.190.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-secrets-manager/-/client-secrets-manager-3.190.0.tgz#31d687ad74b04a5479cc27caa6119fdc3d085e7d"
-  integrity sha512-yp3Xrgtw2HIdwQ+aLEMvRRPD+jQ/MKdu+r+VSyzUs4/FEullrp9eohUNfps2GT2E2Vz2eAiFRt9dYIOFtvM10w==
+"@aws-sdk/client-secrets-manager@3.192.0":
+  version "3.192.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-secrets-manager/-/client-secrets-manager-3.192.0.tgz#1ed13a615a1ae6e991bf00f10541f9306a408a41"
+  integrity sha512-PKhxrURiWGOikTUCxRthwo1/1+zbYT4vmMpoGYLolkBZayf59Zs+452Y6lbBgHyBeR8PWhHMli+Di5TV4dKt0g==
   dependencies:
     "@aws-crypto/sha256-browser" "2.0.0"
     "@aws-crypto/sha256-js" "2.0.0"
-    "@aws-sdk/client-sts" "3.190.0"
+    "@aws-sdk/client-sts" "3.192.0"
     "@aws-sdk/config-resolver" "3.190.0"
     "@aws-sdk/credential-provider-node" "3.190.0"
     "@aws-sdk/fetch-http-handler" "3.190.0"
@@ -147,7 +147,7 @@
     "@aws-sdk/middleware-recursion-detection" "3.190.0"
     "@aws-sdk/middleware-retry" "3.190.0"
     "@aws-sdk/middleware-serde" "3.190.0"
-    "@aws-sdk/middleware-signing" "3.190.0"
+    "@aws-sdk/middleware-signing" "3.192.0"
     "@aws-sdk/middleware-stack" "3.190.0"
     "@aws-sdk/middleware-user-agent" "3.190.0"
     "@aws-sdk/node-config-provider" "3.190.0"
@@ -206,10 +206,10 @@
     "@aws-sdk/util-utf8-node" "3.188.0"
     tslib "^2.3.1"
 
-"@aws-sdk/client-sts@3.190.0":
-  version "3.190.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-sts/-/client-sts-3.190.0.tgz#835a471daec37aa12e073f425aeab60fc1b3f9e5"
-  integrity sha512-s5MqfxqWxHAl1RhfQ6swjawsVPBqmq5F+SfzZcGLBCnVv03GaSL8J9K42O1Cc0+HwPQH2miY+Avy0zAr6VpY+Q==
+"@aws-sdk/client-sts@3.192.0":
+  version "3.192.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-sts/-/client-sts-3.192.0.tgz#99ef970262a40a3a3dd09dfda7321be8070c1a52"
+  integrity sha512-iv72dmRxbZ1cN5jGn4KIVzzu11eduS2fXHbNgd7JsFd5hLBV5TvJaugQzUdXNmy2gN4HiRJr+qa9WkD5b39lsA==
   dependencies:
     "@aws-crypto/sha256-browser" "2.0.0"
     "@aws-crypto/sha256-js" "2.0.0"
@@ -223,9 +223,9 @@
     "@aws-sdk/middleware-logger" "3.190.0"
     "@aws-sdk/middleware-recursion-detection" "3.190.0"
     "@aws-sdk/middleware-retry" "3.190.0"
-    "@aws-sdk/middleware-sdk-sts" "3.190.0"
+    "@aws-sdk/middleware-sdk-sts" "3.192.0"
     "@aws-sdk/middleware-serde" "3.190.0"
-    "@aws-sdk/middleware-signing" "3.190.0"
+    "@aws-sdk/middleware-signing" "3.192.0"
     "@aws-sdk/middleware-stack" "3.190.0"
     "@aws-sdk/middleware-user-agent" "3.190.0"
     "@aws-sdk/node-config-provider" "3.190.0"
@@ -420,12 +420,12 @@
     tslib "^2.3.1"
     uuid "^8.3.2"
 
-"@aws-sdk/middleware-sdk-sts@3.190.0":
-  version "3.190.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/middleware-sdk-sts/-/middleware-sdk-sts-3.190.0.tgz#4606c41658f6d0ff2ff9b11bd2fc3a35f8ebd1ea"
-  integrity sha512-eUHrsr35mkD/cAFKoYuFYz0zE7QPBWvSzMzqmEJC+YXzAF6IABP3FL/htAFpWkje5XDl5dQ6dAxzV+ebK8RNXQ==
+"@aws-sdk/middleware-sdk-sts@3.192.0":
+  version "3.192.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/middleware-sdk-sts/-/middleware-sdk-sts-3.192.0.tgz#d4dbbf8a257d7362b4a0d52eaeb951cd8bcc37d4"
+  integrity sha512-xzTV7MyG5ipWYTvekWX1tQc5ExsUvCYsDTBCD3LR5hBrP8assUDPo52zGSe+QMcjgnQv7BcYIzeikTkLEG0dUw==
   dependencies:
-    "@aws-sdk/middleware-signing" "3.190.0"
+    "@aws-sdk/middleware-signing" "3.192.0"
     "@aws-sdk/property-provider" "3.190.0"
     "@aws-sdk/protocol-http" "3.190.0"
     "@aws-sdk/signature-v4" "3.190.0"
@@ -440,10 +440,10 @@
     "@aws-sdk/types" "3.190.0"
     tslib "^2.3.1"
 
-"@aws-sdk/middleware-signing@3.190.0":
-  version "3.190.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/middleware-signing/-/middleware-signing-3.190.0.tgz#32fc668c6ea7e632c1dd0eaacd78c71ff522dc77"
-  integrity sha512-Xj5MmXZq8UIpY8wOwyqei5q6MgqKxsO9Plo2zUgW7JR0w7R21MlqY2kzzvcM9R0FFhi9dqhniFT2ZMRUb1v73w==
+"@aws-sdk/middleware-signing@3.192.0":
+  version "3.192.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/middleware-signing/-/middleware-signing-3.192.0.tgz#e4d81ffca7321bf2d691505e93382bac36014fe9"
+  integrity sha512-qTRIU/TL/dvtTrNj+AkZkgYeTIFslib3Y3XnQNNM6RCm4cMxIgs2K/lnhaUmLdbzHrpOQb4cISkY8yiHo+pNsw==
   dependencies:
     "@aws-sdk/property-provider" "3.190.0"
     "@aws-sdk/protocol-http" "3.190.0"
