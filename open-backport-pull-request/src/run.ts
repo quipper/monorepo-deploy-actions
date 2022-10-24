@@ -14,6 +14,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const headBranch = getHeadBranch(context)
   const baseBranch = inputs.baseBranch
   const octokit = getOctokit(inputs.githubToken)
+  const headSha = await getHeadSha(octokit, context)
 
   core.setOutput('base-branch', baseBranch)
   core.setOutput('head-branch', headBranch)
@@ -21,6 +22,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
   if (await hasDiff({ headBranch, baseBranch, octokit, context })) {
     const pullRequestUrl = await openPullRequest({
       headBranch,
+      headSha,
       baseBranch,
       octokit,
       context,
@@ -35,6 +37,21 @@ export const getHeadBranch = (context: Context): string => {
     return context.payload.inputs.headBranch as string
   } else {
     return context.ref.replace(/^refs\/heads\//, '')
+  }
+}
+
+const getHeadSha = async (octokit: Octokit, context: Context): Promise<string> => {
+  if (context.eventName === 'workflow_dispatch') {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const branch = context.payload.inputs.headBranch as string
+    const { data: ref } = await octokit.rest.git.getRef({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      ref: `heads/${branch}`,
+    })
+    return ref.object.sha
+  } else {
+    return context.sha
   }
 }
 
@@ -55,34 +72,57 @@ const hasDiff = async (params: hasDiffParams): Promise<boolean> => {
 
 type openPullRequestParams = {
   headBranch: string
+  headSha: string
   baseBranch: string
   context: Context
   octokit: Octokit
 }
+
 const openPullRequest = async (params: openPullRequestParams): Promise<string | undefined> => {
+  // Create a working branch so that we can edit it if conflicted.
+  // Generally, the head branch is protected and cannot be edited.
+  const workingBranch = `backport-${params.headBranch.replaceAll('/', '-')}-${Date.now()}`
+  await params.octokit.rest.git.createRef({
+    owner: params.context.repo.owner,
+    repo: params.context.repo.repo,
+    ref: `refs/heads/${workingBranch}`,
+    sha: params.headSha,
+  })
+
+  core.info(`Creating a pull request ${workingBranch} -> ${params.baseBranch}`)
+  const pr = await params.octokit.rest.pulls.create({
+    owner: params.context.repo.owner,
+    repo: params.context.repo.repo,
+    head: workingBranch,
+    base: params.baseBranch,
+    title: `Backport ${params.headBranch} into ${params.baseBranch}`,
+    body: `Created from https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+  })
+  core.info(`Created ${pr.data.html_url}`)
+
+  core.info(`Requesting a review to ${params.context.actor}`)
   try {
-    const pr = await params.octokit.rest.pulls.create({
+    await params.octokit.rest.pulls.requestReviewers({
       owner: params.context.repo.owner,
       repo: params.context.repo.repo,
-      head: params.headBranch,
-      base: params.baseBranch,
-      title: `Backport ${params.headBranch} into ${params.baseBranch}`,
-      body: `Created from https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+      pull_number: pr.data.number,
+      reviewers: [params.context.actor],
     })
-    return pr.data.html_url
-  } catch (err) {
-    console.error(err)
-
-    if (isUnprocessableEntityError(err)) {
-      core.warning('Pull Request already exists')
-    } else {
-      core.error('Unknown failure: ${err.message}')
-    }
+  } catch (e) {
+    core.info(`could not request a review to ${params.context.actor}: ${String(e)}`)
   }
-}
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const isUnprocessableEntityError = (err: any): boolean => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  return typeof err === 'object' && 'status' in err && err.status === 422
+  core.info(`Adding ${params.context.actor} to assignees`)
+  try {
+    await params.octokit.rest.issues.addAssignees({
+      owner: params.context.repo.owner,
+      repo: params.context.repo.repo,
+      issue_number: pr.data.number,
+      assignees: [params.context.actor],
+    })
+  } catch (e) {
+    core.info(`could not assign ${params.context.actor}: ${String(e)}`)
+  }
+
+  return pr.data.html_url
 }

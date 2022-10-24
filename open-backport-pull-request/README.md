@@ -6,6 +6,8 @@ This is useful in branching strategies like Gitflow, where a hotfix to the `main
 
 ## Usage
 
+To create a backport pull request when a branch is changed:
+
 ```yaml
 on:
   push:
@@ -29,6 +31,10 @@ jobs:
         with:
           base-branch: develop
 ```
+
+This action creates a working branch from the latest commit of head branch.
+It creates a pull request from the working branch, because the head branch is protected typically.
+When the pull request is conflicted, you can edit the working branch on GitHub.
 
 ## Inputs
 
