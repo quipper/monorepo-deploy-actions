@@ -90,23 +90,14 @@ const openPullRequest = async (params: openPullRequestParams): Promise<string | 
   })
 
   core.info(`Creating a pull request ${workingBranch} -> ${params.baseBranch}`)
-  let pr
-  try {
-    pr = await params.octokit.rest.pulls.create({
-      owner: params.context.repo.owner,
-      repo: params.context.repo.repo,
-      head: workingBranch,
-      base: params.baseBranch,
-      title: `Backport ${params.headBranch} into ${params.baseBranch}`,
-      body: `Created from https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
-    })
-  } catch (err) {
-    if (isUnprocessableEntityError(err)) {
-      core.warning(`Pull Request already exists: ${String(err)}`)
-      return
-    }
-    throw err
-  }
+  const pr = await params.octokit.rest.pulls.create({
+    owner: params.context.repo.owner,
+    repo: params.context.repo.repo,
+    head: workingBranch,
+    base: params.baseBranch,
+    title: `Backport ${params.headBranch} into ${params.baseBranch}`,
+    body: `Created from https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+  })
   core.info(`Created ${pr.data.html_url}`)
 
   core.info(`Requesting a review to ${params.context.actor}`)
@@ -134,10 +125,4 @@ const openPullRequest = async (params: openPullRequestParams): Promise<string | 
   }
 
   return pr.data.html_url
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const isUnprocessableEntityError = (err: any): boolean => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  return typeof err === 'object' && 'status' in err && err.status === 422
 }
