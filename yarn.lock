@@ -128,10 +128,10 @@
     "@aws-sdk/types" "3.193.0"
     tslib "^2.3.1"
 
-"@aws-sdk/client-secrets-manager@3.194.0":
-  version "3.194.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-secrets-manager/-/client-secrets-manager-3.194.0.tgz#241edb28bf14d680562e191ab52a20f2bcceef87"
-  integrity sha512-O3yzVoEW4fbU7hIrWmYCbsfBBI8jsikKVcHHkPRNtY1lkjX5Gb6VBPrNLRbbyCeZfBACcbk0xLQQOyNMXr79gA==
+"@aws-sdk/client-secrets-manager@3.195.0":
+  version "3.195.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-secrets-manager/-/client-secrets-manager-3.195.0.tgz#f1c8ca49f3c91617acd6717adf324132813a225b"
+  integrity sha512-9Ss7DZAAD8EMqBeKfBL4BhcR4HMMzwzHkMQS3/tXuqm4wK6D5HOxepE7Xx/wTfbROj7Cz2pqad6QpjPEDhCgQA==
   dependencies:
     "@aws-crypto/sha256-browser" "2.0.0"
     "@aws-crypto/sha256-js" "2.0.0"
@@ -142,6 +142,7 @@
     "@aws-sdk/hash-node" "3.193.0"
     "@aws-sdk/invalid-dependency" "3.193.0"
     "@aws-sdk/middleware-content-length" "3.193.0"
+    "@aws-sdk/middleware-endpoint" "3.193.0"
     "@aws-sdk/middleware-host-header" "3.193.0"
     "@aws-sdk/middleware-logger" "3.193.0"
     "@aws-sdk/middleware-recursion-detection" "3.193.0"
@@ -162,6 +163,7 @@
     "@aws-sdk/util-body-length-node" "3.188.0"
     "@aws-sdk/util-defaults-mode-browser" "3.193.0"
     "@aws-sdk/util-defaults-mode-node" "3.193.0"
+    "@aws-sdk/util-endpoints" "3.194.0"
     "@aws-sdk/util-user-agent-browser" "3.193.0"
     "@aws-sdk/util-user-agent-node" "3.193.0"
     "@aws-sdk/util-utf8-browser" "3.188.0"
