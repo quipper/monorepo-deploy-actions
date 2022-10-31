@@ -1,0 +1,48 @@
+name: git-push-services-patch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - git-push-services-patch/**
+      - '*.json'
+      - e2e-test/**
+      - .github/workflows/git-push-services-patch.yaml
+  pull_request:
+    branches: [main]
+    paths:
+      - git-push-services-patch/**
+      - '*.json'
+      - e2e-test/**
+      - .github/workflows/git-push-services-patch.yaml
+
+jobs:
+  ts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: git-push-services-patch
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+      - run: yarn
+      - run: yarn lint
+      - run: yarn format-check
+      - run: yarn test
+      - run: yarn build
+      - run: yarn package
+
+      - run: ${{ github.workspace }}/.github/e2e-test-config.sh
+        id: config
+
+      - uses: ./git-push-services-patch
+        with:
+          patch: ${{ github.workspace }}/git-push-services-patch/tests/fixtures/kustomization.yaml
+          operation: add
+          overlay: ${{ steps.config.outputs.overlay }}
+          namespace: ${{ steps.config.outputs.namespace }}
+          destination-repository: ${{ github.repository }}

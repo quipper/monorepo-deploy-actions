@@ -1,0 +1,27 @@
+name: git-push-services-patch
+description: action to push a patch to all services in a namespace
+
+inputs:
+  patch:
+    description: path to a patch
+    required: true
+  operation:
+    description: add or delete
+    required: true
+  overlay:
+    description: overlay name
+    required: true
+  namespace:
+    description: namespace name
+    required: true
+  destination-repository:
+    description: destination repository
+    required: true
+  token:
+    description: GitHub token
+    required: true
+    default: ${{ github.token }}
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
