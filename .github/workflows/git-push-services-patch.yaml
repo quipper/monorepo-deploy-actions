@@ -39,6 +39,22 @@ jobs:
       - run: ${{ github.workspace }}/.github/e2e-test-config.sh
         id: config
 
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }} # avoid "shallow update not allowed" error
+          path: e2e-test-fixture
+      - name: Set up a fixture branch
+        working-directory: e2e-test-fixture
+        run: |
+          mkdir -vp services/a
+          date > services/a/generated.yaml
+          git add .
+          git config user.email 'github-actions@github.com'
+          git config user.name 'github-actions'
+          git commit -m "e2e-test-fixture for ${GITHUB_REF}"
+          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}"
+
+      # verify "add" operation
       - uses: ./git-push-services-patch
         with:
           patch: ${{ github.workspace }}/git-push-services-patch/tests/fixtures/kustomization.yaml
@@ -46,3 +62,40 @@ jobs:
           overlay: ${{ steps.config.outputs.overlay }}
           namespace: ${{ steps.config.outputs.namespace }}
           destination-repository: ${{ github.repository }}
+
+      - uses: actions/checkout@v3
+        with:
+          ref: ns/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}
+          path: e2e-test-fixture
+      - run: find services
+        working-directory: e2e-test-fixture
+      - run: test -f services/a/generated.yaml
+        working-directory: e2e-test-fixture
+      - run: test -f services/a/kustomization.yaml
+        working-directory: e2e-test-fixture
+
+      # verify "delete" operation
+      - uses: ./git-push-services-patch
+        with:
+          patch: ${{ github.workspace }}/git-push-services-patch/tests/fixtures/kustomization.yaml
+          operation: delete
+          overlay: ${{ steps.config.outputs.overlay }}
+          namespace: ${{ steps.config.outputs.namespace }}
+          destination-repository: ${{ github.repository }}
+
+      - uses: actions/checkout@v3
+        with:
+          ref: ns/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}
+          path: e2e-test-fixture
+      - run: find services
+        working-directory: e2e-test-fixture
+      - run: test -f services/a/generated.yaml
+        working-directory: e2e-test-fixture
+      - run: test ! -f services/a/kustomization.yaml
+        working-directory: e2e-test-fixture
+
+      - name: Clean up the fixture branch
+        continue-on-error: true
+        if: always()
+        run: |
+          git push origin --delete "refs/heads/ns/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}"
