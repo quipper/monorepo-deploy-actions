@@ -6,6 +6,7 @@ import * as path from 'path'
 type Inputs = {
   workspace: string
   patch: string
+  excludeServices: Set<string>
 }
 
 export const addToServices = async (inputs: Inputs) => {
@@ -15,6 +16,10 @@ export const addToServices = async (inputs: Inputs) => {
   core.info(`found ${services.length} service(s)`)
 
   for (const service of services) {
+    if (inputs.excludeServices.has(service)) {
+      core.info(`excluded service ${service}`)
+      continue
+    }
     const serviceDirectory = `${inputs.workspace}/services/${service}`
     core.info(`copying the patch into ${serviceDirectory}`)
     await io.cp(inputs.patch, serviceDirectory, { force: true })
@@ -30,6 +35,10 @@ export const deleteFromServices = async (inputs: Inputs) => {
   core.info(`found ${services.length} service(s)`)
 
   for (const service of services) {
+    if (inputs.excludeServices.has(service)) {
+      core.info(`excluded service ${service}`)
+      continue
+    }
     const patchPath = `${inputs.workspace}/services/${service}/${patchBasename}`
     core.info(`removing ${patchPath}`)
     await io.rmRF(patchPath)

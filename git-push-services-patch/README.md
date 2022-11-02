@@ -10,6 +10,7 @@ Name | Type | Description
 `operation` | string | Either `add` or `delete`
 `overlay` | string | Name of overlay
 `namespace` | string | Name of namespace
+`exclude-services` | multiline string | Names of services to exclude (optional)
 `destination-repository` | string | Destination repository
 `token` | string | GitHub token (default to `github.token`)
 
