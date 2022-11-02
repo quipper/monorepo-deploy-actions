@@ -22,17 +22,19 @@ Nothing.
 
 For cost saving, we can temporarily stop all pods in night.
 
+### Scale in
+
 Here is an example of workflow.
 
 ```yaml
-name: scale-in-pods-daily
+name: scale-in-services-daily
 
 on:
   schedule:
     - cron: '0 13 * * 1-5' # 22:00 JST weekday
 
 jobs:
-  namespaces:
+  develop:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -58,11 +60,43 @@ destination-repository (branch: ns/${project}/${overlay}/${namespace})
         └── kustomization.yaml
 ```
 
-For scale-out, you can delete the patch as follows:
+### Scale out
+
+To delete the patch, create a workflow with `delete` operation.
+
+```yaml
+name: scale-in-services-daily
+
+on:
+  schedule:
+    - cron: '0 23 * * 0-4' # 08:00 JST weekday
+
+jobs:
+  develop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: quipper/monorepo-deploy-actions/git-push-services-patch@v1
+        with:
+          patch: nightly-stop-patch/kustomization.yaml
+          operation: delete
+          overlay: develop
+          namespace: develop
+```
+
+### Exclude specific service(s)
+
+You can exclude specific service(s).
 
 ```yaml
       - uses: quipper/monorepo-deploy-actions/git-push-services-patch@v1
         with:
           patch: nightly-stop-patch/kustomization.yaml
-          operation: delete
+          operation: add
+          overlay: develop
+          namespace: develop
+          exclude-services: |
+            some-backend
+            some-frontend
 ```
