@@ -7,6 +7,7 @@ const main = async (): Promise<void> => {
     operation: operationOf(core.getInput('operation', { required: true })),
     overlay: core.getInput('overlay', { required: true }),
     namespace: core.getInput('namespace', { required: true }),
+    excludeServices: core.getMultilineInput('exclude-services'),
     destinationRepository: core.getInput('destination-repository', { required: true }),
     token: core.getInput('token', { required: true }),
   })

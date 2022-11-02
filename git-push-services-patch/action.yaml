@@ -14,6 +14,9 @@ inputs:
   namespace:
     description: namespace name
     required: true
+  exclude-services:
+    description: services to exclude (optional)
+    required: false
   destination-repository:
     description: destination repository
     required: true

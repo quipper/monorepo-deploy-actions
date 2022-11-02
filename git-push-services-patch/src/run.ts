@@ -12,6 +12,7 @@ type Inputs = {
   operation: Operation
   overlay: string
   namespace: string
+  excludeServices: string[]
   destinationRepository: string
   token: string
 }
@@ -48,9 +49,9 @@ const push = async (inputs: Inputs): Promise<void | Error> => {
   core.endGroup()
 
   if (inputs.operation === 'add') {
-    await patch.addToServices({ workspace, patch: inputs.patch })
+    await patch.addToServices({ workspace, patch: inputs.patch, excludeServices: new Set(inputs.excludeServices) })
   } else if (inputs.operation === 'delete') {
-    await patch.deleteFromServices({ workspace, patch: inputs.patch })
+    await patch.deleteFromServices({ workspace, patch: inputs.patch, excludeServices: new Set(inputs.excludeServices) })
   }
 
   const status = await git.status(workspace)
