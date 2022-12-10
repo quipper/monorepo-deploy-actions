@@ -1900,10 +1900,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.41.tgz#d0b939d94c1d7bd53d04824af45f1139b8c45615"
   integrity sha512-dueRKfaJL4RTtSa7bWeTK1M+VH+Gns73oCgzvYfHZywRCoPSd8EkXBL0mZ9unPTveBn+D9phZBaxuzpwjWkW0g==
 
-"@types/node@16.18.6":
-  version "16.18.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.6.tgz#87846192fd51b693368fad3e99123169225621d4"
-  integrity sha512-vmYJF0REqDyyU0gviezF/KHq/fYaUbFhkcNbQCuPGFQj6VTbXuHZoxs/Y7mutWe73C8AC6l9fFu8mSYiBAqkGA==
+"@types/node@16.18.8":
+  version "16.18.8"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.8.tgz#ffb2a4efa4eb4384811081776c52b054481cca54"
+  integrity sha512-TrpoNiaPvBH5h8rQQenMtVsJXtGsVBRJrcp2Ik6oEt99jHfGvDLh20VTTq3ixTbjYujukYz1IlY4N8a8yfY0jA==
 
 "@types/prettier@^2.1.5":
   version "2.2.3"
