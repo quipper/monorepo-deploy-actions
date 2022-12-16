@@ -1,0 +1,12 @@
+name: environment-matrix
+description: generate a JSON for matrix deploy
+inputs:
+  name:
+    description: example input
+    required: true
+outputs:
+  json:
+    description: string of JSON
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
