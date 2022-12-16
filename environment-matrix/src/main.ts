@@ -3,7 +3,7 @@ import { run } from './run'
 
 const main = async (): Promise<void> => {
   const outputs = await run({
-    rules: core.getInput('matches', { required: true }),
+    rules: core.getInput('rules', { required: true }),
   })
   core.setOutput('json', outputs.environments)
 }
