@@ -8,18 +8,16 @@ on:
     outputs:
       overlay:
         description: overlay for this context
-        value: ${{ jobs.environment.outputs.overlay }}
+        value: ${{ fromJSON(jobs.environment.outputs.json)[0].overlay }}
       namespace:
         description: namespace for this context
-        value: ${{ jobs.environment.outputs.namespace }}
+        value: ${{ fromJSON(jobs.environment.outputs.json)[0].namespace }}
 
 jobs:
   environment:
     runs-on: ubuntu-latest
     outputs:
-      environments: ${{ steps.environment-matrix.outputs.json }}
-      overlay: ${{ fromJSON(steps.environment-matrix.outputs.json)[0].overlay }}
-      namespace: ${{ fromJSON(steps.environment-matrix.outputs.json)[0].namespace }}
+      json: ${{ steps.environment-matrix.outputs.json }}
     steps:
       - uses: quipper/monorepo-deploy-actions/environment-matrix@v1
         id: environment-matrix
@@ -36,5 +34,7 @@ jobs:
               environments:
                 - overlay: main
                   namespace: main-${{ github.run_number }}
-      - run: echo '${{ fromJSON(steps.environment-matrix.outputs.json)[0].overlay }}'
-      - run: echo '${{ fromJSON(steps.environment-matrix.outputs.json)[0].namespace }}'
+      - name: overlay=${{ fromJSON(steps.environment-matrix.outputs.json)[0].overlay }}
+        run: exit
+      - name: namespace=${{ fromJSON(steps.environment-matrix.outputs.json)[0].namespace }}
+        run: exit
