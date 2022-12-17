@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       environments: ${{ steps.environment-matrix.outputs.json }}
-      overlay: ${{ steps.config.outputs.overlay }}
-      namespace: ${{ steps.config.outputs.namespace }}
+      overlay: ${{ fromJSON(steps.environment-matrix.outputs.json)[0].overlay }}
+      namespace: ${{ fromJSON(steps.environment-matrix.outputs.json)[0].namespace }}
     steps:
       - uses: quipper/monorepo-deploy-actions/environment-matrix@v1
         id: environment-matrix
@@ -36,12 +36,3 @@ jobs:
               environments:
                 - overlay: main
                   namespace: main-${{ github.run_number }}
-      - uses: actions/github-script@v6
-        id: config
-        env:
-          environments: ${{ steps.environment-matrix.outputs.environments }}
-        with:
-          script: |
-            const { overlay, namespace } = JSON.parse(process.env.environments)[0]
-            core.setOutput('overlay', overlay)
-            core.setOutput('namespace', namespace)
