@@ -15,11 +15,14 @@ export const find = (context: Context, rules: Rules): Environment[] | undefined 
 
 const match = (context: Context, rule: Rule): boolean => {
   if (context.eventName === 'pull_request' && rule.pull_request !== undefined) {
-    const payload = context.payload
-    if (!isPullRequestPayload(payload)) {
-      throw new Error(`payload does not contain pull request fields`)
+    const { pull_request } = context.payload
+    if (!isPullRequestPayload(pull_request)) {
+      throw new Error(`payload.pull_request does not contain expected fields`)
     }
-    return minimatch(payload.base.ref, rule.pull_request.base) && minimatch(payload.head.ref, rule.pull_request.head)
+    return (
+      minimatch(pull_request.base.ref, rule.pull_request.base) &&
+      minimatch(pull_request.head.ref, rule.pull_request.head)
+    )
   }
   if (context.eventName === 'push' && rule.push !== undefined) {
     return minimatch(context.ref, rule.push.ref)
@@ -28,7 +31,7 @@ const match = (context: Context, rule: Rule): boolean => {
 }
 
 // picked from https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request
-type PullRequestPayload = {
+type PullRequestPayload = WebhookPayload['pull_request'] & {
   head: {
     ref: string
   }
@@ -37,7 +40,10 @@ type PullRequestPayload = {
   }
 }
 
-const isPullRequestPayload = (x: WebhookPayload): x is PullRequestPayload => {
+const isPullRequestPayload = (x: WebhookPayload['pull_request']): x is PullRequestPayload => {
+  if (x === undefined) {
+    throw new Error(`payload.pull_request is undefined`)
+  }
   const { head, base } = x
   return typeof head === 'object' && 'ref' in head && typeof base === 'object' && 'ref' in base
 }

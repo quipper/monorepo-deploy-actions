@@ -43,8 +43,11 @@ test('pull_request with any branches', () => {
   const context = {
     eventName: 'pull_request',
     payload: {
-      head: { ref: 'topic' },
-      base: { ref: 'main' },
+      pull_request: {
+        number: 1,
+        head: { ref: 'topic' },
+        base: { ref: 'main' },
+      },
     },
     ref: 'refs/pull/1/merge',
   }
@@ -60,8 +63,11 @@ test('pull_request with patterns', () => {
   const context = {
     eventName: 'pull_request',
     payload: {
-      head: { ref: 'microservice/qa' },
-      base: { ref: 'microservice/production' },
+      pull_request: {
+        number: 2,
+        head: { ref: 'microservice/qa' },
+        base: { ref: 'microservice/production' },
+      },
     },
     ref: 'refs/pull/2/merge',
   }
