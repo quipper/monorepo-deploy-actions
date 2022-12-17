@@ -124,6 +124,7 @@ destination-repository  (branch: ns/${source-repository}/${overlay}/${namespace}
 | [git-delete-namespace-application](git-delete-namespace-application) | Delete Argo CD Applications of pull request namespaces | [![git-delete-namespace-application](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-delete-namespace-application.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-delete-namespace-application.yaml)
 | [git-delete-namespace-branch](git-delete-namespace-branch) | Delete branches of pull request namespaces | [![git-delete-namespace-branch](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-delete-namespace-branch.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-delete-namespace-branch.yaml)
 | [open-backport-pull-request](open-backport-pull-request) | Open Backport Pull Requests from a specific branch | [![open-backport-pull-request](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/open-backport-pull-request.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/open-backport-pull-request.yaml)
+| [environment-matrix](environment-matrix) | Generate a JSON of environments for the matrix jobs | [![environment-matrix](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/environment-matrix.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/environment-matrix.yaml)
 
 
 ## Development

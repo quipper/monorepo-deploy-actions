@@ -1,15 +1,44 @@
-# environment-matrix [![environment-matrix](https://github.com/int128/typescript-actions-monorepo/actions/workflows/environment-matrix.yaml/badge.svg)](https://github.com/int128/typescript-actions-monorepo/actions/workflows/environment-matrix.yaml)
+# environment-matrix [![environment-matrix](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/environment-matrix.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/environment-matrix.yaml)
 
-This action generates a JSON string to deploy a service to environments by the matrix job.
+This action generates a JSON string to deploy a service to environment(s) by the matrix jobs.
 
 ## Getting Started
 
-Let's think about the following requirements:
+Let's think about the following example:
 
 - When a pull request is created, deploy it to `pr-NUMBER` namespace
 - When `main` branch is pushed, deploy it to `development` namespace
 
-Here is an example workflow.
+It can be descibed as the following rules:
+
+```yaml
+- pull_request:
+    base: '**'
+    head: '**'
+  environments:
+    - overlay: pr
+      namespace: pr-${{ github.event.pull_request.number }}
+- push:
+    ref: refs/heads/main
+  environments:
+    - overlay: development
+      namespace: development
+```
+
+This action finds a rule matched to the current context.
+If any rule is matched, this action returns a JSON string of `environments` field of the rule.
+For example, when `main` branch is pushed, this action returns the following JSON:
+
+```json
+[{"overlay": "development", "namespace": "development"}]
+```
+
+This action finds a rule in order.
+If no rule is matched, this action fails.
+
+### Workflow example
+
+Here is the workflow of matrix jobs.
 
 ```yaml
 jobs:
@@ -51,17 +80,6 @@ jobs:
           namespace: ${{ matrix.environment.namespace }}
           service: # (omit in this example)
 ```
-
-This action finds a rule matched to the current context.
-If any rule is matched, this action returns a JSON string of `environments` field of the rule.
-For example, when `main` branch is pushed, this action returns the following JSON:
-
-```json
-[{"overlay": "development", "namespace": "development"}]
-```
-
-This action finds a rule in order.
-If no rule is matched, this action fails.
 
 ## Spec
 
