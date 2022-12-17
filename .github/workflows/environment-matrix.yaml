@@ -61,5 +61,5 @@ jobs:
       matrix:
         environment: ${{ fromJSON(needs.ts.outputs.environments) }}
     steps:
-      - run: echo 'overlay=${{ matrix.overlay }}'
-      - run: echo 'namespace=${{ matrix.namespace }}'
+      - run: echo 'overlay=${{ matrix.environment.overlay }}'
+      - run: echo 'namespace=${{ matrix.environment.namespace }}'
