@@ -1,3 +1,4 @@
+import * as yaml from 'js-yaml'
 import Ajv, { JTDSchemaType } from 'ajv/dist/jtd'
 
 export type Environment = Record<string, string>
@@ -54,3 +55,16 @@ const rulesSchema: JTDSchemaType<Rules> = {
 
 const ajv = new Ajv()
 export const validateRules = ajv.compile(rulesSchema)
+
+export const parseRulesYAML = (s: string): Rules => {
+  const rules = yaml.load(s)
+  if (!validateRules(rules)) {
+    if (validateRules.errors) {
+      throw new Error(
+        `invalid rules YAML: ${validateRules.errors.map((e) => `${e.instancePath} ${e.message || ''}`).join(', ')}`
+      )
+    }
+    throw new Error('invalid rules YAML')
+  }
+  return rules
+}

@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as yaml from 'js-yaml'
-import { Environment, validateRules } from './types'
+import { Environment, parseRulesYAML } from './rule'
 import { find } from './matcher'
 
 type Inputs = {
@@ -14,11 +13,8 @@ type Outputs = {
 
 // eslint-disable-next-line @typescript-eslint/require-await
 export const run = async (inputs: Inputs): Promise<Outputs> => {
-  const rules = yaml.load(inputs.rules)
-  if (!validateRules(rules)) {
-    throw validateRules.errors
-  }
-  core.info(`valid rules: ${JSON.stringify(rules, undefined, 2)}`)
+  const rules = parseRulesYAML(inputs.rules)
+  core.info(`rules: ${JSON.stringify(rules, undefined, 2)}`)
   const environments = find(github.context, rules)
   if (environments === undefined) {
     throw new Error(`no environment to deploy`)
