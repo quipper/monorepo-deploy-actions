@@ -36,3 +36,5 @@ jobs:
               environments:
                 - overlay: main
                   namespace: main-${{ github.run_number }}
+      - run: echo '${{ fromJSON(steps.environment-matrix.outputs.json)[0].overlay }}'
+      - run: echo '${{ fromJSON(steps.environment-matrix.outputs.json)[0].namespace }}'
