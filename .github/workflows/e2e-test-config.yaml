@@ -1,0 +1,47 @@
+name: e2e-test-config
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/e2e-test-config.yaml
+  workflow_call:
+    outputs:
+      overlay:
+        description: overlay for this context
+        value: ${{ jobs.environment.outputs.overlay }}
+      namespace:
+        description: namespace for this context
+        value: ${{ jobs.environment.outputs.namespace }}
+
+jobs:
+  environment:
+    runs-on: ubuntu-latest
+    outputs:
+      environments: ${{ steps.environment-matrix.outputs.json }}
+      overlay: ${{ steps.config.outputs.overlay }}
+      namespace: ${{ steps.config.outputs.namespace }}
+    steps:
+      - uses: quipper/monorepo-deploy-actions/environment-matrix@v1
+        id: environment-matrix
+        with:
+          rules: |
+            - pull_request:
+                base: '**'
+                head: '**'
+              environments:
+                - overlay: pr
+                  namespace: pr-${{ github.event.pull_request.number }}
+            - push:
+                ref: refs/heads/main
+              environments:
+                - overlay: main
+                  namespace: main-${{ github.run_number }}
+      - uses: actions/github-script@v6
+        id: config
+        env:
+          environments: ${{ steps.environment-matrix.outputs.environments }}
+        with:
+          script: |
+            const { overlay, namespace } = JSON.parse(process.env.environments)[0]
+            core.setOutput('overlay', overlay)
+            core.setOutput('namespace', namespace)
