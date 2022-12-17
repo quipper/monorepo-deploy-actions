@@ -16,6 +16,7 @@ on:
 jobs:
   environment:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       json: ${{ steps.environment-matrix.outputs.json }}
     steps:
