@@ -9,7 +9,6 @@ on:
       - e2e-test/**
       - .github/workflows/git-push-namespace.yaml
   pull_request:
-    branches: [main]
     paths:
       - git-push-namespace/**
       - '*.json'
@@ -17,7 +16,11 @@ on:
       - .github/workflows/git-push-namespace.yaml
 
 jobs:
+  e2e-test-config:
+    uses: ./.github/workflows/e2e-test-config.yaml
+
   ts:
+    needs: e2e-test-config
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
@@ -42,27 +45,24 @@ jobs:
           path: e2e-test-fixture
       - name: Set up a fixture branch
         working-directory: e2e-test-fixture
-        run: git push origin "HEAD:refs/heads/e2e/git-push-namespace/${{ github.run_number }}"
-
-      - run: bash ${{ github.workspace }}/.github/e2e-test-config.sh
-        id: config
+        run: git push origin "HEAD:refs/heads/e2e/git-push-namespace/${{ needs.e2e-test-config.outputs.namespace }}"
 
       - uses: ./git-push-namespace
         with:
-          overlay: ${{ steps.config.outputs.overlay }}
-          namespace: ${{ steps.config.outputs.namespace }}
+          overlay: ${{ needs.e2e-test-config.outputs.overlay }}
+          namespace: ${{ needs.e2e-test-config.outputs.namespace }}
           destination-repository: ${{ github.repository }}
-          destination-branch: e2e/git-push-namespace/${{ github.run_number }}
+          destination-branch: e2e/git-push-namespace/${{ needs.e2e-test-config.outputs.namespace }}
 
       - uses: actions/checkout@v3
         with:
-          ref: e2e/git-push-namespace/${{ github.run_number }}
+          ref: e2e/git-push-namespace/${{ needs.e2e-test-config.outputs.namespace }}
           path: git-push-namespace/actual
       - run: find actual -type f
-      - run: test -f actual/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}.yaml
+      - run: test -f actual/monorepo-deploy-actions/${{ needs.e2e-test-config.outputs.overlay }}/${{ needs.e2e-test-config.outputs.namespace }}.yaml
 
       - name: Clean up the branch
         continue-on-error: true
         if: always()
         run: |
-          git push origin --delete "refs/heads/e2e/git-push-namespace/${{ github.run_number }}"
+          git push origin --delete "refs/heads/e2e/git-push-namespace/${{ needs.e2e-test-config.outputs.namespace }}"
