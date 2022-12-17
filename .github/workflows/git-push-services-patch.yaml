@@ -36,9 +36,6 @@ jobs:
       - run: yarn build
       - run: yarn package
 
-      - run: ${{ github.workspace }}/.github/e2e-test-config.sh
-        id: config
-
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref }} # avoid "shallow update not allowed" error
@@ -52,20 +49,20 @@ jobs:
           git config user.email 'github-actions@github.com'
           git config user.name 'github-actions'
           git commit -m "e2e-test-fixture for ${GITHUB_REF}"
-          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}"
+          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/e2e-git-push-services-patch/ns-${{ github.run_number }}"
 
       # verify "add" operation
       - uses: ./git-push-services-patch
         with:
           patch: ${{ github.workspace }}/git-push-services-patch/tests/fixtures/kustomization.yaml
           operation: add
-          overlay: ${{ steps.config.outputs.overlay }}
-          namespace: ${{ steps.config.outputs.namespace }}
+          overlay: e2e-git-push-services-patch
+          namespace: ns-${{ github.run_number }}
           destination-repository: ${{ github.repository }}
 
       - uses: actions/checkout@v3
         with:
-          ref: ns/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}
+          ref: ns/monorepo-deploy-actions/e2e-git-push-services-patch/ns-${{ github.run_number }}
           path: e2e-test-fixture
       - run: find services
         working-directory: e2e-test-fixture
@@ -79,13 +76,13 @@ jobs:
         with:
           patch: ${{ github.workspace }}/git-push-services-patch/tests/fixtures/kustomization.yaml
           operation: delete
-          overlay: ${{ steps.config.outputs.overlay }}
-          namespace: ${{ steps.config.outputs.namespace }}
+          overlay: e2e-git-push-services-patch
+          namespace: ns-${{ github.run_number }}
           destination-repository: ${{ github.repository }}
 
       - uses: actions/checkout@v3
         with:
-          ref: ns/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}
+          ref: ns/monorepo-deploy-actions/e2e-git-push-services-patch/ns-${{ github.run_number }}
           path: e2e-test-fixture
       - run: find services
         working-directory: e2e-test-fixture
@@ -98,4 +95,4 @@ jobs:
         continue-on-error: true
         if: always()
         run: |
-          git push origin --delete "refs/heads/ns/monorepo-deploy-actions/${{ steps.config.outputs.overlay }}/${{ steps.config.outputs.namespace }}"
+          git push origin --delete "refs/heads/ns/monorepo-deploy-actions/e2e-git-push-services-patch/ns-${{ github.run_number }}"
