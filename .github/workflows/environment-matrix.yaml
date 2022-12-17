@@ -22,7 +22,7 @@ jobs:
       run:
         working-directory: environment-matrix
     outputs:
-      matrix: ${{ steps.environment-matrix.outputs.json }}
+      environments: ${{ steps.environment-matrix.outputs.json }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -58,7 +58,8 @@ jobs:
     timeout-minutes: 3
     strategy:
       fail-fast: true
-      matrix: ${{ fromJSON(needs.ts.outputs.matrix) }}
+      matrix:
+        environment: ${{ fromJSON(needs.ts.outputs.environments) }}
     steps:
       - run: echo 'overlay=${{ matrix.overlay }}'
       - run: echo 'namespace=${{ matrix.namespace }}'
