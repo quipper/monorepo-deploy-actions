@@ -18,12 +18,12 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
   if (!validateRules(rules)) {
     throw validateRules.errors
   }
-  core.info(`valid rules: ${(JSON.stringify(rules), undefined, 2)}`)
+  core.info(`valid rules: ${JSON.stringify(rules, undefined, 2)}`)
   const environments = find(github.context, rules)
   if (environments === undefined) {
     throw new Error(`no environment to deploy`)
   }
-  core.info(`environments: ${(JSON.stringify(environments), undefined, 2)}`)
+  core.info(`environments: ${JSON.stringify(environments, undefined, 2)}`)
   return {
     environments,
   }
