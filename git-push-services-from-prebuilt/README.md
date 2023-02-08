@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: prebuilt/REPOSITORY/pr/refs/heads/main
+          ref: prebuilt/REPOSITORY/pr
           path: prebuilt
       - uses: quipper/monorepo-deploy-actions/substitute@v1
         with:

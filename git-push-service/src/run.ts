@@ -17,7 +17,8 @@ type Inputs = {
   namespaceLevel: boolean
   applicationAnnotations: string[]
   destinationRepository: string
-  prebuilt: boolean
+  destinationBranch: string
+  prebuilt: boolean // TODO: deprecated
   updateViaPullRequest: boolean
   token: string
 }
@@ -63,9 +64,12 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
 
   const [owner, repo] = inputs.destinationRepository.split('/')
   const project = github.context.repo.repo
-  const branch = inputs.prebuilt
-    ? `prebuilt/${project}/${inputs.overlay}/${github.context.ref}`
+  let branch = inputs.prebuilt
+    ? `prebuilt/${project}/${inputs.overlay}/${github.context.ref}` // TODO: deprecated
     : `ns/${project}/${inputs.overlay}/${inputs.namespace}`
+  if (inputs.destinationBranch) {
+    branch = inputs.destinationBranch
+  }
 
   core.startGroup(`checkout branch ${branch} if exist`)
   await git.init(workspace, owner, repo, inputs.token)

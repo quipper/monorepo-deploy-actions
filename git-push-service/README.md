@@ -14,7 +14,7 @@ Name | Type | Description
 `namespace-level` | boolean | Push the manifests to namespace level (default to false)
 `application-annotations` | multiline string | Annotations to add to an Application (default to empty)
 `destination-repository` | string | Destination repository
-`prebuilt` | boolean | Push prebuilt manifest (default to false)
+`destination-branch` | string | Destination branch (default to `ns/${project}/${overlay}/${namespace}`)
 `update-via-pull-request` | boolean | Update a branch via a pull request (default to false)
 `token` | string | GitHub token (default to `github.token`)
 
@@ -115,13 +115,13 @@ To push a manifest as a prebuilt manifest:
           manifests: ${{ steps.kustomize.outputs.directory }}/**
           overlay: pr
           service: foo
-          prebuilt: true
+          destination-branch: prebuilt/REPOSITORY/pr
 ```
 
 It pushes the following file into a destination repository:
 
 ```
-destination-repository (branch: prebuilt/${project}/${overlay}/${ref})
+destination-repository (branch: prebuilt/${project}/${overlay})
 └── services
     └── ${service}
         └── generated.yaml

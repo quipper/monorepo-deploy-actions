@@ -10,7 +10,8 @@ async function main(): Promise<void> {
     namespaceLevel: core.getBooleanInput('namespace-level', { required: true }),
     applicationAnnotations: core.getMultilineInput('application-annotations'),
     destinationRepository: core.getInput('destination-repository', { required: true }),
-    prebuilt: core.getBooleanInput('prebuilt', { required: true }),
+    destinationBranch: core.getInput('destination-branch'),
+    prebuilt: core.getBooleanInput('prebuilt', { required: true }), // TODO: deprecated
     updateViaPullRequest: core.getBooleanInput('update-via-pull-request', { required: true }),
     token: core.getInput('token', { required: true }),
   })
