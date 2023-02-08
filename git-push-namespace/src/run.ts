@@ -15,13 +15,28 @@ interface Inputs {
   token: string
 }
 
-export const run = async (inputs: Inputs): Promise<void> =>
-  await retry(async () => push(inputs), {
+export const run = async (inputs: Inputs): Promise<void> => {
+  await checkIfNamespaceBranchExists(inputs)
+  await retry(() => pushNamespaceApplication(inputs), {
     maxAttempts: 5,
     waitMillisecond: 10000,
   })
+}
 
-const push = async (inputs: Inputs): Promise<void | Error> => {
+const checkIfNamespaceBranchExists = async (inputs: Inputs): Promise<void> => {
+  const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-namespace-action-'))
+  core.info(`created workspace at ${workspace}`)
+
+  const project = github.context.repo.repo
+  const namespaceBranch = `ns/${project}/${inputs.overlay}/${inputs.namespace}`
+
+  core.startGroup(`checking if namespace branch ${namespaceBranch} exists`)
+  await git.init(workspace, inputs.destinationRepository, inputs.token)
+  await git.checkout(workspace, namespaceBranch)
+  core.endGroup()
+}
+
+const pushNamespaceApplication = async (inputs: Inputs): Promise<void | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-namespace-action-'))
   core.info(`created workspace at ${workspace}`)
 
