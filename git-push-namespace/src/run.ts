@@ -17,7 +17,7 @@ interface Inputs {
 
 export const run = async (inputs: Inputs): Promise<void> => {
   await checkIfNamespaceBranchExists(inputs)
-  await retry(async () => push(inputs), {
+  await retry(() => pushNamespaceApplication(inputs), {
     maxAttempts: 5,
     waitMillisecond: 10000,
   })
@@ -36,7 +36,7 @@ const checkIfNamespaceBranchExists = async (inputs: Inputs): Promise<void> => {
   core.endGroup()
 }
 
-const push = async (inputs: Inputs): Promise<void | Error> => {
+const pushNamespaceApplication = async (inputs: Inputs): Promise<void | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-namespace-action-'))
   core.info(`created workspace at ${workspace}`)
 
