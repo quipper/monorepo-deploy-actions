@@ -16,7 +16,7 @@ Name | Type | Description
 
 ## Getting Started
 
-To add a namespace:
+To push a namespace manifest:
 
 ```yaml
     steps:
@@ -26,4 +26,28 @@ To add a namespace:
           namespace: pr-12345
 ```
 
-This action writes an `Application` to `${project}/${overlay}/${namespace}.yaml` in the destination repository.
+It writes the following `Application` to `${project}/${overlay}/${namespace}.yaml` in the destination repository.
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ${namespace}
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: project
+  source:
+    repoURL: https://github.com/octocat/manifests.git
+    targetRevision: ns/${project}/${overlay}/${namespace}
+    path: applications
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+```
+
+If the namespace branch `ns/${project}/${overlay}/${namespace}` does not exist, this action throws an error.
