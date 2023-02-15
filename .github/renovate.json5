@@ -1,4 +1,6 @@
 {
+  // Note:
+  // DO NOT enable platformAutomerge, because this repository does not have a required check in the branch protection rules.
   "extends": [
     "config:base",
     "github>int128/typescript-action-renovate-config#v1.0.0",
