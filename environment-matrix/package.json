@@ -17,7 +17,7 @@
     "@actions/github": "5.1.1",
     "ajv": "8.12.0",
     "js-yaml": "4.1.0",
-    "minimatch": "7.4.2"
+    "minimatch": "7.4.3"
   },
   "devDependencies": {
     "@types/minimatch": "5.1.2"
