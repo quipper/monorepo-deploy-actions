@@ -1,5 +1,5 @@
 import * as github from '@actions/github'
-import minimatch from 'minimatch'
+import { minimatch } from 'minimatch'
 import { Environment, Rule, Rules } from './rule'
 import { WebhookPayload } from '@actions/github/lib/interfaces'
 
