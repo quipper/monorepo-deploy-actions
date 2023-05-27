@@ -40,3 +40,18 @@ spec:
   const output = await resolve(manifest, manager)
   expect(output).toBe(manifest)
 })
+
+test('throw an error if invalid AWSSecret', async () => {
+  const manager = { getCurrentVersionId: jest.fn() }
+  const manifest = `---
+apiVersion: mumoshu.github.io/v1alpha1
+kind: AWSSecret
+metadata:
+  name: docker-hub
+spec:
+  stringDataFrom:
+    secretsManagerSecretRef:
+      secretId: this-has-no-versionId-field
+`
+  await expect(resolve(manifest, manager)).rejects.toThrow('invalid AWSSecret')
+})
