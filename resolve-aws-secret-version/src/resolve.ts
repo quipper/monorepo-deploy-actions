@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs'
 import * as core from '@actions/core'
 import * as yaml from 'js-yaml'
+import { assertKubernetesAWSSecret, isKubernetesObject } from './kubernetes'
 
 interface AWSSecretsManager {
   getCurrentVersionId(secretId: string): Promise<string>
@@ -48,10 +49,7 @@ const findAWSSecrets = (manifest: string): AWSSecret[] => {
     if (d.kind !== 'AWSSecret') {
       continue
     }
-    if (!isKubernetesAWSSecret(d)) {
-      core.warning(`kind is ${d.kind} but invalid object: ${JSON.stringify(d)}`)
-      continue
-    }
+    assertKubernetesAWSSecret(d)
 
     const name = d.metadata.name
     const secretId = d.spec.stringDataFrom.secretsManagerSecretRef.secretId
@@ -62,49 +60,4 @@ const findAWSSecrets = (manifest: string): AWSSecret[] => {
     secrets.push({ name, secretId, versionId })
   }
   return secrets
-}
-
-type KubernetesObject = {
-  kind: string
-}
-
-const isKubernetesObject = (a: unknown): a is KubernetesObject => {
-  if (typeof a !== 'object' || a === null) {
-    return false
-  }
-  const c = a as KubernetesObject
-  return typeof c.kind === 'string'
-}
-
-type KubernetesAWSSecret = KubernetesObject & {
-  metadata: {
-    name: string
-  }
-  spec: {
-    stringDataFrom: {
-      secretsManagerSecretRef: {
-        secretId: string
-        versionId: string
-      }
-    }
-  }
-}
-
-const isKubernetesAWSSecret = (a: unknown): a is KubernetesAWSSecret => {
-  if (!isKubernetesObject(a)) {
-    return false
-  }
-  const c = a as KubernetesAWSSecret
-  if (
-    typeof c.metadata !== 'object' ||
-    typeof c.metadata.name !== 'string' ||
-    typeof c.spec !== 'object' ||
-    typeof c.spec.stringDataFrom !== 'object' ||
-    typeof c.spec.stringDataFrom.secretsManagerSecretRef !== 'object' ||
-    typeof c.spec.stringDataFrom.secretsManagerSecretRef.secretId !== 'string' ||
-    typeof c.spec.stringDataFrom.secretsManagerSecretRef.versionId !== 'string'
-  ) {
-    return false
-  }
-  return true
 }
