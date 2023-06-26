@@ -1,0 +1,21 @@
+name: create-single-release-pr
+description: 'Create PR for single release deployment'
+inputs:
+  body:
+    description: 'Body for the action'
+    required: true
+  token:
+    description: 'Github token used for action'
+    required: true
+  services:
+    description: 'Services to be deployed'
+    required: true
+  baseBranch:
+    description: 'Base branch of the deployment'
+    required: true
+  headBranch:
+    description: 'Head branch for the deployment'
+    required: true
+runs:
+  using: 'node16'
+  main: 'ts-node create-single-release-pr/main.ts'
