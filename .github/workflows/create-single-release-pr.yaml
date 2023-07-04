@@ -1,0 +1,38 @@
+name: create-single-release-pr
+
+on:
+    push:
+      branches:
+        - main
+      paths:
+        - create-single-release-pr/**
+        - "*.json"
+        - .github/workflows/create-single-release-pr.yaml
+    pull_request:
+      paths:
+        - create-single-release-pr/**
+        - "*.json"
+        - .github/workflows/create-single-release-pr.yaml
+
+jobs:
+  ts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: create-single-release-pr
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+      - run: yarn
+      - run: yarn lint
+      - run: yarn format-check
+      - run: yarn build
+      - run: yarn package
+
+      # - uses: ./create-single-release-pr
+      #   with:
+        
