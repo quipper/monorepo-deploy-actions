@@ -18,4 +18,4 @@ inputs:
     required: true
 runs:
   using: 'node16'
-  main: 'ts-node create-single-release-pr/main.ts'
+  main: 'ts-node src/main.ts'

@@ -1,7 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "create-single-release-pr": "ts-node create-single-release-pr/main.ts",
+    "create-single-release-pr": "ts-node src/main.ts",
+    "build": "tsc",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
