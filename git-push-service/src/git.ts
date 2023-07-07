@@ -14,7 +14,7 @@ export const init = async (cwd: string, owner: string, repo: string, token: stri
     ['config', '--local', 'http.https://github.com/.extraheader', `AUTHORIZATION: basic ${credentials}`],
     {
       cwd,
-    }
+    },
   )
 }
 
@@ -32,7 +32,7 @@ export const checkoutIfExist = async (cwd: string, branch: string): Promise<numb
       'origin',
       `+refs/heads/${branch}:refs/remotes/origin/${branch}`,
     ],
-    { cwd, ignoreReturnCode: true }
+    { cwd, ignoreReturnCode: true },
   )
   if (fetchCode === 0) {
     await exec.exec('git', ['branch', '--list', '--remote', `origin/${branch}`], { cwd })

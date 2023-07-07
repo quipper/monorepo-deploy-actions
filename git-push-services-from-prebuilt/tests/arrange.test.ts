@@ -20,11 +20,11 @@ test('if workspace is empty, just create', async () => {
 
   expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
   expect(await readContent(path.join(workspace, `services/a/generated.yaml`))).toBe(
-    await readContent(path.join(__dirname, `fixtures/prebuilt/services/a/generated.yaml`))
+    await readContent(path.join(__dirname, `fixtures/prebuilt/services/a/generated.yaml`)),
   )
   expect(await readContent(path.join(workspace, `applications/namespace--b.yaml`))).toBe(applicationB)
   expect(await readContent(path.join(workspace, `services/b/generated.yaml`))).toBe(
-    await readContent(path.join(__dirname, `fixtures/prebuilt/services/b/generated.yaml`))
+    await readContent(path.join(__dirname, `fixtures/prebuilt/services/b/generated.yaml`)),
   )
 })
 
@@ -49,7 +49,7 @@ test('if service was pushed by git-push-services-from-prebuilt, overwrite it', a
 
   expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
   expect(await readContent(path.join(workspace, `services/a/generated.yaml`))).toBe(
-    await readContent(path.join(__dirname, `fixtures/prebuilt/services/a/generated.yaml`))
+    await readContent(path.join(__dirname, `fixtures/prebuilt/services/a/generated.yaml`)),
   )
 })
 
@@ -73,7 +73,7 @@ test('if service was pushed by git-push-service, do not overwrite it', async () 
   })
 
   expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(
-    applicationPushedByGitPushService
+    applicationPushedByGitPushService,
   )
   expect(await readContent(path.join(workspace, `services/a/generated.yaml`))).toBe('dummy-generated-manifest')
 })

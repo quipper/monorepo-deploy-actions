@@ -14,7 +14,7 @@ export const init = async (cwd: string, repository: string, token: string): Prom
     ['config', '--local', 'http.https://github.com/.extraheader', `AUTHORIZATION: basic ${credentials}`],
     {
       cwd,
-    }
+    },
   )
 }
 
@@ -32,7 +32,7 @@ export const checkout = async (cwd: string, branch: string): Promise<void> => {
       'origin',
       `+refs/heads/${branch}:refs/remotes/origin/${branch}`,
     ],
-    { cwd }
+    { cwd },
   )
   await exec.exec('git', ['branch', '--list', '--remote', `origin/${branch}`], { cwd })
   await exec.exec('git', ['checkout', '--progress', '--force', branch], { cwd })

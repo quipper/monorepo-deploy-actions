@@ -2,7 +2,6 @@
 
 This is a template of TypeScript Action.
 
-
 ## Getting Started
 
 To run this action:
@@ -18,16 +17,14 @@ jobs:
           name: hello
 ```
 
-
 ## Inputs
 
-| Name | Required | Default | Description
-|------|----------|---------|------------
-| `name` | `true` | - | example input
-
+| Name   | Required | Default | Description   |
+| ------ | -------- | ------- | ------------- |
+| `name` | `true`   | -       | example input |
 
 ## Outputs
 
-| Name | Description
-|------|------------
-| `example` | example output
+| Name      | Description    |
+| --------- | -------------- |
+| `example` | example output |

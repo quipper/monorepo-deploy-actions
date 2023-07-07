@@ -50,7 +50,7 @@ const arrangeServiceManifests = async (inputs: Inputs): Promise<void> => {
       },
       annotations: inputs.applicationAnnotations,
     },
-    inputs.workspace
+    inputs.workspace,
   )
 }
 

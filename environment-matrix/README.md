@@ -30,7 +30,7 @@ If any rule is matched, this action returns a JSON string of `environments` fiel
 For example, when `main` branch is pushed, this action returns the following JSON:
 
 ```json
-[{"overlay": "development", "namespace": "development"}]
+[{ "overlay": "development", "namespace": "development" }]
 ```
 
 This action finds a rule in order.
@@ -85,20 +85,20 @@ jobs:
 
 ### Inputs
 
-| Name | Type | Description
-|------|----------|---------
-| `rules` | `string` | YAML string of rules
+| Name    | Type     | Description          |
+| ------- | -------- | -------------------- |
+| `rules` | `string` | YAML string of rules |
 
 The following fields are available in the rules YAML.
 
 ```yaml
 - pull_request: # on pull_request event
-    base:       # base branch name (wildcard available)
-    head:       # head branch name (wildcard available)
+    base: # base branch name (wildcard available)
+    head: # head branch name (wildcard available)
   environments: # array of map<string, string>
-- push:                   # on push event
-    ref: refs/heads/main  # ref name (wildcard available)
-  environments:           # array of map<string, string>
+- push: # on push event
+    ref: refs/heads/main # ref name (wildcard available)
+  environments: # array of map<string, string>
 ```
 
 It supports the wildcard pattern.
@@ -106,6 +106,6 @@ See https://github.com/isaacs/minimatch for details.
 
 ### Outputs
 
-| Name | Description
-|------|------------
-| `json` | JSON string of environments
+| Name   | Description                 |
+| ------ | --------------------------- |
+| `json` | JSON string of environments |

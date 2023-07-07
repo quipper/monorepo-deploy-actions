@@ -38,16 +38,15 @@ When the pull request is conflicted, you can edit the working branch on GitHub.
 
 ## Inputs
 
-| Name           | Required | Default         | Description
-|----------------|----------|-----------------|----------------------------------------------
-| `github-token` | `true`   | `$github.token` | GitHub token used for opening a Pull Request
-| `base-branch`  | `true`   |                 | Base branch of the Pull Request
-
+| Name           | Required | Default         | Description                                  |
+| -------------- | -------- | --------------- | -------------------------------------------- |
+| `github-token` | `true`   | `$github.token` | GitHub token used for opening a Pull Request |
+| `base-branch`  | `true`   |                 | Base branch of the Pull Request              |
 
 ## Outputs
 
-| Name               | Description
-|--------------------|--------------------------------------------
-| `pull-request-url` | URL of the opened Pull Request
-| `base-branch`      | The base branch of the opened Pull Request 
-| `head-branch`      | The head branch of the opened Pull Request
+| Name               | Description                                |
+| ------------------ | ------------------------------------------ |
+| `pull-request-url` | URL of the opened Pull Request             |
+| `base-branch`      | The base branch of the opened Pull Request |
+| `head-branch`      | The head branch of the opened Pull Request |

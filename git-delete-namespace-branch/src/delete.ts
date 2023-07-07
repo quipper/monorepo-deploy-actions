@@ -4,7 +4,7 @@ import * as path from 'path'
 export const computeRefsToDelete = (
   refs: string[],
   retainPullRequestNumbers: string[],
-  namespacePrefix: string
+  namespacePrefix: string,
 ): string[] => {
   const refsToDelete: string[] = []
   for (const ref of refs) {

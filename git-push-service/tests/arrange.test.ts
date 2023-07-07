@@ -22,7 +22,7 @@ test('arrange a service manifest', async () => {
 
   expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
   expect(await readContent(path.join(workspace, `services/a/generated.yaml`))).toBe(
-    await readContent(path.join(__dirname, `fixtures/a/generated.yaml`))
+    await readContent(path.join(__dirname, `fixtures/a/generated.yaml`)),
   )
 })
 
@@ -50,7 +50,7 @@ test('overwrite even if a file exists', async () => {
 
   expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
   expect(await readContent(path.join(workspace, `services/a/generated.yaml`))).toBe(
-    await readContent(path.join(__dirname, `fixtures/a/generated.yaml`))
+    await readContent(path.join(__dirname, `fixtures/a/generated.yaml`)),
   )
 })
 
@@ -101,7 +101,7 @@ test('arrange a manifest into namespace level', async () => {
   })
 
   expect(await readContent(path.join(workspace, `applications/generated.yaml`))).toBe(
-    await readContent(path.join(__dirname, `fixtures/a/generated.yaml`))
+    await readContent(path.join(__dirname, `fixtures/a/generated.yaml`)),
   )
 
   // make sure the old manifests are removed

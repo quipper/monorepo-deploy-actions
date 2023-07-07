@@ -31,13 +31,13 @@ export function assertKubernetesAWSSecret(a: KubernetesObject): asserts a is Kub
   assertHasField(a.spec.stringDataFrom.secretsManagerSecretRef, 'secretId')
   assert(
     typeof a.spec.stringDataFrom.secretsManagerSecretRef.secretId === 'string',
-    'spec.stringDataFrom.secretsManagerSecretRef.secretId must be a string'
+    'spec.stringDataFrom.secretsManagerSecretRef.secretId must be a string',
   )
 
   assertHasField(a.spec.stringDataFrom.secretsManagerSecretRef, 'versionId')
   assert(
     typeof a.spec.stringDataFrom.secretsManagerSecretRef.versionId === 'string',
-    'spec.stringDataFrom.secretsManagerSecretRef.versionId must be a string'
+    'spec.stringDataFrom.secretsManagerSecretRef.versionId must be a string',
   )
 }
 
