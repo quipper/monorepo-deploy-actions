@@ -52,7 +52,7 @@ export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
         },
         annotations: ['github.action=git-push-services-from-prebuilt'],
       },
-      inputs.workspace
+      inputs.workspace,
     )
   }
 }

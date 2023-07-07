@@ -3,28 +3,26 @@
 This is an action to resolve version IDs of `AWSSecret` in a manifest.
 It is designed for https://github.com/mumoshu/aws-secret-operator.
 
-
 ## Inputs
 
-Name | Type | Description
------|------|------------
-`manifests` | multiline string | Glob pattern(s) to manifest(s)
-
+| Name        | Type             | Description                    |
+| ----------- | ---------------- | ------------------------------ |
+| `manifests` | multiline string | Glob pattern(s) to manifest(s) |
 
 ## Example
 
 Here is an example workflow:
 
 ```yaml
-    steps:
-      - uses: int128/kustomize-action@v1
-        id: kustomize
-        with:
-          kustomization: path/to/kustomization.yaml
-      - uses: quipper/monorepo-deploy-actions/resolve-aws-secret-version@v1
-        id: resolve-secret
-        with:
-          manifests: ${{ steps.kustomize.outputs.directory }}/**/*.yaml
+steps:
+  - uses: int128/kustomize-action@v1
+    id: kustomize
+    with:
+      kustomization: path/to/kustomization.yaml
+  - uses: quipper/monorepo-deploy-actions/resolve-aws-secret-version@v1
+    id: resolve-secret
+    with:
+      manifests: ${{ steps.kustomize.outputs.directory }}/**/*.yaml
 ```
 
 When the below manifest is given,

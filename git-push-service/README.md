@@ -2,32 +2,29 @@
 
 This is an action to push manifest(s) with Argo CD `Application` manifest(s) to deploy service(s).
 
-
 ## Inputs
 
-Name | Type | Description
------|------|------------
-`manifests` | multiline string | Glob pattern of file(s)
-`overlay` | string | Name of overlay
-`namespace` | string | Name of namespace
-`service` | string | Name of service
-`namespace-level` | boolean | Push the manifests to namespace level (default to false)
-`application-annotations` | multiline string | Annotations to add to an Application (default to empty)
-`destination-repository` | string | Destination repository
-`destination-branch` | string | Destination branch (default to `ns/${project}/${overlay}/${namespace}`)
-`update-via-pull-request` | boolean | Update a branch via a pull request (default to false)
-`token` | string | GitHub token (default to `github.token`)
+| Name                      | Type             | Description                                                             |
+| ------------------------- | ---------------- | ----------------------------------------------------------------------- |
+| `manifests`               | multiline string | Glob pattern of file(s)                                                 |
+| `overlay`                 | string           | Name of overlay                                                         |
+| `namespace`               | string           | Name of namespace                                                       |
+| `service`                 | string           | Name of service                                                         |
+| `namespace-level`         | boolean          | Push the manifests to namespace level (default to false)                |
+| `application-annotations` | multiline string | Annotations to add to an Application (default to empty)                 |
+| `destination-repository`  | string           | Destination repository                                                  |
+| `destination-branch`      | string           | Destination branch (default to `ns/${project}/${overlay}/${namespace}`) |
+| `update-via-pull-request` | boolean          | Update a branch via a pull request (default to false)                   |
+| `token`                   | string           | GitHub token (default to `github.token`)                                |
 
 If `manifests` do not match anything, this action does nothing.
 
-
 ## Outputs
 
-Name | Type | Description
------|------|------------
-`destination-pull-request-number` | number | Pull request number if created in the destination repository
-`destination-pull-request-url` | string | URL of pull request if created in the destination repository
-
+| Name                              | Type   | Description                                                  |
+| --------------------------------- | ------ | ------------------------------------------------------------ |
+| `destination-pull-request-number` | number | Pull request number if created in the destination repository |
+| `destination-pull-request-url`    | string | URL of pull request if created in the destination repository |
 
 ## Use-cases
 
@@ -36,17 +33,17 @@ Name | Type | Description
 To push a manifest of a service:
 
 ```yaml
-    steps:
-      - uses: int128/kustomize-action@v1
-        id: kustomize
-        with:
-          kustomization: foo/kubernetes/overlays/develop/kustomization.yaml
-      - uses: quipper/monorepo-deploy-actions/git-push-service@v1
-        with:
-          manifests: ${{ steps.kustomize.outputs.files }}
-          overlay: develop
-          namespace: develop
-          service: foo
+steps:
+  - uses: int128/kustomize-action@v1
+    id: kustomize
+    with:
+      kustomization: foo/kubernetes/overlays/develop/kustomization.yaml
+  - uses: quipper/monorepo-deploy-actions/git-push-service@v1
+    with:
+      manifests: ${{ steps.kustomize.outputs.files }}
+      overlay: develop
+      namespace: develop
+      service: foo
 ```
 
 It pushes the following files into a destination repository:
@@ -73,23 +70,22 @@ It generates an `Application` manifest with the following properties:
 - destination
   - namespace: `${namespace}`
 
-
 ### Push a manifest to the namespace level
 
 To push a manifest to the namespace level in App of Apps hierarchy:
 
 ```yaml
-    steps:
-      - uses: int128/kustomize-action@v1
-        id: kustomize
-        with:
-          kustomization: deploy/namespace/kubernetes/overlays/pr/kustomization.yaml
-      - uses: quipper/monorepo-deploy-actions/git-push-service@v1
-        with:
-          manifests: ${{ steps.kustomize.outputs.files }}
-          overlay: pr
-          namespace: pr-1
-          namespace-level: true
+steps:
+  - uses: int128/kustomize-action@v1
+    id: kustomize
+    with:
+      kustomization: deploy/namespace/kubernetes/overlays/pr/kustomization.yaml
+  - uses: quipper/monorepo-deploy-actions/git-push-service@v1
+    with:
+      manifests: ${{ steps.kustomize.outputs.files }}
+      overlay: pr
+      namespace: pr-1
+      namespace-level: true
 ```
 
 It pushes the following file into a destination repository:
@@ -100,22 +96,21 @@ destination-repository (branch: ns/${project}/${overlay}/${namespace})
     └── generated.yaml
 ```
 
-
 ### Push a manifest as a prebuilt one
 
 To push a manifest as a prebuilt manifest:
 
 ```yaml
-      - uses: int128/kustomize-action@v1
-        id: kustomize
-        with:
-          kustomization: foo/kubernetes/overlays/pr/kustomization.yaml
-      - uses: quipper/monorepo-deploy-actions/git-push-service@v1
-        with:
-          manifests: ${{ steps.kustomize.outputs.directory }}/**
-          overlay: pr
-          service: foo
-          destination-branch: prebuilt/REPOSITORY/pr
+- uses: int128/kustomize-action@v1
+  id: kustomize
+  with:
+    kustomization: foo/kubernetes/overlays/pr/kustomization.yaml
+- uses: quipper/monorepo-deploy-actions/git-push-service@v1
+  with:
+    manifests: ${{ steps.kustomize.outputs.directory }}/**
+    overlay: pr
+    service: foo
+    destination-branch: prebuilt/REPOSITORY/pr
 ```
 
 It pushes the following file into a destination repository:
@@ -128,7 +123,6 @@ destination-repository (branch: prebuilt/${project}/${overlay})
 ```
 
 You can build the prebuilt manifest using [git-push-services-from-prebuilt action](../git-push-services-from-prebuilt).
-
 
 ## Options
 

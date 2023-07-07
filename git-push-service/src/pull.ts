@@ -24,7 +24,7 @@ type Outputs = {
 export const updateBranchByPullRequest = async (inputs: Inputs): Promise<Outputs | Error> => {
   const topicBranch = `git-push-service--${inputs.namespace}--${inputs.service}--${Date.now()}`
   const code = await core.group(`push branch ${topicBranch}`, () =>
-    git.pushByFastForward(inputs.workspace, topicBranch)
+    git.pushByFastForward(inputs.workspace, topicBranch),
   )
   if (code > 0) {
     return new Error(`failed to push branch ${topicBranch} by fast-forward`)
@@ -83,7 +83,7 @@ export const updateBranchByPullRequest = async (inputs: Inputs): Promise<Outputs
         {
           maxAttempts: 10,
           waitMillisecond: 1000,
-        }
+        },
       )
     })
   } finally {

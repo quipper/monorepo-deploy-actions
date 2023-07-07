@@ -2,11 +2,9 @@
 
 This is a set of GitHub Actions to deploy microservices in a mono-repository (monorepo).
 
-
 ## Motivation
 
 TODO
-
 
 ## Concept
 
@@ -42,13 +40,13 @@ We deploy a set of services from a branch to a namespace.
 For example,
 
 - When `develop` branch is pushed,
-    - Build a Docker image from `develop` branch
-    - Run kustomize build against `develop` overlay
-    - Deploy to `develop` namespace
+  - Build a Docker image from `develop` branch
+  - Run kustomize build against `develop` overlay
+  - Deploy to `develop` namespace
 - When a pull request is created,
-    - Build a Docker image from head branch
-    - Run kustomize build against `staging` overlay
-    - Deploy to an ephemeral namespace like `pr-12345`
+  - Build a Docker image from head branch
+  - Run kustomize build against `staging` overlay
+  - Deploy to an ephemeral namespace like `pr-12345`
 
 Consequently, a structure of monorepo is like below.
 
@@ -60,7 +58,6 @@ monorepo
             └── ${overlay}
                 └── kustomization.yaml
 ```
-
 
 ### Structure of Argo CD Applications
 
@@ -76,13 +73,12 @@ ${source-repository-name}  (Application)
 
 Here are the definitions of words.
 
-Name | Description | Example
------|-------------|--------
-`source-repository-name` | name of source repository | `monorepo`
-`overlay` | name of overlay to build with Kustomize | `staging`
-`namespace` | namespace to deploy into a cluster | `pr-12345`
-`service` | name of microservice | `backend` or `frontend`
-
+| Name                     | Description                             | Example                 |
+| ------------------------ | --------------------------------------- | ----------------------- |
+| `source-repository-name` | name of source repository               | `monorepo`              |
+| `overlay`                | name of overlay to build with Kustomize | `staging`               |
+| `namespace`              | namespace to deploy into a cluster      | `pr-12345`              |
+| `service`                | name of microservice                    | `backend` or `frontend` |
 
 ### Destination repository
 
@@ -109,23 +105,20 @@ destination-repository  (branch: ns/${source-repository}/${overlay}/${namespace}
         └── generated.yaml
 ```
 
-
-
 ## Actions
 
-| Name | Description | Status
-|------|-------------|-------
-| [resolve-aws-secret-version](resolve-aws-secret-version) | Resolve AWSSecret versionId placeholders in a manifest | [![resolve-aws-secret-version](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/resolve-aws-secret-version.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/resolve-aws-secret-version.yaml)
-| [substitute](substitute) | Substitute variables in manifests | [![substitute](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/substitute.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/substitute.yaml)
-| [git-push-service](git-push-service) | Push an Argo CD Application with generated manifest for service | [![git-push-service](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-service.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-service.yaml)
-| [git-push-services-from-prebuilt](git-push-services-from-prebuilt) | Push an Argo CD Application with generated manifest from prebuilt manifests | [![git-push-services-from-prebuilt](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-services-from-prebuilt.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-services-from-prebuilt.yaml)
-| [git-push-services-patch](git-push-services-patch) | push a patch to all services in a namespace | [![git-push-services-patch](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-services-patch.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-services-patch.yaml)
-| [git-push-namespace](git-push-namespace) | Push an Argo CD Application for namespace | [![git-push-namespace](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-namespace.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-namespace.yaml)
-| [git-delete-namespace-application](git-delete-namespace-application) | Delete Argo CD Applications of pull request namespaces | [![git-delete-namespace-application](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-delete-namespace-application.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-delete-namespace-application.yaml)
-| [git-delete-namespace-branch](git-delete-namespace-branch) | Delete branches of pull request namespaces | [![git-delete-namespace-branch](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-delete-namespace-branch.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-delete-namespace-branch.yaml)
-| [open-backport-pull-request](open-backport-pull-request) | Open Backport Pull Requests from a specific branch | [![open-backport-pull-request](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/open-backport-pull-request.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/open-backport-pull-request.yaml)
-| [environment-matrix](environment-matrix) | Generate a JSON of environments for the matrix jobs | [![environment-matrix](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/environment-matrix.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/environment-matrix.yaml)
-
+| Name                                                                 | Description                                                                 | Status                                                                                                                                                                                                                                                                  |
+| -------------------------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [resolve-aws-secret-version](resolve-aws-secret-version)             | Resolve AWSSecret versionId placeholders in a manifest                      | [![resolve-aws-secret-version](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/resolve-aws-secret-version.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/resolve-aws-secret-version.yaml)                   |
+| [substitute](substitute)                                             | Substitute variables in manifests                                           | [![substitute](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/substitute.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/substitute.yaml)                                                                   |
+| [git-push-service](git-push-service)                                 | Push an Argo CD Application with generated manifest for service             | [![git-push-service](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-service.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-service.yaml)                                                 |
+| [git-push-services-from-prebuilt](git-push-services-from-prebuilt)   | Push an Argo CD Application with generated manifest from prebuilt manifests | [![git-push-services-from-prebuilt](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-services-from-prebuilt.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-services-from-prebuilt.yaml)    |
+| [git-push-services-patch](git-push-services-patch)                   | push a patch to all services in a namespace                                 | [![git-push-services-patch](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-services-patch.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-services-patch.yaml)                            |
+| [git-push-namespace](git-push-namespace)                             | Push an Argo CD Application for namespace                                   | [![git-push-namespace](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-namespace.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-namespace.yaml)                                           |
+| [git-delete-namespace-application](git-delete-namespace-application) | Delete Argo CD Applications of pull request namespaces                      | [![git-delete-namespace-application](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-delete-namespace-application.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-delete-namespace-application.yaml) |
+| [git-delete-namespace-branch](git-delete-namespace-branch)           | Delete branches of pull request namespaces                                  | [![git-delete-namespace-branch](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-delete-namespace-branch.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-delete-namespace-branch.yaml)                |
+| [open-backport-pull-request](open-backport-pull-request)             | Open Backport Pull Requests from a specific branch                          | [![open-backport-pull-request](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/open-backport-pull-request.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/open-backport-pull-request.yaml)                   |
+| [environment-matrix](environment-matrix)                             | Generate a JSON of environments for the matrix jobs                         | [![environment-matrix](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/environment-matrix.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/environment-matrix.yaml)                                           |
 
 ## Development
 

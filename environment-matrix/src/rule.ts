@@ -61,7 +61,7 @@ export const parseRulesYAML = (s: string): Rules => {
   if (!validateRules(rules)) {
     if (validateRules.errors) {
       throw new Error(
-        `invalid rules YAML: ${validateRules.errors.map((e) => `${e.instancePath} ${e.message || ''}`).join(', ')}`
+        `invalid rules YAML: ${validateRules.errors.map((e) => `${e.instancePath} ${e.message || ''}`).join(', ')}`,
       )
     }
     throw new Error('invalid rules YAML')

@@ -25,7 +25,7 @@ test('getCurrentVersionId returns the current version id', async () => {
       ],
       ARN: 'arn:aws:secretsmanager:ap-northeast-1:123456789012:secret:microservice/develop-3zcyRx',
       Name: 'microservice/develop',
-    }
+    },
   )
 
   const versionId = await awsSecretsManager.getCurrentVersionId('microservice/develop')

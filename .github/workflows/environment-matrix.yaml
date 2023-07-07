@@ -6,12 +6,12 @@ on:
       - main
     paths:
       - environment-matrix/**
-      - "*.json"
+      - '*.json'
       - .github/workflows/environment-matrix.yaml
   pull_request:
     paths:
       - environment-matrix/**
-      - "*.json"
+      - '*.json'
       - .github/workflows/environment-matrix.yaml
 
 jobs:
