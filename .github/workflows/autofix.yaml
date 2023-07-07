@@ -1,0 +1,27 @@
+name: autofix
+
+on:
+  pull_request:
+    paths:
+      - '**/*.ts'
+      - '*.json'
+      - .github/workflows/autofix.yaml
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - run: yarn
+      - run: yarn workspaces run lint --fix
+      - uses: int128/update-generated-files-action@v2
+
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - run: yarn
+      - run: yarn workspaces run format
+      - uses: int128/update-generated-files-action@v2
