@@ -14,7 +14,6 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const headBranch = getHeadBranch(context)
   const baseBranch = inputs.baseBranch
   const octokit = getOctokit(inputs.githubToken)
-  const headSha = await getHeadSha(octokit, context)
 
   core.setOutput('base-branch', baseBranch)
   core.setOutput('head-branch', headBranch)
@@ -22,7 +21,6 @@ export const run = async (inputs: Inputs): Promise<void> => {
   if (await hasDiff({ headBranch, baseBranch, octokit, context })) {
     const pullRequestUrl = await openPullRequest({
       headBranch,
-      headSha,
       baseBranch,
       octokit,
       context,
@@ -37,21 +35,6 @@ export const getHeadBranch = (context: Context): string => {
     return context.payload.inputs.headBranch as string
   } else {
     return context.ref.replace(/^refs\/heads\//, '')
-  }
-}
-
-const getHeadSha = async (octokit: Octokit, context: Context): Promise<string> => {
-  if (context.eventName === 'workflow_dispatch') {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const branch = context.payload.inputs.headBranch as string
-    const { data: ref } = await octokit.rest.git.getRef({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      ref: `heads/${branch}`,
-    })
-    return ref.object.sha
-  } else {
-    return context.sha
   }
 }
 
@@ -72,21 +55,42 @@ const hasDiff = async (params: hasDiffParams): Promise<boolean> => {
 
 type openPullRequestParams = {
   headBranch: string
-  headSha: string
   baseBranch: string
   context: Context
   octokit: Octokit
 }
 
 const openPullRequest = async (params: openPullRequestParams): Promise<string | undefined> => {
+  const commitMessage = `Backport from ${params.headBranch} into ${params.baseBranch}
+
+Created by GitHub Actions
+https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+
+  // Add an empty commit onto the head commit.
+  // If a required check is set against the base branch and the head commit is failing, we cannot merge it.
+  const { data: headBranch } = await params.octokit.rest.repos.getBranch({
+    owner: params.context.repo.owner,
+    repo: params.context.repo.repo,
+    branch: params.headBranch,
+  })
+  core.info(`Creating an empty commit on the head ${headBranch.commit.sha}`)
+  const { data: workingCommit } = await params.octokit.rest.git.createCommit({
+    owner: params.context.repo.owner,
+    repo: params.context.repo.repo,
+    parents: [headBranch.commit.sha],
+    tree: headBranch.commit.commit.tree.sha,
+    message: commitMessage,
+  })
+
   // Create a working branch so that we can edit it if conflicted.
   // Generally, the head branch is protected and cannot be edited.
   const workingBranch = `backport-${params.headBranch.replaceAll('/', '-')}-${Date.now()}`
+  core.info(`Creating a working branch ${workingBranch} from ${workingCommit.sha}`)
   await params.octokit.rest.git.createRef({
     owner: params.context.repo.owner,
     repo: params.context.repo.repo,
     ref: `refs/heads/${workingBranch}`,
-    sha: params.headSha,
+    sha: workingCommit.sha,
   })
 
   core.info(`Creating a pull request ${workingBranch} -> ${params.baseBranch}`)
@@ -95,8 +99,8 @@ const openPullRequest = async (params: openPullRequestParams): Promise<string | 
     repo: params.context.repo.repo,
     head: workingBranch,
     base: params.baseBranch,
-    title: `Backport ${params.headBranch} into ${params.baseBranch}`,
-    body: `Created from https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+    title: `Backport from ${params.headBranch} into ${params.baseBranch}`,
+    body: commitMessage,
   })
   core.info(`Created ${pr.data.html_url}`)
 
