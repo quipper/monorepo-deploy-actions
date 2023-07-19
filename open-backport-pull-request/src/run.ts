@@ -60,7 +60,7 @@ type openPullRequestParams = {
   octokit: Octokit
 }
 
-const openPullRequest = async (params: openPullRequestParams): Promise<string | undefined> => {
+const openPullRequest = async (params: openPullRequestParams): Promise<string> => {
   const commitMessage = `Backport from ${params.headBranch} into ${params.baseBranch}
 
 Created by GitHub Actions
