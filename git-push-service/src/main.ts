@@ -24,4 +24,7 @@ async function main(): Promise<void> {
   await core.summary.write()
 }
 
-main().catch((e) => core.setFailed(e instanceof Error ? e.message : JSON.stringify(e)))
+main().catch((e: Error) => {
+  core.setFailed(e)
+  console.error(e)
+})
