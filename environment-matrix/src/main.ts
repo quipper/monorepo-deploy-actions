@@ -8,4 +8,7 @@ const main = async (): Promise<void> => {
   core.setOutput('json', outputs.environments)
 }
 
-main().catch((e) => core.setFailed(e instanceof Error ? e.message : JSON.stringify(e)))
+main().catch((e: Error) => {
+  core.setFailed(e)
+  console.error(e)
+})
