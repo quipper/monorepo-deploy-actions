@@ -11,7 +11,7 @@
   packageRules: [
     {
       description: 'Split pull requests by action',
-      matchPaths: ['*/**'],
+      matchFileNames: ['*/**'],
       additionalBranchPrefix: '{{packageFileDir}}-',
       commitMessageSuffix: '({{packageFileDir}})',
       excludePackageNames: [
