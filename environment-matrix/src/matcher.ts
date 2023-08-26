@@ -1,7 +1,7 @@
+import assert from 'assert'
 import * as github from '@actions/github'
 import { minimatch } from 'minimatch'
 import { Environment, Rule, Rules } from './rule'
-import { WebhookPayload } from '@actions/github/lib/interfaces'
 
 type Context = Pick<typeof github.context, 'eventName' | 'ref' | 'payload'>
 
@@ -16,9 +16,7 @@ export const find = (context: Context, rules: Rules): Environment[] | undefined 
 const match = (context: Context, rule: Rule): boolean => {
   if (context.eventName === 'pull_request' && rule.pull_request !== undefined) {
     const { pull_request } = context.payload
-    if (!isPullRequestPayload(pull_request)) {
-      throw new Error(`payload.pull_request does not contain expected fields`)
-    }
+    assertPullRequestPayload(pull_request)
     return (
       minimatch(pull_request.base.ref, rule.pull_request.base) &&
       minimatch(pull_request.head.ref, rule.pull_request.head)
@@ -31,7 +29,7 @@ const match = (context: Context, rule: Rule): boolean => {
 }
 
 // picked from https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request
-type PullRequestPayload = WebhookPayload['pull_request'] & {
+type PullRequestPayload = {
   head: {
     ref: string
   }
@@ -40,10 +38,19 @@ type PullRequestPayload = WebhookPayload['pull_request'] & {
   }
 }
 
-const isPullRequestPayload = (x: WebhookPayload['pull_request']): x is PullRequestPayload => {
-  if (x === undefined) {
-    throw new Error(`payload.pull_request is undefined`)
-  }
-  const { head, base } = x
-  return typeof head === 'object' && 'ref' in head && typeof base === 'object' && 'ref' in base
+function assertPullRequestPayload(x: unknown): asserts x is PullRequestPayload {
+  assert(typeof x === 'object')
+  assert(x != null)
+
+  assert('base' in x)
+  assert(typeof x.base === 'object')
+  assert(x.base != null)
+  assert('ref' in x.base)
+  assert(typeof x.base.ref === 'string')
+
+  assert('head' in x)
+  assert(typeof x.head === 'object')
+  assert(x.head != null)
+  assert('ref' in x.head)
+  assert(typeof x.head.ref === 'string')
 }
