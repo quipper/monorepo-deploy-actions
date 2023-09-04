@@ -6,6 +6,8 @@
     ":label(renovate/{{depName}})",
     ":reviewer(team:sre)",
   ],
+  // DO NOT enable platformAutomerge,
+  // because this repository does not have a required check in the branch protection rules.
   "platformAutomerge": false,
   "packageRules": [
     {
