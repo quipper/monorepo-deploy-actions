@@ -1,18 +1,6 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
-  },
-  "keywords": [
-    "actions",
-    "node",
-    "setup"
-  ],
-  "author": "",
+  "name": "monorepo-deploy-actions",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "1.10.0"
@@ -33,5 +21,8 @@
   },
   "workspaces": [
     "*"
-  ]
+  ],
+  "engines": {
+    "node": "16.x"
+  }
 }
