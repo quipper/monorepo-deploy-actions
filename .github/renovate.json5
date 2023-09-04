@@ -1,23 +1,23 @@
 {
-  // Note:
-  // DO NOT enable platformAutomerge, because this repository does not have a required check in the branch protection rules.
-  extends: [
-    'config:base',
-    'github>int128/typescript-action-renovate-config#v1.1.0',
-    ':automergeMinor',
-    ':label(renovate/{{depName}})',
-    ':reviewer(team:sre)',
+  "extends": [
+    "config:base",
+    "github>int128/typescript-action-renovate-config#v1.1.0",
+    ":automergeMinor",
+    ":label(renovate/{{depName}})",
+    ":reviewer(team:sre)",
   ],
-  packageRules: [
+  // DO NOT enable platformAutomerge,
+  // because this repository does not have a required check in the branch protection rules.
+  "platformAutomerge": false,
+  "packageRules": [
     {
-      description: 'Split pull requests by action',
-      matchFileNames: ['*/**'],
-      additionalBranchPrefix: '{{packageFileDir}}-',
-      commitMessageSuffix: '({{packageFileDir}})',
-      excludePackageNames: [
+      "matchPaths": ["*/**"],
+      "additionalBranchPrefix": "{{packageFileDir}}-",
+      "commitMessageSuffix": "({{packageFileDir}})",
+      "excludePackageNames": [
         // update all action.yaml in single pull request
-        '@types/node',
+        "@types/node",
       ],
-    },
-  ],
+    }
+  ]
 }
