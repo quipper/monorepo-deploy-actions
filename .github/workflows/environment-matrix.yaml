@@ -1,6 +1,11 @@
 name: environment-matrix
 
 on:
+  pull_request:
+    paths:
+      - environment-matrix/**
+      - '*.json'
+      - .github/workflows/environment-matrix.yaml
   push:
     branches:
       - main
@@ -8,29 +13,36 @@ on:
       - environment-matrix/**
       - '*.json'
       - .github/workflows/environment-matrix.yaml
-  pull_request:
-    paths:
-      - environment-matrix/**
-      - '*.json'
-      - .github/workflows/environment-matrix.yaml
 
+defaults:
+  run:
+    working-directory: environment-matrix
+  
 jobs:
-  ts:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: environment-matrix
-    outputs:
-      environments: ${{ steps.environment-matrix.outputs.json }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
         with:
           node-version: 16
           cache: yarn
       - run: yarn
       - run: yarn test
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      environments: ${{ steps.environment-matrix.outputs.json }}
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        with:
+          node-version: 16
+          cache: yarn
+      - run: yarn
       - run: yarn build
       - run: yarn package
       - uses: ./environment-matrix
@@ -49,15 +61,17 @@ jobs:
                 - overlay: development
                   namespace: development
 
-  test-matrix:
-    needs:
-      - ts
+  e2e-test-matrix:
+    needs: e2e-test
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    defaults:
+      run:
+        working-directory: . # run without actions/checkout
     strategy:
       fail-fast: true
       matrix:
-        environment: ${{ fromJSON(needs.ts.outputs.environments) }}
+        environment: ${{ fromJSON(needs.e2e-test.outputs.environments) }}
     steps:
       - run: echo 'overlay=${{ matrix.environment.overlay }}'
       - run: echo 'namespace=${{ matrix.environment.namespace }}'
