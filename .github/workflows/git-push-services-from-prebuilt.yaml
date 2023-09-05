@@ -51,7 +51,7 @@ jobs:
           namespace: ns-${{ github.run_number }}
           destination-repository: ${{ github.repository }}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
           ref: ns/monorepo-deploy-actions/e2e-git-push-services-from-prebuilt/ns-${{ github.run_number }}
           path: git-push-services-from-prebuilt/actual
