@@ -14,6 +14,10 @@ on:
       - '*.json'
       - .github/workflows/git-push-services-patch.yaml
 
+defaults:
+  run:
+    working-directory: git-push-services-patch
+
 jobs:
   test:
     runs-on: ubuntu-latest
