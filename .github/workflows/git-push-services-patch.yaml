@@ -1,36 +1,42 @@
 name: git-push-services-patch
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - git-push-services-patch/**
-      - '*.json'
-      - e2e-test/**
-      - .github/workflows/git-push-services-patch.yaml
   pull_request:
-    branches: [main]
     paths:
       - git-push-services-patch/**
       - '*.json'
-      - e2e-test/**
+      - .github/workflows/git-push-services-patch.yaml
+  push:
+    branches:
+      - main
+    paths:
+      - git-push-services-patch/**
+      - '*.json'
       - .github/workflows/git-push-services-patch.yaml
 
 jobs:
-  ts:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: git-push-services-patch
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
         with:
           node-version: 16
           cache: yarn
       - run: yarn
       - run: yarn test
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        with:
+          node-version: 16
+          cache: yarn
+      - run: yarn
       - run: yarn build
       - run: yarn package
 

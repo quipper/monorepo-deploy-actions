@@ -1,37 +1,48 @@
 name: hello-world
 
 on:
-  push:
-    branches: [main]
+  pull_request:
     paths:
       - hello-world/**
       - '*.json'
       - .github/workflows/hello-world.yaml
-  pull_request:
-    branches: [main]
+  push:
+    branches:
+      - main
     paths:
       - hello-world/**
       - '*.json'
       - .github/workflows/hello-world.yaml
 
+defaults:
+  run:
+    working-directory: hello-world
+
 jobs:
-  ts:
+  test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: hello-world
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
         with:
           node-version: 16
           cache: yarn
       - run: yarn
       - run: yarn test
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        with:
+          node-version: 16
+          cache: yarn
+      - run: yarn
       - run: yarn build
       - run: yarn package
-
-      - name: e2e-test
-        uses: ./hello-world
+      - uses: ./hello-world
         with:
           name: foo
