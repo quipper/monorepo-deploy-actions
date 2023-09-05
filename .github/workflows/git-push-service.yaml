@@ -30,8 +30,6 @@ jobs:
           node-version: 16
           cache: yarn
       - run: yarn
-      - run: yarn lint
-      - run: yarn format-check
       - run: yarn test
       - run: yarn build
       - run: yarn package

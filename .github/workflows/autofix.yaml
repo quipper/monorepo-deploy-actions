@@ -8,7 +8,7 @@ on:
       - .github/workflows/autofix.yaml
 
 jobs:
-  lint:
+  autofix:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -18,18 +18,6 @@ jobs:
           node-version: 16
           cache: yarn
       - run: yarn
-      - run: yarn workspaces run lint --fix
-      - uses: int128/update-generated-files-action@v2
-
-  format:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: yarn
-      - run: yarn
-      - run: yarn workspaces run format
+      - run: yarn format
+      - run: yarn lint
       - uses: int128/update-generated-files-action@v2

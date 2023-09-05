@@ -105,6 +105,6 @@ test('arrange a manifest into namespace level', async () => {
   )
 
   // make sure the old manifests are removed
-  await expect(fs.stat(path.join(workspace, `applications/pr-123--namespace.yaml`))).rejects.toThrowError()
-  await expect(fs.stat(path.join(workspace, `services/namespace/generated.yaml`))).rejects.toThrowError()
+  await expect(fs.stat(path.join(workspace, `applications/pr-123--namespace.yaml`))).rejects.toThrow()
+  await expect(fs.stat(path.join(workspace, `services/namespace/generated.yaml`))).rejects.toThrow()
 })
