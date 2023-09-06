@@ -10,6 +10,7 @@ type CreatePullOptions = {
   base: string
   title: string
   body: string
+  draft: boolean
   labels: string[]
   reviewers: string[]
   assignees: string[]
@@ -38,6 +39,7 @@ export const createPull = async (octokit: Octokit, options: CreatePullOptions) =
     head: options.head,
     title: options.title,
     body: options.body,
+    draft: options.draft,
   })
   core.info(`Created ${pull.html_url}`)
   core.summary.addRaw(`Created [#${pull.number} ${pull.title}](${pull.html_url})`, true)
