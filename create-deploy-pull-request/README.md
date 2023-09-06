@@ -22,14 +22,13 @@ jobs:
             This will deploy the services to production environment.
 ```
 
-If the base branch does not exist, this action will create it from the head branch.
-
+If the base branch does not exist, this action creates it from the head branch.
 If a pull request already exists between head and base, this action does nothing.
 
 ### Pin head commit
 
-If a pull request is created from main branch directly,
-the head commit will be changed when main branch is updated.
+It is not recommended to create a pull request from main branch directly,
+because the head commit will be changed when main branch is updated.
 
 To pin the head commit of a pull request,
 
