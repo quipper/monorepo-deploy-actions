@@ -17,6 +17,10 @@ inputs:
   labels:
     description: Label of pull request (multiline)
     required: false
+  draft:
+    description: Set the pull request to draft
+    required: true
+    default: 'true'
   token:
     description: GitHub token
     required: true

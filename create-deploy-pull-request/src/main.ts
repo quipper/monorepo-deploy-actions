@@ -9,11 +9,13 @@ const main = async (): Promise<void> => {
     title: core.getInput('title', { required: true }),
     body: core.getInput('body', { required: true }),
     labels: core.getMultilineInput('labels'),
+    draft: core.getBooleanInput('draft', { required: true }),
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     actor: github.context.actor,
     token: core.getInput('token', { required: true }),
   })
+  await core.summary.write()
 }
 
 main().catch((e: Error) => {

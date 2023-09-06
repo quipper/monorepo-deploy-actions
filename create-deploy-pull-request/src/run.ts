@@ -8,6 +8,7 @@ type Inputs = {
   base: string
   title: string
   body: string
+  draft: boolean
   labels: string[]
   owner: string
   repo: string
@@ -44,6 +45,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
     base: inputs.base,
     title: inputs.title,
     body: inputs.body,
+    draft: inputs.draft,
     labels: inputs.labels,
     reviewers: [inputs.actor],
     assignees: [inputs.actor],

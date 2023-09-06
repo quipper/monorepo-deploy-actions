@@ -61,6 +61,7 @@ jobs:
 | `title`       | (required)     | Title of pull request             |
 | `body`        | (required)     | Body of pull request              |
 | `labels`      | -              | Label of pull request (multiline) |
+| `draft`       | `true`         | Set the pull request to draft     |
 | `token`       | `github.token` | GitHub token                      |
 
 ### Outputs
