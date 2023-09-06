@@ -37,7 +37,8 @@ export const createBranch = async (octokit: Octokit, options: CreateUpdateBranch
     branch: options.fromBranch,
   })
 
-  core.info(`Creating branch ${options.toBranch} from ${fromBranch.commit.sha}`)
+  core.info(`From commit ${fromBranch.commit.sha} of branch ${options.fromBranch}`)
+  core.info(`Creating a new branch ${options.toBranch}`)
   await octokit.rest.git.createRef({
     owner: options.owner,
     repo: options.repo,
