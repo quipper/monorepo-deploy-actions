@@ -47,6 +47,8 @@ jobs:
         with:
           head-branch: main
           base-branch: create-deploy-pull-request--e2e-test--${{ github.run_number }}
+          title: E2E test of create-deploy-pull-request
+          body: E2E test of create-deploy-pull-request
       - if: always()
         run: git push origin --delete 'refs/heads/create-deploy-pull-request--e2e-test--${{ github.run_number }}'
         continue-on-error: true
