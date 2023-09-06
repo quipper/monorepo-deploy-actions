@@ -5,7 +5,6 @@ import { run } from './run'
 const main = async (): Promise<void> => {
   await run({
     head: core.getInput('head-branch', { required: true }),
-    via: core.getInput('via-branch') || undefined,
     base: core.getInput('base-branch', { required: true }),
     title: core.getInput('title', { required: true }),
     body: core.getInput('body', { required: true }),

@@ -37,7 +37,6 @@ it('should create base branch if not exist', async () => {
 
   await run({
     head: 'release',
-    via: undefined,
     base: 'production',
     title: 'Deploy service to production',
     body: 'Hello',
@@ -80,7 +79,6 @@ it('should create pull request if base branch exists', async () => {
 
   await run({
     head: 'release',
-    via: undefined,
     base: 'production',
     title: 'Deploy service to production',
     body: 'Hello',
@@ -96,68 +94,6 @@ it('should create pull request if base branch exists', async () => {
     owner: 'OWNER',
     repo: 'REPO',
     branch: 'production',
-  })
-  expect(octokitMock.rest.pulls.create).toHaveBeenCalledWith({
-    owner: 'OWNER',
-    repo: 'REPO',
-    head: 'release',
-    base: 'production',
-    title: 'Deploy service to production',
-    body: 'Hello',
-  })
-})
-
-it('should create pull request from via branch', async () => {
-  octokitMock.rest.repos.getBranch.mockImplementation(
-    (req: { branch: string }) =>
-      new Promise((resolve) => {
-        resolve({
-          data: { commit: { sha: `${req.branch}-sha` } },
-        })
-      }),
-  )
-  octokitMock.rest.pulls.list.mockResolvedValueOnce({
-    data: [],
-  })
-  octokitMock.rest.pulls.create.mockResolvedValueOnce({
-    data: { html_url: 'https://github.com/OWNER/REPO/pulls/1' },
-  })
-
-  await run({
-    head: 'develop',
-    via: 'release',
-    base: 'production',
-    title: 'Deploy service to production',
-    body: 'Hello',
-    actor: 'octocat',
-    labels: [],
-    owner: 'OWNER',
-    repo: 'REPO',
-    token: 'GITHUB_TOKEN',
-  })
-
-  expect(octokitMock.rest.repos.getBranch).toHaveBeenCalledTimes(3)
-  expect(octokitMock.rest.repos.getBranch).toHaveBeenCalledWith({
-    owner: 'OWNER',
-    repo: 'REPO',
-    branch: 'develop',
-  })
-  expect(octokitMock.rest.repos.getBranch).toHaveBeenCalledWith({
-    owner: 'OWNER',
-    repo: 'REPO',
-    branch: 'release',
-  })
-  expect(octokitMock.rest.repos.getBranch).toHaveBeenCalledWith({
-    owner: 'OWNER',
-    repo: 'REPO',
-    branch: 'production',
-  })
-  expect(octokitMock.rest.git.updateRef).toHaveBeenCalledWith({
-    owner: 'OWNER',
-    repo: 'REPO',
-    ref: 'heads/release',
-    sha: 'develop-sha',
-    force: true,
   })
   expect(octokitMock.rest.pulls.create).toHaveBeenCalledWith({
     owner: 'OWNER',

@@ -45,4 +45,8 @@ jobs:
       - run: yarn package
       - uses: ./create-deploy-pull-request
         with:
-          name: foo
+          head-branch: main
+          base-branch: create-deploy-pull-request--e2e-test--${{ github.run_number }}
+      - if: always()
+        run: git push origin --delete 'refs/heads/create-deploy-pull-request--e2e-test--${{ github.run_number }}'
+        continue-on-error: true

@@ -22,7 +22,6 @@ jobs:
 | Name          | Default        | Description                       |
 | ------------- | -------------- | --------------------------------- |
 | `head-branch` | (required)     | Name of head branch               |
-| `via-branch`  | -              | Name of via branch                |
 | `base-branch` | (required)     | Name of base branch               |
 | `title`       | (required)     | Title of pull request             |
 | `body`        | (required)     | Body of pull request              |

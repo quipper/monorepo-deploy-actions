@@ -46,39 +46,3 @@ export const createBranch = async (octokit: Octokit, options: CreateUpdateBranch
     sha: fromBranch.commit.sha,
   })
 }
-
-export const createOrUpdateBranch = async (octokit: Octokit, options: CreateUpdateBranchOptions) => {
-  core.info(`Getting branch ${options.fromBranch}`)
-  const { data: fromBranch } = await octokit.rest.repos.getBranch({
-    owner: options.owner,
-    repo: options.repo,
-    branch: options.fromBranch,
-  })
-  const sha = fromBranch.commit.sha
-
-  core.info(`Checking if branch ${options.toBranch} exists`)
-  const toBranchExists = await checkIfBranchExists(octokit, {
-    owner: options.owner,
-    repo: options.repo,
-    branch: options.toBranch,
-  })
-  if (toBranchExists) {
-    core.info(`Updating branch ${options.toBranch} to sha ${sha}`)
-    await octokit.rest.git.updateRef({
-      owner: options.owner,
-      repo: options.repo,
-      ref: `heads/${options.toBranch}`,
-      sha,
-      force: true,
-    })
-    return
-  }
-
-  core.info(`Creating branch ${options.toBranch} from sha ${sha}`)
-  await octokit.rest.git.createRef({
-    owner: options.owner,
-    repo: options.repo,
-    ref: `refs/heads/${options.toBranch}`,
-    sha,
-  })
-}

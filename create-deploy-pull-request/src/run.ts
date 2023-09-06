@@ -1,11 +1,10 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import { createPull } from './pull'
-import { checkIfBranchExists, createBranch, createOrUpdateBranch } from './branch'
+import { checkIfBranchExists, createBranch } from './branch'
 
 type Inputs = {
   head: string
-  via: string | undefined
   base: string
   title: string
   body: string
@@ -18,16 +17,6 @@ type Inputs = {
 
 export const run = async (inputs: Inputs): Promise<void> => {
   const octokit = github.getOctokit(inputs.token)
-
-  if (inputs.via) {
-    core.info(`Creating or updating via branch`)
-    await createOrUpdateBranch(octokit, {
-      owner: inputs.owner,
-      repo: inputs.repo,
-      fromBranch: inputs.head,
-      toBranch: inputs.via,
-    })
-  }
 
   core.info(`Checking if base branch exists`)
   const baseBranchExists = await checkIfBranchExists(octokit, {
@@ -50,7 +39,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
   await createPull(octokit, {
     owner: inputs.owner,
     repo: inputs.repo,
-    head: inputs.via || inputs.head,
+    head: inputs.head,
     base: inputs.base,
     title: inputs.title,
     body: inputs.body,
