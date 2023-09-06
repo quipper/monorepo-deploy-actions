@@ -42,6 +42,7 @@ it('should create base branch if not exist', async () => {
     body: 'Hello',
     actor: 'octocat',
     labels: [],
+    draft: true,
     owner: 'OWNER',
     repo: 'REPO',
     token: 'GITHUB_TOKEN',
@@ -84,6 +85,7 @@ it('should create pull request if base branch exists', async () => {
     body: 'Hello',
     actor: 'octocat',
     labels: [],
+    draft: true,
     owner: 'OWNER',
     repo: 'REPO',
     token: 'GITHUB_TOKEN',
@@ -102,5 +104,6 @@ it('should create pull request if base branch exists', async () => {
     base: 'production',
     title: 'Deploy service to production',
     body: 'Hello',
+    draft: true,
   })
 })
