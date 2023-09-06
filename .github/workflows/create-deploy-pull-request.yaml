@@ -1,0 +1,54 @@
+name: create-deploy-pull-request
+
+on:
+  pull_request:
+    paths:
+      - create-deploy-pull-request/**
+      - '*.json'
+      - .github/workflows/create-deploy-pull-request.yaml
+  push:
+    branches:
+      - main
+    paths:
+      - create-deploy-pull-request/**
+      - '*.json'
+      - .github/workflows/create-deploy-pull-request.yaml
+
+defaults:
+  run:
+    working-directory: create-deploy-pull-request
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        with:
+          node-version: 16
+          cache: yarn
+      - run: yarn
+      - run: yarn test
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        with:
+          node-version: 16
+          cache: yarn
+      - run: yarn
+      - run: yarn build
+      - run: yarn package
+      - uses: ./create-deploy-pull-request
+        with:
+          head-branch: main
+          base-branch: create-deploy-pull-request--e2e-test--${{ github.run_number }}
+          title: E2E test of create-deploy-pull-request
+          body: E2E test of create-deploy-pull-request
+      - if: always()
+        run: git push origin --delete 'refs/heads/create-deploy-pull-request--e2e-test--${{ github.run_number }}'
+        continue-on-error: true

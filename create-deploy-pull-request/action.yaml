@@ -1,0 +1,27 @@
+name: create-deploy-pull-request
+description: create a pull request to deploy a service
+
+inputs:
+  head-branch:
+    description: Name of head branch
+    required: true
+  base-branch:
+    description: Name of base branch
+    required: true
+  title:
+    description: Title of pull request
+    required: true
+  body:
+    description: Body of pull request
+    required: true
+  labels:
+    description: Label of pull request (multiline)
+    required: false
+  token:
+    description: GitHub token
+    required: true
+    default: ${{ github.token }}
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

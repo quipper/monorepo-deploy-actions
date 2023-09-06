@@ -1,0 +1,72 @@
+import * as core from '@actions/core'
+import { GitHub } from '@actions/github/lib/utils'
+
+type Octokit = InstanceType<typeof GitHub>
+
+type CreatePullOptions = {
+  owner: string
+  repo: string
+  head: string
+  base: string
+  title: string
+  body: string
+  labels: string[]
+  reviewers: string[]
+  assignees: string[]
+}
+
+export const createPull = async (octokit: Octokit, options: CreatePullOptions) => {
+  core.info(`Finding an existing pull request of ${options.head} -> ${options.base}`)
+  const { data: exists } = await octokit.rest.pulls.list({
+    owner: options.owner,
+    repo: options.repo,
+    base: options.base,
+    head: options.head,
+  })
+  if (exists.length > 0) {
+    core.info(`Already exists: ${exists.map((pull) => pull.html_url).join()}`)
+    const pull = exists[0]
+    core.summary.addRaw(`Already exists [#${pull.number} ${pull.title}](${pull.html_url})`, true)
+    return
+  }
+
+  core.info(`Creating a pull request from ${options.head} to ${options.base}`)
+  const { data: pull } = await octokit.rest.pulls.create({
+    owner: options.owner,
+    repo: options.repo,
+    base: options.base,
+    head: options.head,
+    title: options.title,
+    body: options.body,
+  })
+  core.info(`Created ${pull.html_url}`)
+  core.summary.addRaw(`Created [#${pull.number} ${pull.title}](${pull.html_url})`, true)
+
+  if (options.reviewers.length > 0) {
+    core.info(`Requesting a review to ${options.reviewers.join(', ')}`)
+    await octokit.rest.pulls.requestReviewers({
+      owner: options.owner,
+      repo: options.repo,
+      pull_number: pull.number,
+      reviewers: options.reviewers,
+    })
+  }
+  if (options.assignees.length > 0) {
+    core.info(`Adding assignees ${options.assignees.join(', ')}`)
+    await octokit.rest.issues.addAssignees({
+      owner: options.owner,
+      repo: options.repo,
+      issue_number: pull.number,
+      assignees: options.assignees,
+    })
+  }
+  if (options.labels.length > 0) {
+    core.info(`Adding labels ${options.labels.join(', ')}`)
+    await octokit.rest.issues.addLabels({
+      owner: options.owner,
+      repo: options.repo,
+      issue_number: pull.number,
+      labels: options.labels,
+    })
+  }
+}
