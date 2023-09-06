@@ -18,24 +18,25 @@ type Inputs = {
 export const run = async (inputs: Inputs): Promise<void> => {
   const octokit = github.getOctokit(inputs.token)
 
-  core.info(`Checking if base branch exists`)
+  core.info(`Checking if ${inputs.base} branch exists`)
   const baseBranchExists = await checkIfBranchExists(octokit, {
     owner: inputs.owner,
     repo: inputs.repo,
     branch: inputs.base,
   })
   if (!baseBranchExists) {
-    core.info(`Creating base branch`)
+    core.info(`Creating ${inputs.base} branch because it does not exist`)
     await createBranch(octokit, {
       owner: inputs.owner,
       repo: inputs.repo,
       fromBranch: inputs.head,
       toBranch: inputs.base,
     })
-    core.summary.addRaw(`Created base branch: ${inputs.base}`, true)
+    core.summary.addRaw(`Created ${inputs.base} branch`, true)
     return
   }
 
+  core.info(`Creating a pull request from ${inputs.head} to ${inputs.base}`)
   await createPull(octokit, {
     owner: inputs.owner,
     repo: inputs.repo,

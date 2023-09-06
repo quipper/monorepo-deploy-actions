@@ -16,7 +16,6 @@ export const checkIfBranchExists = async (octokit: Octokit, options: CheckIfBran
     return true
   } catch (error) {
     if (error instanceof RequestError && error.status === 404) {
-      core.info(`Branch ${options.branch} does not exist: ${error.message}`)
       return false
     }
     throw error
@@ -31,7 +30,7 @@ type CreateUpdateBranchOptions = {
 }
 
 export const createBranch = async (octokit: Octokit, options: CreateUpdateBranchOptions) => {
-  core.info(`Getting branch ${options.fromBranch}`)
+  core.info(`Getting the commit of branch ${options.fromBranch}`)
   const { data: fromBranch } = await octokit.rest.repos.getBranch({
     owner: options.owner,
     repo: options.repo,
