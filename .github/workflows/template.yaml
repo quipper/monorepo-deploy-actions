@@ -1,22 +1,22 @@
-name: hello-world
+name: template
 
 on:
   pull_request:
     paths:
-      - hello-world/**
+      - template/**
       - '*.json'
-      - .github/workflows/hello-world.yaml
+      - .github/workflows/template.yaml
   push:
     branches:
       - main
     paths:
-      - hello-world/**
+      - template/**
       - '*.json'
-      - .github/workflows/hello-world.yaml
+      - .github/workflows/template.yaml
 
 defaults:
   run:
-    working-directory: hello-world
+    working-directory: template
 
 jobs:
   test:
@@ -43,6 +43,6 @@ jobs:
       - run: yarn
       - run: yarn build
       - run: yarn package
-      - uses: ./hello-world
+      - uses: ./template
         with:
           name: foo

@@ -1,9 +1,11 @@
-name: hello-world
+name: template
 description: say Hello World
+
 inputs:
   name:
     description: example input
     required: true
+
 runs:
   using: 'node16'
   main: 'dist/index.js'
