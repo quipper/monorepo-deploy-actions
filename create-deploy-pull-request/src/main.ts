@@ -13,6 +13,8 @@ const main = async (): Promise<void> => {
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     actor: github.context.actor,
+    now: () => new Date(),
+    timeZone: core.getInput('time-zone') || undefined,
     token: core.getInput('token', { required: true }),
   })
   await core.summary.write()

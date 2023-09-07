@@ -25,6 +25,10 @@ jobs:
 If the base branch does not exist, this action creates it from the head branch.
 If a pull request already exists between head and base, this action does nothing.
 
+This action appends the current timestamp to the title of pull request.
+It is the local time in form of ISO 8601, such as `2023-09-07 15:01:02`.
+You may need to set your `time-zone`.
+
 ### Pin head commit
 
 It is not recommended to create a pull request from main branch directly,
@@ -62,6 +66,7 @@ jobs:
 | `body`        | (required)     | Body of pull request              |
 | `labels`      | -              | Label of pull request (multiline) |
 | `draft`       | `true`         | Set the pull request to draft     |
+| `time-zone`   | -              | Time-zone for timestamp in title  |
 | `token`       | `github.token` | GitHub token                      |
 
 ### Outputs
