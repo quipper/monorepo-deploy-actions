@@ -45,6 +45,8 @@ it('should create base branch if not exist', async () => {
     draft: true,
     owner: 'OWNER',
     repo: 'REPO',
+    now: () => new Date(Date.UTC(2023, 8, 7, 6, 1, 2, 0)),
+    timeZone: 'Asia/Tokyo',
     token: 'GITHUB_TOKEN',
   })
 
@@ -88,6 +90,8 @@ it('should create pull request if base branch exists', async () => {
     draft: true,
     owner: 'OWNER',
     repo: 'REPO',
+    now: () => new Date(Date.UTC(2023, 8, 7, 6, 1, 2, 0)),
+    timeZone: 'Asia/Tokyo', // UTC+9
     token: 'GITHUB_TOKEN',
   })
 
@@ -102,7 +106,7 @@ it('should create pull request if base branch exists', async () => {
     repo: 'REPO',
     head: 'release',
     base: 'production',
-    title: 'Deploy service to production',
+    title: 'Deploy service to production at 2023-09-07 15:01:02',
     body: 'Hello',
     draft: true,
   })

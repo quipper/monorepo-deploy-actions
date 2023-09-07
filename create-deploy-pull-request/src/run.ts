@@ -13,6 +13,8 @@ type Inputs = {
   owner: string
   repo: string
   actor: string
+  now: () => Date
+  timeZone: string | undefined
   token: string
 }
 
@@ -38,12 +40,13 @@ export const run = async (inputs: Inputs): Promise<void> => {
   }
 
   core.info(`Creating a pull request from ${inputs.head} to ${inputs.base}`)
+  const timestamp = formatISO8601LocalTime(inputs.now(), inputs.timeZone)
   await createPull(octokit, {
     owner: inputs.owner,
     repo: inputs.repo,
     head: inputs.head,
     base: inputs.base,
-    title: inputs.title,
+    title: `${inputs.title} at ${timestamp}`,
     body: inputs.body,
     draft: inputs.draft,
     labels: inputs.labels,
@@ -51,3 +54,6 @@ export const run = async (inputs: Inputs): Promise<void> => {
     assignees: [inputs.actor],
   })
 }
+
+// https://stackoverflow.com/questions/25050034/get-iso-8601-using-intl-datetimeformat
+const formatISO8601LocalTime = (d: Date, timeZone?: string) => d.toLocaleString('sv-SE', { timeZone })

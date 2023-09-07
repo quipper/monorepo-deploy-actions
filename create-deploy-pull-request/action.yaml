@@ -21,6 +21,9 @@ inputs:
     description: Set the pull request to draft
     required: true
     default: 'true'
+  time-zone:
+    description: Time-zone for timestamp in title
+    required: false
   token:
     description: GitHub token
     required: true
