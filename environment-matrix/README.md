@@ -47,7 +47,7 @@ jobs:
     outputs:
       environments: ${{ steps.environment-matrix.outputs.json }}
     steps:
-      - uses: int128/typescript-actions-monorepo/environment-matrix@v1
+      - uses: quipper/monorepo-deploy-actions/environment-matrix@v1
         id: environment-matrix
         with:
           rules: |

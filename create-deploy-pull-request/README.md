@@ -1,4 +1,4 @@
-# create-deploy-pull-request [![create-deploy-pull-request](https://github.com/int128/typescript-actions-monorepo/actions/workflows/create-deploy-pull-request.yaml/badge.svg)](https://github.com/int128/typescript-actions-monorepo/actions/workflows/create-deploy-pull-request.yaml)
+# create-deploy-pull-request [![create-deploy-pull-request](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/create-deploy-pull-request.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/create-deploy-pull-request.yaml)
 
 This action creates a pull request to deploy a service.
 It assumes a branch strategy such as Git Flow or GitLab Flow.
