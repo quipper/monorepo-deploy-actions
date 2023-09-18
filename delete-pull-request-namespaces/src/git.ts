@@ -33,18 +33,34 @@ export const checkout = async (opts: CheckoutOptions) => {
   return cwd
 }
 
-export const fetch = async (cwd: string, ref: string): Promise<void> => {
-  await exec.exec(
+export const getLastCommitDate = async (cwd: string, branch: string): Promise<Date | undefined> => {
+  const code = await exec.exec('git', ['fetch', '--no-tags', '--depth=1', 'origin', `refs/heads/${branch}`], {
+    cwd,
+    ignoreReturnCode: true,
+  })
+  if (code !== 0) {
+    return // ref not found
+  }
+  const { stdout } = await exec.getExecOutput(
     'git',
-    ['fetch', '--no-tags', '--depth=1', 'origin', `+refs/heads/${ref}:refs/remotes/origin/${ref}`],
-    { cwd },
+    [
+      'log',
+      '-1',
+      // --date=iso-strict (or --date=iso8601-strict) shows timestamps in strict ISO 8601 format.
+      '--date=iso8601-strict',
+      // %cd = committer date (format respects --date= option)
+      '--pretty=format:%cd',
+      `origin/refs/heads/${branch}`,
+    ],
+    {
+      cwd,
+    },
   )
-}
-
-export const getLastCommitDate = async (cwd: string, ref: string): Promise<Date> => {
-  // %cI = committer date, strict ISO 8601 format
-  const { stdout } = await exec.getExecOutput('git', ['log', '-1', '--pretty=format:%cI', ref], { cwd })
-  return new Date(stdout.trim())
+  const lastCommitDate = Date.parse(stdout.trim())
+  if (!Number.isSafeInteger(lastCommitDate)) {
+    return // invalid date
+  }
+  return new Date(lastCommitDate)
 }
 
 export const commit = async (cwd: string, message: string): Promise<void> => {

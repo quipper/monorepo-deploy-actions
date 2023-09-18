@@ -31,9 +31,6 @@ const deleteNamespaceApplications = async (opts: DeleteNamespaceApplicationsOpti
     token: opts.destinationRepositoryToken,
   })
 
-  core.info(`Prefetching namespace branches`)
-  await git.fetch(cwd, `ns/${opts.sourceRepositoryName}/${opts.overlay}/*`)
-
   const applications = await findNamespaceApplication(cwd, opts)
   const deletedPullRequestNumbers = []
   for (const application of applications) {
@@ -44,10 +41,8 @@ const deleteNamespaceApplications = async (opts: DeleteNamespaceApplicationsOpti
 
     // Do not delete an application updated recently.
     // Argo CD would be stuck on deletion if PreSync hook is in progress.
-    const lastUpdatedAgoMinutes = await getLastUpdatedAgoMinutes(cwd, `origin/${application.namespaceBranch}`)
-    core.info(`Namespace ${application.namespace} was updated ${lastUpdatedAgoMinutes} minutes ago`)
-    if (lastUpdatedAgoMinutes < opts.excludeUpdatedWithinMinutes) {
-      core.info(`Skip deletion of namespace ${application.namespace}`)
+    if (await isUpdatedRecently(cwd, application.namespaceBranch, opts.excludeUpdatedWithinMinutes)) {
+      core.info(`Skip deletion of namespace ${application.namespace}, because updated recently`)
       continue
     }
 
@@ -108,7 +103,13 @@ const extractPullRequestNumber = (filename: string, prefix: string, suffix = '.y
   }
 }
 
-const getLastUpdatedAgoMinutes = async (cwd: string, branch: string): Promise<number> => {
+const isUpdatedRecently = async (cwd: string, branch: string, excludeUpdatedWithinMinutes: number) => {
   const lastCommitDate = await git.getLastCommitDate(cwd, branch)
-  return Math.floor((Date.now() - lastCommitDate.getTime()) / (60 * 1000))
+  if (lastCommitDate === undefined) {
+    return false
+  }
+
+  const agoMinutes = Math.floor((Date.now() - lastCommitDate.getTime()) / (60 * 1000))
+  core.info(`Branch ${branch} was updated ${agoMinutes} minutes ago`)
+  return agoMinutes < excludeUpdatedWithinMinutes
 }
