@@ -1,0 +1,79 @@
+name: delete-pull-request-namespaces
+
+on:
+  pull_request:
+    paths:
+      - delete-pull-request-namespaces/**
+      - '*.json'
+      - .github/workflows/delete-pull-request-namespaces.yaml
+  push:
+    branches:
+      - main
+    paths:
+      - delete-pull-request-namespaces/**
+      - '*.json'
+      - .github/workflows/delete-pull-request-namespaces.yaml
+
+defaults:
+  run:
+    working-directory: delete-pull-request-namespaces
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        with:
+          node-version: 16
+          cache: yarn
+      - run: yarn
+      - run: yarn test
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        with:
+          node-version: 16
+          cache: yarn
+      - run: yarn
+      - run: yarn build
+      - run: yarn package
+
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+        with:
+          ref: ${{ github.head_ref }} # avoid "shallow update not allowed" error
+          path: fixture
+      - name: Set up a fixture branch
+        working-directory: fixture
+        run: |
+          mkdir -vp monorepo-deploy-actions/pr
+          cd monorepo-deploy-actions/pr
+          touch pr-1.yaml
+          touch pr-2.yaml
+          touch pr-${{ github.event.pull_request.number }}.yaml
+          git add .
+          git config user.email 'github-actions@github.com'
+          git config user.name 'github-actions'
+          git commit -m "e2e-test fixture for ${GITHUB_REF}"
+          git push origin "HEAD:refs/heads/delete-pull-request-namespaces-${{ github.run_number }}"
+
+      - uses: ./delete-pull-request-namespaces
+        id: delete-pull-request-namespaces
+        with:
+          overlay: pr
+          namespace-prefix: pr-
+          destination-repository: ${{ github.repository }}
+          destination-branch: delete-pull-request-namespaces-${{ github.run_number }}
+          exclude-label: skip-nightly-stop
+          remove-label-on-deletion: deploy
+
+      - name: Clean up the fixture branch
+        continue-on-error: true
+        if: always()
+        run: |
+          git push origin --delete "refs/heads/delete-pull-request-namespaces-${{ github.run_number }}"
