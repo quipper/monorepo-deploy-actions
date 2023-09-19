@@ -34,32 +34,56 @@ const deleteNamespaceApplications = async (opts: DeleteNamespaceApplicationsOpti
   const applications = await findNamespaceApplication(cwd, opts)
   const deletedPullRequestNumbers = []
   for (const application of applications) {
-    if (opts.excludePullRequestNumbers.includes(application.pullRequestNumber)) {
-      core.info(`Skip deletion of namespace ${application.namespace}, because it has the label`)
-      continue
+    if (await shouldDeleteNamespace(application, cwd, opts)) {
+      core.info(`Removing ${application.filepath}`)
+      await io.rmRF(application.filepath)
+      deletedPullRequestNumbers.push(application.pullRequestNumber)
     }
-
-    // Do not delete an application updated recently.
-    // Argo CD would be stuck on deletion if PreSync hook is in progress.
-    if (await isUpdatedRecently(cwd, application.namespaceBranch, opts.excludeUpdatedWithinMinutes)) {
-      core.info(`Skip deletion of namespace ${application.namespace}, because updated recently`)
-      continue
-    }
-
-    core.info(`Deleting namespace ${application.namespace} of ${application.filepath}`)
-    await io.rmRF(application.filepath)
-    deletedPullRequestNumbers.push(application.pullRequestNumber)
   }
+  if (deletedPullRequestNumbers.length === 0) {
+    core.info(`Nothing to delete`)
+    return []
+  }
+  const commitMessage = `${opts.commitMessage}\n${deletedPullRequestNumbers.join(', ')}`
+  await git.commit(cwd, commitMessage)
 
-  if (!opts.dryRun && deletedPullRequestNumbers.length > 0) {
-    const commitMessage = `${opts.commitMessage}\n${deletedPullRequestNumbers.join(', ')}`
-    await git.commit(cwd, commitMessage)
-    const pushCode = await git.pushByFastForward(cwd)
-    if (pushCode > 0) {
-      return new Error(`git-push returned code ${pushCode}`) // retry
-    }
+  if (opts.dryRun) {
+    core.info(`(dry-run) git-push`)
+    return deletedPullRequestNumbers
+  }
+  const pushCode = await git.pushByFastForward(cwd)
+  if (pushCode > 0) {
+    // Retry from checkout if fast-forward was failed
+    return new Error(`git-push returned code ${pushCode}`)
   }
   return deletedPullRequestNumbers
+}
+
+const shouldDeleteNamespace = async (
+  application: NamespaceApplication,
+  cwd: string,
+  opts: DeleteNamespaceApplicationsOptions,
+) => {
+  if (opts.excludePullRequestNumbers.includes(application.pullRequestNumber)) {
+    core.info(`Skip deletion of namespace ${application.namespace}, because it has the label`)
+    return false
+  }
+
+  const lastCommitDate = await git.getLastCommitDate(cwd, application.namespaceBranch)
+  if (lastCommitDate === undefined) {
+    core.info(`Namespace branch ${application.namespaceBranch} does not exist`)
+    return true
+  }
+
+  // Do not delete an application updated recently.
+  // Argo CD would be stuck on deletion if PreSync hook is in progress.
+  const agoMinutes = Math.floor((Date.now() - lastCommitDate.getTime()) / (60 * 1000))
+  core.info(`Branch ${application.namespaceBranch} was updated ${agoMinutes} minutes ago`)
+  if (agoMinutes < opts.excludeUpdatedWithinMinutes) {
+    core.info(`Skip deletion of namespace ${application.namespace}, because the namespace branch was updated recently`)
+    return false
+  }
+  return true
 }
 
 type NamespaceApplication = {
@@ -81,6 +105,7 @@ const findNamespaceApplication = async (cwd: string, opts: DeleteNamespaceApplic
     if (pullRequestNumber === undefined) {
       continue
     }
+    core.info(`Found namespace application: ${filename}`)
     applications.push({
       filepath: path.join(baseDirectory, filename),
       namespace: `${opts.namespacePrefix}${pullRequestNumber}`,
@@ -101,15 +126,4 @@ const extractPullRequestNumber = (filename: string, prefix: string, suffix = '.y
   if (Number.isSafeInteger(n)) {
     return n
   }
-}
-
-const isUpdatedRecently = async (cwd: string, branch: string, excludeUpdatedWithinMinutes: number) => {
-  const lastCommitDate = await git.getLastCommitDate(cwd, branch)
-  if (lastCommitDate === undefined) {
-    return false
-  }
-
-  const agoMinutes = Math.floor((Date.now() - lastCommitDate.getTime()) / (60 * 1000))
-  core.info(`Branch ${branch} was updated ${agoMinutes} minutes ago`)
-  return agoMinutes < excludeUpdatedWithinMinutes
 }
