@@ -50,7 +50,7 @@ export const getLastCommitDate = async (cwd: string, branch: string): Promise<Da
       '--date=iso8601-strict',
       // %cd = committer date (format respects --date= option)
       '--pretty=format:%cd',
-      `origin/refs/heads/${branch}`,
+      `origin/${branch}`,
     ],
     {
       cwd,
