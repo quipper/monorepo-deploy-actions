@@ -31,22 +31,24 @@ const deleteNamespaceApplications = async (opts: DeleteNamespaceApplicationsOpti
     token: opts.destinationRepositoryToken,
   })
 
-  const applications = await findNamespaceApplication(cwd, opts)
-  const deletedPullRequestNumbers = []
+  const applications = await findApplications(cwd, opts)
+  const deletedApplications = []
   for (const application of applications) {
     if (await shouldDeleteNamespace(application, cwd, opts)) {
       core.info(`Removing ${application.filepath}`)
       await io.rmRF(application.filepath)
-      deletedPullRequestNumbers.push(application.pullRequestNumber)
+      deletedApplications.push(application)
     }
   }
-  if (deletedPullRequestNumbers.length === 0) {
+  if (deletedApplications.length === 0) {
     core.info(`Nothing to delete`)
     return []
   }
-  const commitMessage = `${opts.commitMessage}\n${deletedPullRequestNumbers.join(', ')}`
+  const deletedNamespaces = deletedApplications.map((app) => app.namespace).join('\n')
+  const commitMessage = `${opts.commitMessage}\nDeleted:\n${deletedNamespaces}`
   await git.commit(cwd, commitMessage)
 
+  const deletedPullRequestNumbers = deletedApplications.map((app) => app.pullRequestNumber)
   if (opts.dryRun) {
     core.info(`(dry-run) git-push`)
     return deletedPullRequestNumbers
@@ -93,7 +95,7 @@ type NamespaceApplication = {
   pullRequestNumber: number
 }
 
-const findNamespaceApplication = async (cwd: string, opts: DeleteNamespaceApplicationsOptions) => {
+const findApplications = async (cwd: string, opts: DeleteNamespaceApplicationsOptions) => {
   const baseDirectory = path.join(cwd, opts.sourceRepositoryName, opts.overlay)
   const entries = await fs.readdir(baseDirectory, { withFileTypes: true })
   const filenames = entries.filter((e) => e.isFile()).map((e) => e.name)
