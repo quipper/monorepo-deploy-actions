@@ -1,0 +1,49 @@
+name: delete-pull-request-namespaces
+description: Delete pull request namespace applications
+
+inputs:
+  overlay:
+    description: Name of overlay
+    required: true
+  namespace-prefix:
+    description: Prefix of namespace
+    required: true
+  source-repository:
+    description: Source repository
+    required: true
+    default: ${{ github.repository }}
+  source-repository-token:
+    description: GitHub token for source repository
+    required: true
+    default: ${{ github.token }}
+  destination-repository:
+    description: Destination repository
+    required: true
+  destination-branch:
+    description: Destination branch
+    required: true
+  destination-repository-token:
+    description: GitHub token for destination repository
+    required: true
+    default: ${{ github.token }}
+  exclude-label:
+    description: Exclude pull requests which has the label
+    required: false
+  exclude-updated-within-minutes:
+    description: Exclude pull requests updated recently (exclude nothing if 0 is given)
+    required: false
+    default: '15'
+  remove-label-on-deletion:
+    description: Remove the label when the namespace is deleted
+    required: false
+  comment-on-deletion:
+    description: Post a comment when the namespace is deleted
+    required: false
+  dry-run:
+    description: Do not delete manifest(s) actually
+    required: true
+    default: 'false'
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
