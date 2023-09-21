@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { deleteNamespaceApplicationsWithRetry } from './namespace'
+import { deleteNamespaceApplicationsWithRetry } from './applications'
 import { notifyDeletion } from './notify'
 
 type Inputs = {

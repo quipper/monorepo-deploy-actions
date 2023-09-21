@@ -1,7 +1,7 @@
 import * as git from '../src/git'
 import * as os from 'os'
 import * as path from 'path'
-import { deleteNamespaceApplicationsWithRetry } from '../src/namespace'
+import { deleteNamespaceApplicationsWithRetry } from '../src/applications'
 import { promises as fs } from 'fs'
 
 jest.mock('../src/git')
