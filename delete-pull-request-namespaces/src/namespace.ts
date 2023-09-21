@@ -79,6 +79,7 @@ const shouldDeleteNamespace = async (
 
   // Do not delete an application updated recently.
   // Argo CD would be stuck on deletion if PreSync hook is in progress.
+  // If excludeUpdatedWithinMinutes is zero, exclude nothing.
   const agoMinutes = Math.floor((Date.now() - lastCommitDate.getTime()) / (60 * 1000))
   core.info(`Branch ${application.namespaceBranch} was updated ${agoMinutes} minutes ago`)
   if (agoMinutes < opts.excludeUpdatedWithinMinutes) {

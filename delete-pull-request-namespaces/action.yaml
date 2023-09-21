@@ -30,7 +30,7 @@ inputs:
     description: Exclude pull requests which has the label
     required: false
   exclude-updated-within-minutes:
-    description: Exclude pull requests updated recently
+    description: Exclude pull requests updated recently (exclude nothing if 0 is given)
     required: false
     default: '15'
   remove-label-on-deletion:
