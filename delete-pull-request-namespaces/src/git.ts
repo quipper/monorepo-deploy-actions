@@ -68,7 +68,7 @@ export const commit = async (cwd: string, message: string): Promise<void> => {
   await exec.exec('git', ['config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com'], { cwd })
   await exec.exec('git', ['config', 'user.name', 'github-actions[bot]'], { cwd })
   await exec.exec('git', ['commit', '-m', message], { cwd })
-  await exec.exec('git', ['rev-parse', 'HEAD'])
+  await exec.exec('git', ['rev-parse', 'HEAD'], { cwd })
 }
 
 export const pushByFastForward = async (cwd: string): Promise<number> => {
