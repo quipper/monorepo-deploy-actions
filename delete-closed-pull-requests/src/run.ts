@@ -18,6 +18,7 @@ type Inputs = {
 export const run = async (inputs: Inputs): Promise<void> => {
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
   const openPullRequestNumbers = await listOpenPullRequestNumbers(inputs)
+  core.info(`Found ${openPullRequestNumbers.length} of open pull requests`)
 
   core.info(`Deleting namespace applications`)
   const { deployedPullRequestNumbers } = await deleteNamespaceApplicationsWithRetry({

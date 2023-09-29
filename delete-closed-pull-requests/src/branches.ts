@@ -18,7 +18,9 @@ export const deleteNamespaceBranches = async (opts: DeleteNamespaceBranchesOptio
   const octokit = github.getOctokit(opts.destinationRepositoryToken)
   const branches = await findBranches(octokit, opts)
   const branchesToDelete = branches.filter((branch) => shouldDeleteNamespace(branch, opts))
-  core.info(`Deleting branches:\n${branchesToDelete.map((b) => b.branchName).join('\n')}`)
+  core.info(`Deleting namespace branches:\n${branchesToDelete.map((b) => b.branchName).join('\n')}`)
+  core.summary.addHeading(`Deleting namespace branches`)
+  core.summary.addList(branchesToDelete.map((b) => b.branchName))
   if (opts.dryRun) {
     core.info(`(dry-run)`)
     return

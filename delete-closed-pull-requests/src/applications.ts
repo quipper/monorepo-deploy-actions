@@ -30,7 +30,6 @@ const deleteNamespaceApplications = async (opts: DeleteNamespaceApplicationsOpti
     branch: opts.destinationBranch,
     token: opts.destinationRepositoryToken,
   })
-
   const applications = await findApplications(cwd, opts)
   const deletedApplications = []
   const deployedApplications = []
@@ -43,6 +42,9 @@ const deleteNamespaceApplications = async (opts: DeleteNamespaceApplicationsOpti
       deployedApplications.push(application)
     }
   }
+
+  core.summary.addHeading(`Deleting namespace applications`)
+  core.summary.addList(deletedApplications.map((app) => app.filepath))
   const result = {
     deployedPullRequestNumbers: deployedApplications.map((app) => app.pullRequestNumber),
   }

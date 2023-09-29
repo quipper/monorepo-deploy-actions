@@ -13,6 +13,7 @@ const main = async (): Promise<void> => {
     excludeUpdatedWithinMinutes: getIntegerInput('exclude-updated-within-minutes'),
     dryRun: core.getBooleanInput('dry-run', { required: true }),
   })
+  await core.summary.write()
 }
 
 const getIntegerInput = (key: string) => {
