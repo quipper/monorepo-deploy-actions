@@ -19,7 +19,7 @@ type DeleteNamespaceApplicationsOptions = {
 }
 
 export const deleteNamespaceApplicationsWithRetry = async (opts: DeleteNamespaceApplicationsOptions) =>
-  await retryExponential(deleteNamespaceApplications(opts), {
+  await retryExponential(() => deleteNamespaceApplications(opts), {
     maxAttempts: 5,
     waitMs: 10000,
   })
