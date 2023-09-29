@@ -71,7 +71,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }} # avoid "shallow update not allowed" error
           path: namespace-branch
-      - name: Set up an namespace branch
+      - name: Set up namespace branches
         working-directory: namespace-branch
         run: |
           touch dummy
@@ -94,10 +94,10 @@ jobs:
         if: always()
         run: |
           git push origin --delete "refs/heads/delete-closed-pull-requests-${{ github.run_number }}"
-      - name: Clean up the namespace branch
+      - name: Clean up the namespace branches
         continue-on-error: true
         if: always()
         run: |
           git push origin --delete \
-            "refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}"
+            "refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}" \
             "refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}0"
