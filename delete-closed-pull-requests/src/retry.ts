@@ -5,9 +5,9 @@ type RetrySpec = {
   waitMs: number
 }
 
-export const retryExponential = async <T>(f: Promise<T | Error>, spec: RetrySpec): Promise<T> => {
+export const retryExponential = async <T>(f: () => Promise<T | Error>, spec: RetrySpec): Promise<T> => {
   for (let attempt = 1; ; attempt++) {
-    const value = await f
+    const value = await f()
     if (!(value instanceof Error)) {
       return value
     }
