@@ -76,7 +76,7 @@ jobs:
         run: |
           touch dummy
           git add .
-          # set the past commit date to delete the branch
+          # set the past commit date to be deleted by action
           GIT_COMMITTER_DATE=2020-03-31T00:00:00Z git commit -m "Add namespace branch for e2e-test of ${GITHUB_REF}"
           git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}"   # this should be kept
           git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}0"  # this should be deleted
