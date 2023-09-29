@@ -61,9 +61,8 @@ jobs:
         run: |
           mkdir -vp monorepo-deploy-actions/pr
           cd monorepo-deploy-actions/pr
-          touch pr-1.yaml
-          touch pr-2.yaml
-          touch pr-${{ github.event.pull_request.number }}.yaml
+          touch pr-${{ github.event.pull_request.number }}.yaml   # this should be kept
+          touch pr-${{ github.event.pull_request.number }}0.yaml  # this should be deleted
           git add .
           git commit -m "Add overlay branch for e2e-test of ${GITHUB_REF}"
           git push origin "HEAD:refs/heads/delete-closed-pull-requests-${{ github.run_number }}"
@@ -78,7 +77,8 @@ jobs:
           touch dummy
           git add .
           git commit -m "Add namespace branch for e2e-test of ${GITHUB_REF}"
-          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}"
+          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}"   # this should be kept
+          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}0"  # this should be deleted
 
       - uses: ./delete-closed-pull-requests
         id: delete-closed-pull-requests
@@ -97,4 +97,6 @@ jobs:
         continue-on-error: true
         if: always()
         run: |
-          git push origin --delete "refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}"
+          git push origin --delete \
+            "refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}"
+            "refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}0"
