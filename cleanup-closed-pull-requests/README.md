@@ -65,6 +65,7 @@ It deletes applications by the following rules:
 - If a pull request is open, this action does not delete it.
 - If a pull request was recently updated, this action does not delete it.
   Argo CD Application becomes stuck on deletion if the PreSync hook is running.
+- Otherwise, delete it.
 
 ### Namespace branches
 
@@ -82,9 +83,10 @@ ns/monorepo/pr/pr-101
 ns/monorepo/pr/pr-102
 ```
 
-It deletes branches by the following rule:
+It deletes branches by the following rules:
 
-- If a namespace application exists, this action does not delete the corresponding branch.
+- If both namespace application and namespace branch exist, this action does not delete it.
+- Otherwise, delete it.
 
 ## Specification
 
