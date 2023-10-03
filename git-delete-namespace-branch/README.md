@@ -2,6 +2,10 @@
 
 This is an action to delete branch(es) corresponding to namespace(s).
 
+## DEPRECATED :warning:
+
+Use [cleanup-closed-pull-requests](../cleanup-closed-pull-requests) instead.
+
 ## Inputs
 
 | Name                          | Type             | Description                                             |
