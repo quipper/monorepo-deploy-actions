@@ -8,7 +8,7 @@ jest.mock('../src/git')
 
 describe('deleteNamespaceApplicationsWithRetry', () => {
   it('should do nothing if no manifest', async () => {
-    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'delete-closed-pull-requests-'))
+    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'cleanup-closed-pull-requests-'))
     await fs.mkdir(`${cwd}/source-repository/pr`, { recursive: true })
 
     jest.mocked(git.checkout).mockResolvedValueOnce(cwd)
@@ -31,7 +31,7 @@ describe('deleteNamespaceApplicationsWithRetry', () => {
   })
 
   it('should delete all namespaces', async () => {
-    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'delete-closed-pull-requests-'))
+    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'cleanup-closed-pull-requests-'))
     await fs.mkdir(`${cwd}/source-repository/pr`, { recursive: true })
     await fs.writeFile(`${cwd}/source-repository/pr/pr-100.yaml`, 'dummy')
     await fs.writeFile(`${cwd}/source-repository/pr/pr-200.yaml`, 'dummy')
@@ -57,7 +57,7 @@ describe('deleteNamespaceApplicationsWithRetry', () => {
   })
 
   it('should exclude given namespaces', async () => {
-    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'delete-closed-pull-requests-'))
+    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'cleanup-closed-pull-requests-'))
     await fs.mkdir(`${cwd}/source-repository/pr`, { recursive: true })
     await fs.writeFile(`${cwd}/source-repository/pr/pr-100.yaml`, 'dummy')
     await fs.writeFile(`${cwd}/source-repository/pr/pr-200.yaml`, 'dummy')
@@ -83,7 +83,7 @@ describe('deleteNamespaceApplicationsWithRetry', () => {
   })
 
   it('should exclude recently updated namespaces', async () => {
-    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'delete-closed-pull-requests-'))
+    const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'cleanup-closed-pull-requests-'))
     await fs.mkdir(`${cwd}/source-repository/pr`, { recursive: true })
     await fs.writeFile(`${cwd}/source-repository/pr/pr-100.yaml`, 'dummy')
     await fs.writeFile(`${cwd}/source-repository/pr/pr-200.yaml`, 'dummy')

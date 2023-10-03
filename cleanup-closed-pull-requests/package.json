@@ -1,5 +1,5 @@
 {
-  "name": "delete-closed-pull-requests",
+  "name": "cleanup-closed-pull-requests",
   "version": "0.0.0",
   "private": true,
   "main": "lib/src/main.js",

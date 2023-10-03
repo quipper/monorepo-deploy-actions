@@ -1,4 +1,4 @@
-# delete-closed-pull-requests [![delete-closed-pull-requests](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/delete-closed-pull-requests.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/delete-closed-pull-requests.yaml)
+# cleanup-closed-pull-requests [![cleanup-closed-pull-requests](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/cleanup-closed-pull-requests.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/cleanup-closed-pull-requests.yaml)
 
 This is an action to delete the namespaces of closed pull requests.
 
@@ -21,11 +21,11 @@ on:
       - .github/workflows/pr-namespace--cleanup.yaml
 
 jobs:
-  delete-closed-pull-requests:
+  cleanup-closed-pull-requests:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: quipper/monorepo-deploy-actions/delete-closed-pull-requests@v1
+      - uses: quipper/monorepo-deploy-actions/cleanup-closed-pull-requests@v1
         with:
           dry-run: ${{ github.event_name == 'pull_request' }}
           overlay: pr

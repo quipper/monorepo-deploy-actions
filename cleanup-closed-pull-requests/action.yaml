@@ -1,4 +1,4 @@
-name: delete-closed-pull-requests
+name: cleanup-closed-pull-requests
 description: Delete namespaces of closed pull requests
 
 inputs:
