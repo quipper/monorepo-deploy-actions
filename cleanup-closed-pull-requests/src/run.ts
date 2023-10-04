@@ -38,6 +38,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
   await deleteNamespaceBranches({
     overlay: inputs.overlay,
     namespacePrefix: inputs.namespacePrefix,
+    openPullRequestNumbers,
     deployedPullRequestNumbers,
     sourceRepositoryName,
     destinationRepository: inputs.destinationRepository,
