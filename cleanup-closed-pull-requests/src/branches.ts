@@ -39,15 +39,15 @@ export const deleteNamespaceBranches = async (opts: DeleteNamespaceBranchesOptio
 }
 
 const shouldDeleteNamespace = (branch: NamespaceBranch, opts: DeleteNamespaceBranchesOptions) => {
-  // Keep the branch if the pull request is open.
-  // It will be deployed again in the future.
+  // If a pull request is open, do not delete it.
+  // The namespace branch should be preserved, because it will be deployed again in the future.
   if (opts.openPullRequestNumbers.includes(branch.pullRequestNumber)) {
     core.info(`Skip deletion of namespace ${branch.namespace}, because it is open`)
     return false
   }
 
-  // Keep the branch if the application exists.
-  // See application.ts
+  // If a pull request is closed but still deployed, do not delete it.
+  // See also application.ts
   if (opts.deployedPullRequestNumbers.includes(branch.pullRequestNumber)) {
     core.info(`Skip deletion of namespace ${branch.namespace}, because it is still deployed`)
     return false
