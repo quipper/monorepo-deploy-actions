@@ -1,0 +1,103 @@
+name: cleanup-closed-pull-requests
+
+on:
+  pull_request:
+    paths:
+      - cleanup-closed-pull-requests/**
+      - '*.json'
+      - .github/workflows/cleanup-closed-pull-requests.yaml
+  push:
+    branches:
+      - main
+    paths:
+      - cleanup-closed-pull-requests/**
+      - '*.json'
+      - .github/workflows/cleanup-closed-pull-requests.yaml
+
+concurrency:
+  group: ${{ github.workflow }}--${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: cleanup-closed-pull-requests
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        with:
+          node-version: 16
+          cache: yarn
+      - run: yarn
+      - run: yarn test
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        with:
+          node-version: 16
+          cache: yarn
+      - run: yarn
+      - run: yarn build
+      - run: yarn package
+
+      - run: |
+          git config --global user.email 'github-actions@github.com'
+          git config --global user.name 'github-actions'
+
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+        with:
+          ref: ${{ github.head_ref }} # avoid "shallow update not allowed" error
+          path: overlay-branch
+      - name: Set up an overlay branch
+        working-directory: overlay-branch
+        run: |
+          mkdir -vp monorepo-deploy-actions/pr
+          cd monorepo-deploy-actions/pr
+          touch pr-${{ github.event.pull_request.number }}.yaml   # this should be kept
+          touch pr-${{ github.event.pull_request.number }}0.yaml  # this should be deleted
+          git add .
+          git commit -m "Add overlay branch for e2e-test of ${GITHUB_REF}"
+          git push origin "HEAD:refs/heads/cleanup-closed-pull-requests-${{ github.run_number }}"
+
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+        with:
+          ref: ${{ github.head_ref }} # avoid "shallow update not allowed" error
+          path: namespace-branch
+      - name: Set up namespace branches
+        working-directory: namespace-branch
+        run: |
+          touch dummy
+          git add .
+          # set the past commit date to be deleted by action
+          GIT_COMMITTER_DATE=2020-03-31T00:00:00Z git commit -m "Add namespace branch for e2e-test of ${GITHUB_REF}"
+          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}"   # this should be kept
+          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}0"  # this should be deleted
+
+      - uses: ./cleanup-closed-pull-requests
+        id: cleanup-closed-pull-requests
+        with:
+          overlay: pr
+          namespace-prefix: pr-
+          destination-repository: ${{ github.repository }}
+          destination-branch: cleanup-closed-pull-requests-${{ github.run_number }}
+
+      - name: Clean up the overlay branch
+        continue-on-error: true
+        if: always()
+        run: |
+          git push origin --delete "refs/heads/cleanup-closed-pull-requests-${{ github.run_number }}"
+      - name: Clean up the namespace branches
+        continue-on-error: true
+        if: always()
+        run: |
+          git push origin --delete \
+            "refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}" \
+            "refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}0"

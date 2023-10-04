@@ -2,6 +2,10 @@
 
 This is an action to delete manifest(s) of Argo CD `Application`.
 
+## DEPRECATED :warning:
+
+Use [cleanup-closed-pull-requests](../cleanup-closed-pull-requests) instead.
+
 ## Inputs
 
 | Name                          | Type             | Description                                             |
