@@ -3,7 +3,7 @@
 This is an action to delete the namespaces of closed pull requests.
 
 For cost saving and reliability of the Kubernetes cluster,
-it would be nice to delete the namespaces priodically.
+it would be nice to delete the namespaces periodically.
 
 ## Getting Started
 
