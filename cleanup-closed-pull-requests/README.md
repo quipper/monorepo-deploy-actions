@@ -85,7 +85,9 @@ ns/monorepo/pr/pr-102
 
 It deletes branches by the following rules:
 
-- If both namespace application and namespace branch exist, this action does not delete it.
+- If a pull request is open, this action does not delete it.
+  The namespace branch should be preserved, because it will be deployed again in the future.
+- If a pull request is closed but still deployed, this action does not delete it.
 - Otherwise, delete it.
 
 ## Specification

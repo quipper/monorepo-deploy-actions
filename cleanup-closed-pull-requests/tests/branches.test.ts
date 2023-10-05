@@ -22,6 +22,7 @@ describe('deleteNamespaceBranches', () => {
       sourceRepositoryName: 'source-repository',
       destinationRepository: 'octocat/destination-repository',
       destinationRepositoryToken: 'destination-token',
+      openPullRequestNumbers: [],
       deployedPullRequestNumbers: [],
       dryRun: false,
     })
@@ -41,6 +42,7 @@ describe('deleteNamespaceBranches', () => {
       sourceRepositoryName: 'source-repository',
       destinationRepository: 'octocat/destination-repository',
       destinationRepositoryToken: 'destination-token',
+      openPullRequestNumbers: [],
       deployedPullRequestNumbers: [],
       dryRun: false,
     })
@@ -68,6 +70,30 @@ describe('deleteNamespaceBranches', () => {
       sourceRepositoryName: 'source-repository',
       destinationRepository: 'octocat/destination-repository',
       destinationRepositoryToken: 'destination-token',
+      openPullRequestNumbers: [200],
+      deployedPullRequestNumbers: [],
+      dryRun: false,
+    })
+    expect(octokitMock.rest.git.deleteRef).toHaveBeenCalledWith({
+      owner: 'octocat',
+      repo: 'destination-repository',
+      ref: 'heads/ns/source-repository/pr/pr-100',
+    })
+  })
+
+  it('should exclude deployed pull requests', async () => {
+    octokitMock.rest.git.listMatchingRefs.mockResolvedValueOnce([
+      { ref: 'refs/heads/ns/source-repository/pr/pr-100' },
+      { ref: 'refs/heads/ns/source-repository/pr/pr-200' },
+    ])
+
+    await deleteNamespaceBranches({
+      overlay: 'pr',
+      namespacePrefix: 'pr-',
+      sourceRepositoryName: 'source-repository',
+      destinationRepository: 'octocat/destination-repository',
+      destinationRepositoryToken: 'destination-token',
+      openPullRequestNumbers: [],
       deployedPullRequestNumbers: [200],
       dryRun: false,
     })
@@ -90,7 +116,27 @@ describe('deleteNamespaceBranches', () => {
       sourceRepositoryName: 'source-repository',
       destinationRepository: 'octocat/destination-repository',
       destinationRepositoryToken: 'destination-token',
+      openPullRequestNumbers: [],
       deployedPullRequestNumbers: [100, 200, 300],
+      dryRun: false,
+    })
+    expect(octokitMock.rest.git.deleteRef).not.toHaveBeenCalled()
+  })
+
+  it('should do nothing if all pull requests are still deployed', async () => {
+    octokitMock.rest.git.listMatchingRefs.mockResolvedValueOnce([
+      { ref: 'refs/heads/ns/source-repository/pr/pr-100' },
+      { ref: 'refs/heads/ns/source-repository/pr/pr-200' },
+    ])
+
+    await deleteNamespaceBranches({
+      overlay: 'pr',
+      namespacePrefix: 'pr-',
+      sourceRepositoryName: 'source-repository',
+      destinationRepository: 'octocat/destination-repository',
+      destinationRepositoryToken: 'destination-token',
+      openPullRequestNumbers: [100, 200, 300],
+      deployedPullRequestNumbers: [],
       dryRun: false,
     })
     expect(octokitMock.rest.git.deleteRef).not.toHaveBeenCalled()
