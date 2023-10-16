@@ -8,5 +8,5 @@ outputs:
   json:
     description: JSON string of environments
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'

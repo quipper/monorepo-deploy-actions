@@ -15,5 +15,5 @@ outputs:
   head-branch:
     description: The head branch of the opened Pull Request
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
