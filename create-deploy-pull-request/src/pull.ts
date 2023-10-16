@@ -22,7 +22,9 @@ export const createPull = async (octokit: Octokit, options: CreatePullOptions) =
     owner: options.owner,
     repo: options.repo,
     base: options.base,
-    head: options.head,
+    // head must be in the format of `organization:ref-name`
+    // https://docs.github.com/en/rest/pulls/pulls#list-pull-requests
+    head: `${options.owner}:${options.head}`,
   })
   if (exists.length > 0) {
     core.info(`Already exists: ${exists.map((pull) => pull.html_url).join()}`)
