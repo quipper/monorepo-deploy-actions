@@ -23,7 +23,7 @@ export const createPull = async (octokit: Octokit, options: CreatePullOptions) =
     repo: options.repo,
     base: options.base,
     // head must be in the format of `organization:ref-name`
-    // https://docs.github.com/en/free-pro-team@latest/rest/pulls/pulls#list-pull-requests
+    // https://docs.github.com/en/rest/pulls/pulls#list-pull-requests
     head: `${options.owner}:${options.head}`,
   })
   if (exists.length > 0) {
