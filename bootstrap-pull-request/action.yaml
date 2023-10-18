@@ -1,0 +1,31 @@
+name: bootstrap-pull-request
+description: bootstrap the pull request namespace
+
+inputs:
+  overlay:
+    description: Name of overlay
+    required: true
+  namespace:
+    description: Name of namespace
+    required: true
+  source-repository:
+    description: Source repository
+    required: true
+    default: ${{ github.repository }}
+  destination-repository:
+    description: Destination repository
+    required: true
+  destination-repository-token:
+    description: GitHub token for destination repository
+    required: true
+    default: ${{ github.token }}
+  namespace-manifest:
+    description: Path to namespace manifest (optional)
+    required: false
+  substitute-variables:
+    description: Pairs of key=value to substitute the prebuilt manifests (multiline)
+    required: false
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
