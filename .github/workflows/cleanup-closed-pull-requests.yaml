@@ -59,13 +59,13 @@ jobs:
       - name: Set up an overlay branch
         working-directory: overlay-branch
         run: |
-          mkdir -vp monorepo-deploy-actions/pr
-          cd monorepo-deploy-actions/pr
+          mkdir -vp monorepo-deploy-actions/overlay-${{ github.run_id }}
+          cd monorepo-deploy-actions/overlay-${{ github.run_id }}
           touch pr-${{ github.event.pull_request.number }}.yaml   # this should be kept
           touch pr-${{ github.event.pull_request.number }}0.yaml  # this should be deleted
           git add .
           git commit -m "Add overlay branch for e2e-test of ${GITHUB_REF}"
-          git push origin "HEAD:refs/heads/cleanup-closed-pull-requests-${{ github.run_number }}"
+          git push origin "HEAD:refs/heads/cleanup-closed-pull-requests-${{ github.run_id }}"
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
@@ -78,26 +78,26 @@ jobs:
           git add .
           # set the past commit date to be deleted by action
           GIT_COMMITTER_DATE=2020-03-31T00:00:00Z git commit -m "Add namespace branch for e2e-test of ${GITHUB_REF}"
-          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}"   # this should be kept
-          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}0"  # this should be deleted
+          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/overlay-${{ github.run_id }}/pr-${{ github.event.pull_request.number }}"   # this should be kept
+          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/overlay-${{ github.run_id }}/pr-${{ github.event.pull_request.number }}0"  # this should be deleted
 
       - uses: ./cleanup-closed-pull-requests
         id: cleanup-closed-pull-requests
         with:
-          overlay: pr
+          overlay: overlay-${{ github.run_id }}
           namespace-prefix: pr-
           destination-repository: ${{ github.repository }}
-          destination-branch: cleanup-closed-pull-requests-${{ github.run_number }}
+          destination-branch: cleanup-closed-pull-requests-${{ github.run_id }}
 
       - name: Clean up the overlay branch
         continue-on-error: true
         if: always()
         run: |
-          git push origin --delete "refs/heads/cleanup-closed-pull-requests-${{ github.run_number }}"
+          git push origin --delete "refs/heads/cleanup-closed-pull-requests-${{ github.run_id }}"
       - name: Clean up the namespace branches
         continue-on-error: true
         if: always()
         run: |
           git push origin --delete \
-            "refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}" \
-            "refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}0"
+            "refs/heads/ns/monorepo-deploy-actions/overlay-${{ github.run_id }}/pr-${{ github.event.pull_request.number }}" \
+            "refs/heads/ns/monorepo-deploy-actions/overlay-${{ github.run_id }}/pr-${{ github.event.pull_request.number }}0"
