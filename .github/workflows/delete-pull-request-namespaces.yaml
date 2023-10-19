@@ -59,14 +59,14 @@ jobs:
       - name: Set up an overlay branch
         working-directory: overlay-branch
         run: |
-          mkdir -vp monorepo-deploy-actions/pr
-          cd monorepo-deploy-actions/pr
+          mkdir -vp monorepo-deploy-actions/overlay-${{ github.run_id }}
+          cd monorepo-deploy-actions/overlay-${{ github.run_id }}
           touch pr-1.yaml
           touch pr-2.yaml
           touch pr-${{ github.event.pull_request.number }}.yaml
           git add .
           git commit -m "Add overlay branch for e2e-test of ${GITHUB_REF}"
-          git push origin "HEAD:refs/heads/delete-pull-request-namespaces-${{ github.run_number }}"
+          git push origin "HEAD:refs/heads/delete-pull-request-namespaces-${{ github.run_id }}"
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
@@ -78,15 +78,15 @@ jobs:
           touch dummy
           git add .
           git commit -m "Add namespace branch for e2e-test of ${GITHUB_REF}"
-          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}"
+          git push origin "HEAD:refs/heads/ns/monorepo-deploy-actions/overlay-${{ github.run_id }}/pr-${{ github.event.pull_request.number }}"
 
       - uses: ./delete-pull-request-namespaces
         id: delete-pull-request-namespaces
         with:
-          overlay: pr
+          overlay: overlay-${{ github.run_id }}
           namespace-prefix: pr-
           destination-repository: ${{ github.repository }}
-          destination-branch: delete-pull-request-namespaces-${{ github.run_number }}
+          destination-branch: delete-pull-request-namespaces-${{ github.run_id }}
           exclude-label: skip-nightly-stop
           remove-label-on-deletion: deploy
 
@@ -94,9 +94,9 @@ jobs:
         continue-on-error: true
         if: always()
         run: |
-          git push origin --delete "refs/heads/delete-pull-request-namespaces-${{ github.run_number }}"
+          git push origin --delete "refs/heads/delete-pull-request-namespaces-${{ github.run_id }}"
       - name: Clean up the namespace branch
         continue-on-error: true
         if: always()
         run: |
-          git push origin --delete "refs/heads/ns/monorepo-deploy-actions/pr/pr-${{ github.event.pull_request.number }}"
+          git push origin --delete "refs/heads/ns/monorepo-deploy-actions/overlay-${{ github.run_id }}/pr-${{ github.event.pull_request.number }}"
