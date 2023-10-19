@@ -93,7 +93,7 @@ jobs:
         continue-on-error: true
         if: always()
         run: |
-          git push origin --delete "refs/heads/cleanup-closed-pull-requests-${{ github.run_number }}"
+          git push origin --delete "refs/heads/cleanup-closed-pull-requests-${{ github.run_id }}"
       - name: Clean up the namespace branches
         continue-on-error: true
         if: always()
