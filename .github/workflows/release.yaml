@@ -21,4 +21,4 @@ jobs:
           cache: yarn
       - run: yarn
       - run: yarn workspaces run ci:package
-      - uses: int128/release-typescript-action@9e19901f9e557435e53c92f2e63e66dae854dacd # v1.24.0
+      - uses: int128/release-typescript-action@0ae845d68f0934d12cb3d0fc2168780a5ba8160d # v1.25.0
