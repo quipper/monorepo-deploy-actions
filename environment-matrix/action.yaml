@@ -4,6 +4,10 @@ inputs:
   rules:
     description: YAML string of rules
     required: true
+  token:
+    description: GitHub token
+    required: true
+    default: ${{ github.token }}
 outputs:
   json:
     description: JSON string of environments

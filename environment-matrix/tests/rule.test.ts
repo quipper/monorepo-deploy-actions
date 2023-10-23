@@ -41,6 +41,55 @@ test('parse a valid YAML', () => {
   ])
 })
 
+test('parse rules with GitHub Deployment', () => {
+  const yaml = `
+- pull_request:
+    base: '**'
+    head: '**'
+  environments:
+    - overlay: pr
+      namespace: pr-1
+      github-deployment: 'true'
+      github-deployment-environment: pr/pr-1
+- push:
+    ref: refs/heads/main
+  environments:
+    - overlay: development
+      namespace: development
+      github-deployment: 'true'
+      github-deployment-environment: development/development
+`
+  expect(parseRulesYAML(yaml)).toStrictEqual<Rules>([
+    {
+      pull_request: {
+        base: '**',
+        head: '**',
+      },
+      environments: [
+        {
+          overlay: 'pr',
+          namespace: 'pr-1',
+          'github-deployment': 'true',
+          'github-deployment-environment': 'pr/pr-1',
+        },
+      ],
+    },
+    {
+      push: {
+        ref: 'refs/heads/main',
+      },
+      environments: [
+        {
+          overlay: 'development',
+          namespace: 'development',
+          'github-deployment': 'true',
+          'github-deployment-environment': 'development/development',
+        },
+      ],
+    },
+  ])
+})
+
 test('parse an empty string', () => {
   expect(() => parseRulesYAML('')).toThrow(`invalid rules YAML:  must be array`)
 })

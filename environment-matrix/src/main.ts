@@ -4,6 +4,7 @@ import { run } from './run'
 const main = async (): Promise<void> => {
   const outputs = await run({
     rules: core.getInput('rules', { required: true }),
+    token: core.getInput('token', { required: true }),
   })
   core.setOutput('json', outputs.environments)
 }

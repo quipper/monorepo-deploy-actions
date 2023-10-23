@@ -36,6 +36,20 @@ For example, when `main` branch is pushed, this action returns the following JSO
 This action finds a rule in order.
 If no rule is matched, this action fails.
 
+## GitHub Deployment
+
+This action supports [GitHub Deployment](https://docs.github.com/en/rest/deployments/deployments) to receive the deployment status against the environment.
+
+To create a GitHub Deployment for each environment,
+
+- Set `github-deployment` field to `true`
+- Set `github-deployment-environment` field to the environment name
+
+If the old deployment exists, this action deletes it and recreates new one.
+
+This action sets `github-deployment-url` field to the output.
+See the example in the next section.
+
 ### Workflow example
 
 Here is the workflow of matrix jobs.
@@ -57,11 +71,15 @@ jobs:
               environments:
                 - overlay: pr
                   namespace: pr-${{ github.event.pull_request.number }}
+                  github-deployment: 'true'
+                  github-deployment-environment: pr/pr-${{ github.event.pull_request.number }}/example
             - push:
                 ref: refs/heads/main
               environments:
                 - overlay: development
                   namespace: development
+                  github-deployment: 'true'
+                  github-deployment-environment: development/development/example
 
   deploy:
     needs:
@@ -79,15 +97,18 @@ jobs:
           overlay: ${{ matrix.environment.overlay }}
           namespace: ${{ matrix.environment.namespace }}
           service: # (omit in this example)
+          application-annotations: |
+            argocd-commenter.int128.github.io/deployment-url=${{ matrix.github-deployment-url }}
 ```
 
 ## Spec
 
 ### Inputs
 
-| Name    | Type     | Description          |
-| ------- | -------- | -------------------- |
-| `rules` | `string` | YAML string of rules |
+| Name    | Default        | Description          |
+| ------- | -------------- | -------------------- |
+| `rules` | (required)     | YAML string of rules |
+| `token` | `github.token` | GitHub token         |
 
 The following fields are available in the rules YAML.
 
@@ -95,10 +116,16 @@ The following fields are available in the rules YAML.
 - pull_request: # on pull_request event
     base: # base branch name (wildcard available)
     head: # head branch name (wildcard available)
-  environments: # array of map<string, string>
+  environments:
+    - # array of map<string, string>
+      github-deployment: 'true' # set true to create a GitHub Deployment (optional)
+      github-deployment-environment: # environment name of GitHub Deployment (optional)
 - push: # on push event
     ref: refs/heads/main # ref name (wildcard available)
-  environments: # array of map<string, string>
+  environments:
+    - # array of map<string, string>
+      github-deployment: 'true' # set true to create a GitHub Deployment (optional)
+      github-deployment-environment: # environment name of GitHub Deployment (optional)
 ```
 
 It supports the wildcard pattern.

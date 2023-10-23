@@ -55,11 +55,15 @@ jobs:
               environments:
                 - overlay: pr
                   namespace: pr-${{ github.event.pull_request.number }}
+                  github-deployment: 'true'
+                  github-deployment-environment: pr/pr-${{ github.event.pull_request.number }}/example
             - push:
                 ref: refs/heads/main
               environments:
                 - overlay: development
                   namespace: development
+                  github-deployment: 'true'
+                  github-deployment-environment: development/development/example
 
   e2e-test-matrix:
     needs: e2e-test
@@ -75,3 +79,4 @@ jobs:
     steps:
       - run: echo 'overlay=${{ matrix.environment.overlay }}'
       - run: echo 'namespace=${{ matrix.environment.namespace }}'
+      - run: echo 'github-deployment-url=${{ matrix.environment.github-deployment-url }}'
