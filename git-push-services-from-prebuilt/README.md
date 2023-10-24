@@ -2,6 +2,10 @@
 
 This is an action to push services from prebuilt manifests.
 
+## Deprecated :warning:
+
+Use `bootstrap-pull-request` action instead.
+
 ## Inputs
 
 | Name                     | Type   | Description                              |
