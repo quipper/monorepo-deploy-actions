@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as io from '@actions/io'
+import * as path from 'path'
 import * as yaml from 'js-yaml'
 import { promises as fs } from 'fs'
 
@@ -13,7 +14,45 @@ type Inputs = {
   substituteVariables: Map<string, string>
 }
 
-export const copyServicesFromPrebuilt = async (inputs: Inputs): Promise<void> => {
+export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<void> => {
+  // If an application has been removed from the prebuilt branch,
+  // it will remain in the existing namespace branch.
+  //
+  // To clean up the outdated applications,
+  // deleteExistingApplications() deletes the existing applications, and then
+  // copyServicesFromPrebuilt() recreates the applications.
+  await deleteExistingApplications(inputs)
+  await copyServicesFromPrebuilt(inputs)
+}
+
+const deleteExistingApplications = async (inputs: Inputs): Promise<void> => {
+  // We don't need to clean up the directory recursively,
+  // because Argo CD reads only the top-level directory.
+  core.info(`Finding files in ${inputs.namespaceDirectory}/applications`)
+  const applicationManifestPaths = await findFilesOrNull(`${inputs.namespaceDirectory}/applications`)
+  if (applicationManifestPaths === null) {
+    return
+  }
+  for (const applicationManifestPath of applicationManifestPaths) {
+    if (await shouldDeleteApplication(applicationManifestPath)) {
+      core.info(`Deleting ${applicationManifestPath}`)
+      await io.rmRF(applicationManifestPath)
+    }
+  }
+}
+
+const shouldDeleteApplication = async (applicationManifestPath: string): Promise<boolean> => {
+  const applicationManifest = (await fs.readFile(applicationManifestPath)).toString()
+  // If the application was pushed by git-push-service,
+  // we need to keep it to prevent rolling back to the prebuilt manifest.
+  if (/^ *github\.action: git-push-service$/m.test(applicationManifest)) {
+    core.info(`Application manifest ${applicationManifestPath} was pushed by git-push-service action, keep it`)
+    return false
+  }
+  return true
+}
+
+const copyServicesFromPrebuilt = async (inputs: Inputs): Promise<void> => {
   core.info(`Finding services in ${inputs.prebuiltDirectory}/services`)
   const services = (await fs.readdir(`${inputs.prebuiltDirectory}/services`, { withFileTypes: true }))
     .filter((e) => e.isDirectory())
@@ -48,14 +87,22 @@ const shouldWriteService = async (inputs: Inputs, service: string) => {
   return true
 }
 
-const readContentOrNull = async (f: string): Promise<string | null> => {
+const findFilesOrNull = async (directory: string, recursive = false): Promise<string[] | null> =>
+  await catchENOENT(async () =>
+    (await fs.readdir(directory, { withFileTypes: true, recursive }))
+      .filter((e) => e.isFile())
+      .map((e) => path.join(e.path, e.name)),
+  )
+
+const readContentOrNull = async (f: string): Promise<string | null> =>
+  await catchENOENT(async () => (await fs.readFile(f)).toString())
+
+const catchENOENT = async <T>(f: () => Promise<T>): Promise<T | null> => {
   try {
-    const b = await fs.readFile(f)
-    return b.toString()
+    return await f()
   } catch (error) {
-    if (typeof error === 'object' && error !== null && 'code' in error) {
-      const e = error as { code: string }
-      if (e.code === 'ENOENT') {
+    if (typeof error === 'object' && error !== null && 'code' in error && typeof error.code === 'string') {
+      if (error.code === 'ENOENT') {
         return null
       }
     }

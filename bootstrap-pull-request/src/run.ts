@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as git from './git'
-import { copyServicesFromPrebuilt } from './prebuilt'
+import { syncServicesFromPrebuilt } from './prebuilt'
 import { retryExponential } from './retry'
 import { writeNamespaceManifest } from './namespace'
 
@@ -30,9 +30,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<void | Error> => {
   const substituteVariables = parseSubstituteVariables(inputs.substituteVariables)
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
 
-  // TODO: consider the garbage collection of the outdated services
-
-  await copyServicesFromPrebuilt({
+  await syncServicesFromPrebuilt({
     overlay: inputs.overlay,
     namespace: inputs.namespace,
     sourceRepositoryName,
