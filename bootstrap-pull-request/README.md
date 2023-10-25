@@ -75,10 +75,10 @@ prebuilt/${source-repository}/${overlay}
 
 It bootstraps the namespace branch by the following steps:
 
-- Copy the services from prebuilt branch.
+- Sync the services from prebuilt branch.
 - Write the namespace manifest
 
-### Copy the services from prebuilt branch
+### Sync the services from prebuilt branch
 
 This action copies the services from prebuilt branch to the namespace branch.
 
@@ -117,6 +117,27 @@ this action does not overwrite it.
    - `git-push-service` action overwrites the service.
 1. When the pull request is synchronized,
    - This action does not overwrite the service.
+
+If the namespace branch has the outdated applications, this action will delete them.
+For the below example,
+this action will delete `pr-123--outdated.yaml` because the prebuilt branch does not have `outdated` service.
+
+```
+Prebuilt branch:
+.
+└── services
+    ├── backend
+    └── frontend
+
+Namespace branch:
+.
+├── applications
+|   ├── pr-123--backend.yaml
+|   └── pr-123--frontend.yaml
+|   └── pr-123--outdated.yaml    <-- deleted
+└── services
+    └── ...
+```
 
 ### Write the namespace manifest
 
