@@ -30,8 +30,6 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<void | Error> => {
   const substituteVariables = parseSubstituteVariables(inputs.substituteVariables)
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
 
-  // TODO: consider the garbage collection of the outdated services
-
   await syncServicesFromPrebuilt({
     overlay: inputs.overlay,
     namespace: inputs.namespace,
