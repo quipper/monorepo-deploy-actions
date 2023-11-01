@@ -10,7 +10,7 @@ const main = async (): Promise<void> => {
     destinationRepository: core.getInput('destination-repository', { required: true }),
     destinationBranch: core.getInput('destination-branch', { required: true }),
     destinationRepositoryToken: core.getInput('destination-repository-token', { required: true }),
-    excludeLabel: core.getInput('exclude-pull-request-label') || undefined,
+    excludeLabel: core.getInput('exclude-label') || undefined,
     excludeUpdatedWithinMinutes: getIntegerInput('exclude-updated-within-minutes'),
     removeLabelOnDeletion: core.getInput('remove-label-on-deletion') || undefined,
     commentOnDeletion: core.getInput('comment-on-deletion') || undefined,
