@@ -1,6 +1,8 @@
 # git-push-service
 
-This is an action to push manifest(s) with Argo CD `Application` manifest(s) to deploy service(s).
+This is an action to push a service manifest into a namespace branch.
+
+If you need to push a manifest into the namespace level, use [bootstrap-pull-request](../bootstrap-pull-request) action instead.
 
 ## Inputs
 
@@ -10,7 +12,6 @@ This is an action to push manifest(s) with Argo CD `Application` manifest(s) to 
 | `overlay`                 | string           | Name of overlay                                                         |
 | `namespace`               | string           | Name of namespace                                                       |
 | `service`                 | string           | Name of service                                                         |
-| `namespace-level`         | boolean          | Push the manifests to namespace level (default to false)                |
 | `application-annotations` | multiline string | Annotations to add to an Application (default to empty)                 |
 | `destination-repository`  | string           | Destination repository                                                  |
 | `destination-branch`      | string           | Destination branch (default to `ns/${project}/${overlay}/${namespace}`) |
@@ -69,32 +70,6 @@ It generates an `Application` manifest with the following properties:
   - path: `/services/${service}`
 - destination
   - namespace: `${namespace}`
-
-### Push a manifest to the namespace level
-
-To push a manifest to the namespace level in App of Apps hierarchy:
-
-```yaml
-steps:
-  - uses: int128/kustomize-action@v1
-    id: kustomize
-    with:
-      kustomization: deploy/namespace/kubernetes/overlays/pr/kustomization.yaml
-  - uses: quipper/monorepo-deploy-actions/git-push-service@v1
-    with:
-      manifests: ${{ steps.kustomize.outputs.files }}
-      overlay: pr
-      namespace: pr-1
-      namespace-level: true
-```
-
-It pushes the following file into a destination repository:
-
-```
-destination-repository (branch: ns/${project}/${overlay}/${namespace})
-└── applications
-    └── generated.yaml
-```
 
 ### Push a manifest as a prebuilt one
 

@@ -14,10 +14,6 @@ inputs:
   service:
     description: service name
     required: false
-  namespace-level:
-    description: set to true to push the manifests to namespace level in App of Apps
-    required: true
-    default: 'false'
   application-annotations:
     description: annotations of application in form of NAME=VALUE
     required: false

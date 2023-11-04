@@ -14,7 +14,6 @@ type Inputs = {
   overlay: string
   namespace: string
   service: string
-  namespaceLevel: boolean
   applicationAnnotations: string[]
   destinationRepository: string
   destinationBranch: string
@@ -29,10 +28,6 @@ type Outputs = {
 }
 
 export const run = async (inputs: Inputs): Promise<Outputs> => {
-  if (!inputs.service && !inputs.namespaceLevel) {
-    throw new Error('service must be set if namespace-level is false')
-  }
-
   const globber = await glob.create(inputs.manifests, { matchDirectories: false })
   const manifests = await globber.glob()
   core.info(`found ${manifests.length} manifest(s) in ${inputs.manifests}`)
@@ -89,7 +84,6 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
     manifests,
     service: inputs.service,
     namespace: inputs.namespace,
-    namespaceLevel: inputs.namespaceLevel,
     project,
     branch,
     applicationAnnotations,
