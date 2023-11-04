@@ -54,12 +54,13 @@ const arrangeServiceManifests = async (inputs: Inputs): Promise<void> => {
   )
 }
 
-const copyGeneratedManifest = async (manifests: string[], destinationDir: string) => {
+const copyGeneratedManifest = async (manifestPaths: string[], destinationDir: string) => {
+  const manifestContents = await Promise.all(
+    manifestPaths.map(async (manifestPath) => (await fs.readFile(manifestPath)).toString()),
+  )
+  const concatManifest = manifestContents.join('\n---\n')
   await io.mkdirP(destinationDir)
-  for (const f of manifests) {
-    core.info(`copying ${f} to ${destinationDir}`)
-    await io.cp(f, destinationDir)
-  }
+  await fs.writeFile(`${destinationDir}/generated.yaml`, concatManifest)
 }
 
 const putApplicationManifest = async (application: Application, workspace: string) => {

@@ -46,6 +46,8 @@ steps:
       service: foo
 ```
 
+If mutiple manifests are given, this action concatenates them into a single file.
+
 It pushes the following files into a destination repository:
 
 ```
