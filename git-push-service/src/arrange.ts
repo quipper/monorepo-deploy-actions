@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs'
 import * as core from '@actions/core'
 import * as io from '@actions/io'
+import * as path from 'path'
 import { Application, generateApplicationManifest } from './application'
 
 type Inputs = {
@@ -24,7 +25,7 @@ export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
 
 const arrangeNamespaceLevelManifests = async (inputs: Inputs): Promise<void> => {
   core.info(`arrange the manifests of the namespace level resources`)
-  await copyGeneratedManifest(inputs.manifests, `${inputs.workspace}/applications`)
+  await concatServiceManifests(inputs.manifests, `${inputs.workspace}/applications/generated.yaml`)
 
   // For backward compatibility,
   // remove the old manifests to prevent duplicated namespaces
@@ -34,7 +35,7 @@ const arrangeNamespaceLevelManifests = async (inputs: Inputs): Promise<void> => 
 
 const arrangeServiceManifests = async (inputs: Inputs): Promise<void> => {
   core.info(`arrange the manifests of the service`)
-  await copyGeneratedManifest(inputs.manifests, `${inputs.workspace}/services/${inputs.service}`)
+  await concatServiceManifests(inputs.manifests, `${inputs.workspace}/services/${inputs.service}/generated.yaml`)
 
   await putApplicationManifest(
     {
@@ -54,13 +55,14 @@ const arrangeServiceManifests = async (inputs: Inputs): Promise<void> => {
   )
 }
 
-const copyGeneratedManifest = async (manifestPaths: string[], destinationDir: string) => {
+const concatServiceManifests = async (manifestPaths: string[], destinationPath: string) => {
   const manifestContents = await Promise.all(
     manifestPaths.map(async (manifestPath) => (await fs.readFile(manifestPath)).toString()),
   )
   const concatManifest = manifestContents.join('\n---\n')
-  await io.mkdirP(destinationDir)
-  await fs.writeFile(`${destinationDir}/generated.yaml`, concatManifest)
+  core.info(`writing to ${destinationPath}`)
+  await io.mkdirP(path.dirname(destinationPath))
+  await fs.writeFile(destinationPath, concatManifest)
 }
 
 const putApplicationManifest = async (application: Application, workspace: string) => {

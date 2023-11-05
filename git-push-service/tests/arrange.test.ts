@@ -26,6 +26,27 @@ test('arrange a service manifest', async () => {
   )
 })
 
+it('should concatenate service manifests if multiple are given', async () => {
+  const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-action-'))
+
+  await arrangeManifests({
+    workspace,
+    manifests: [path.join(__dirname, `fixtures/a/generated.yaml`), path.join(__dirname, `fixtures/b/generated.yaml`)],
+    branch: `ns/project/overlay/namespace`,
+    namespace: 'namespace',
+    service: 'service',
+    namespaceLevel: false,
+    project: 'project',
+    applicationAnnotations: ['github.ref=refs/heads/main'],
+    destinationRepository: 'octocat/manifests',
+  })
+
+  expect(await readContent(path.join(workspace, `services/service/generated.yaml`))).toBe(`\
+${await readContent(path.join(__dirname, `fixtures/a/generated.yaml`))}
+---
+${await readContent(path.join(__dirname, `fixtures/b/generated.yaml`))}`)
+})
+
 test('overwrite even if a file exists', async () => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-action-'))
 
