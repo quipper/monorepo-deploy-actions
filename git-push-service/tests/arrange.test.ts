@@ -34,7 +34,6 @@ it('should concatenate service manifests if multiple are given', async () => {
     branch: `ns/project/overlay/namespace`,
     namespace: 'namespace',
     service: 'service',
-    namespaceLevel: false,
     project: 'project',
     applicationAnnotations: ['github.ref=refs/heads/main'],
     destinationRepository: 'octocat/manifests',
