@@ -16,7 +16,7 @@
     "js-yaml": "4.1.0"
   },
   "devDependencies": {
-    "@types/js-yaml": "4.0.8",
+    "@types/js-yaml": "4.0.9",
     "aws-sdk-client-mock": "3.0.0"
   }
 }
