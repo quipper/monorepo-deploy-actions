@@ -9,7 +9,6 @@ type Inputs = {
   manifests: string[]
   namespace: string
   service: string
-  namespaceLevel: boolean
   project: string
   branch: string
   applicationAnnotations: string[]
@@ -17,20 +16,7 @@ type Inputs = {
 }
 
 export const arrangeManifests = async (inputs: Inputs): Promise<void> => {
-  if (inputs.namespaceLevel) {
-    return await arrangeNamespaceLevelManifests(inputs)
-  }
   return await arrangeServiceManifests(inputs)
-}
-
-const arrangeNamespaceLevelManifests = async (inputs: Inputs): Promise<void> => {
-  core.info(`arrange the manifests of the namespace level resources`)
-  await concatServiceManifests(inputs.manifests, `${inputs.workspace}/applications/generated.yaml`)
-
-  // For backward compatibility,
-  // remove the old manifests to prevent duplicated namespaces
-  await io.rmRF(`${inputs.workspace}/services/namespace`)
-  await io.rmRF(`${inputs.workspace}/applications/${inputs.namespace}--namespace.yaml`)
 }
 
 const arrangeServiceManifests = async (inputs: Inputs): Promise<void> => {

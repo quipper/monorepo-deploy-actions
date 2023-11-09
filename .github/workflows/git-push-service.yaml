@@ -52,27 +52,14 @@ jobs:
           namespace: ns-${{ github.run_number }}
           service: a
           destination-repository: ${{ github.repository }}
-      - uses: ./git-push-service
-        with:
-          manifests: |
-            ${{ github.workspace }}/git-push-service/tests/fixtures/b/generated.yaml
-          overlay: e2e-git-push-service
-          namespace: ns-${{ github.run_number }}
-          namespace-level: true
-          destination-repository: ${{ github.repository }}
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           ref: ns/monorepo-deploy-actions/e2e-git-push-service/ns-${{ github.run_number }}
           path: git-push-service/actual
       - run: find actual -type f
-
       - run: test -f actual/applications/ns-${{ github.run_number }}--a.yaml
       - run: test -f actual/services/a/generated.yaml
-
-      - run: test -f actual/applications/generated.yaml
-      - run: test ! -f actual/applications/ns-${{ github.run_number }}--b.yaml
-      - run: test ! -f actual/services/b/generated.yaml
 
       - name: clean up the branch
         continue-on-error: true
