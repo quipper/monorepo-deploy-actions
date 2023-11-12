@@ -15,7 +15,7 @@ export const createGitHubDeploymentForEnvironments = async (
 ) => {
   for (const environment of environments) {
     const { overlay, namespace } = environment
-    if (overlay && namespace) {
+    if (overlay && namespace && service) {
       const deployment = await createDeployment(octokit, context, overlay, namespace, service)
       environment['github-deployment-url'] = deployment.url
     }
@@ -31,11 +31,31 @@ const createDeployment = async (
 ) => {
   const environment = `${overlay}/${namespace}/${service}`
 
+  await deleteOldDeployments(octokit, context, environment)
+
+  const ref = getDeploymentRef(context)
+  core.info(`Creating a deployment for environment=${environment}, ref=${ref}`)
+  const created = await octokit.rest.repos.createDeployment({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    ref,
+    environment,
+    auto_merge: false,
+    required_contexts: [],
+    transient_environment: context.eventName === 'pull_request',
+    payload: { overlay, namespace, service },
+  })
+  assert.strictEqual(created.status, 201)
+  core.info(`Created a deployment ${created.data.url}`)
+  return created.data
+}
+
+const deleteOldDeployments = async (octokit: Octokit, context: Context, environment: string) => {
   core.info(`Finding the old deployments for environment ${environment}`)
   const oldDeployments = await octokit.rest.repos.listDeployments({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    environment: environment,
+    environment,
   })
 
   core.info(`Deleting ${oldDeployments.data.length} deployment(s)`)
@@ -55,21 +75,7 @@ const createDeployment = async (
       throw error
     }
   }
-
-  const deploymentRef = getDeploymentRef(context)
-  core.info(`Creating a deployment for environment=${environment}, ref=${deploymentRef}`)
-  const created = await octokit.rest.repos.createDeployment({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    ref: deploymentRef,
-    environment: environment,
-    auto_merge: false,
-    required_contexts: [],
-    transient_environment: context.eventName === 'pull_request',
-  })
-  assert.strictEqual(created.status, 201)
-  core.info(`Created a deployment ${created.data.url}`)
-  return created.data
+  core.info(`Deleted ${oldDeployments.data.length} deployment(s)`)
 }
 
 const getDeploymentRef = (context: Context): string => {
