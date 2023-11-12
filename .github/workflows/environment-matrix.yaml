@@ -48,6 +48,7 @@ jobs:
       - uses: ./environment-matrix
         id: environment-matrix
         with:
+          service: example
           rules: |
             - pull_request:
                 base: '**'
@@ -55,15 +56,11 @@ jobs:
               environments:
                 - overlay: pr
                   namespace: pr-${{ github.event.pull_request.number }}
-                  github-deployment: 'true'
-                  github-deployment-environment: pr/pr-${{ github.event.pull_request.number }}/example
             - push:
                 ref: refs/heads/main
               environments:
                 - overlay: development
                   namespace: development
-                  github-deployment: 'true'
-                  github-deployment-environment: development/development/example
 
   e2e-test-matrix:
     needs: e2e-test

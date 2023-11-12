@@ -7,6 +7,7 @@ import { getOctokit } from './github'
 
 type Inputs = {
   rules: string
+  service: string
   token: string
 }
 
@@ -23,10 +24,13 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
   }
   core.info(`environments = ${JSON.stringify(environments, undefined, 2)}`)
 
-  core.info(`Creating GitHub Deployments if needed`)
-  const octokit = getOctokit(inputs.token)
-  await createGitHubDeploymentForEnvironments(octokit, github.context, environments)
-  core.info(`environments = ${JSON.stringify(environments, undefined, 2)}`)
+  if (inputs.service) {
+    core.info(`Creating GitHub Deployments`)
+    const octokit = getOctokit(inputs.token)
+    await createGitHubDeploymentForEnvironments(octokit, github.context, environments, inputs.service)
+    core.info(`environments = ${JSON.stringify(environments, undefined, 2)}`)
+  }
+
   return {
     environments,
   }

@@ -4,6 +4,9 @@ inputs:
   rules:
     description: YAML string of rules
     required: true
+  service:
+    description: Name of service
+    required: false
   token:
     description: GitHub token
     required: true

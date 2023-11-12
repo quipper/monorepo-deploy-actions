@@ -11,22 +11,31 @@ export const createGitHubDeploymentForEnvironments = async (
   octokit: Octokit,
   context: Context,
   environments: Environment[],
+  service: string,
 ) => {
   for (const environment of environments) {
-    if (environment['github-deployment'] === 'true' && environment['github-deployment-environment']) {
-      const deploymentEnvironment = environment['github-deployment-environment']
-      const deployment = await createDeployment(octokit, context, deploymentEnvironment)
+    const { overlay, namespace } = environment
+    if (overlay && namespace) {
+      const deployment = await createDeployment(octokit, context, overlay, namespace, service)
       environment['github-deployment-url'] = deployment.url
     }
   }
 }
 
-const createDeployment = async (octokit: Octokit, context: Context, deploymentEnvironment: string) => {
-  core.info(`Finding the old deployments for environment ${deploymentEnvironment}`)
+const createDeployment = async (
+  octokit: Octokit,
+  context: Context,
+  overlay: string,
+  namespace: string,
+  service: string,
+) => {
+  const environment = `${overlay}/${namespace}/${service}`
+
+  core.info(`Finding the old deployments for environment ${environment}`)
   const oldDeployments = await octokit.rest.repos.listDeployments({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    environment: deploymentEnvironment,
+    environment: environment,
   })
 
   core.info(`Deleting ${oldDeployments.data.length} deployment(s)`)
@@ -48,12 +57,12 @@ const createDeployment = async (octokit: Octokit, context: Context, deploymentEn
   }
 
   const deploymentRef = getDeploymentRef(context)
-  core.info(`Creating a deployment for environment=${deploymentEnvironment}, ref=${deploymentRef}`)
+  core.info(`Creating a deployment for environment=${environment}, ref=${deploymentRef}`)
   const created = await octokit.rest.repos.createDeployment({
     owner: context.repo.owner,
     repo: context.repo.repo,
     ref: deploymentRef,
-    environment: deploymentEnvironment,
+    environment: environment,
     auto_merge: false,
     required_contexts: [],
     transient_environment: context.eventName === 'pull_request',
