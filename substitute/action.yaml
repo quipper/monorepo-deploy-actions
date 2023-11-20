@@ -3,7 +3,7 @@ description: substitute variable(s) in file(s)
 inputs:
   files:
     description: glob pattern(s) to file(s) in form of multiline string
-    required: true
+    required: false
   path-variables-pattern:
     description: path variable(s) pattern
     required: false

@@ -3,7 +3,7 @@ import { parseVariables, run } from '../src/run'
 
 async function main(): Promise<void> {
   await run({
-    files: core.getInput('files', { required: true }),
+    files: core.getInput('files'),
     pathVariablesPattern: core.getInput('path-variables-pattern') || undefined,
     variables: parseVariables(core.getMultilineInput('variables', { required: true })),
   })

@@ -25,6 +25,8 @@ steps:
       manifests: ${{ steps.kustomize.outputs.directory }}/**/*.yaml
 ```
 
+If no manifest file is matched, this action does nothing.
+
 When the below manifest is given,
 
 ```yaml
