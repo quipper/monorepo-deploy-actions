@@ -29,6 +29,8 @@ steps:
         NAMESPACE=develop
 ```
 
+If no file is matched, this action does nothing.
+
 ### Path variables
 
 This action tests pattern match to each path when `path-variables-pattern` is set.

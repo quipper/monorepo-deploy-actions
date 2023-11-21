@@ -3,7 +3,7 @@ description: resolve AWSSecret versionId placeholders in a manifest
 inputs:
   manifests:
     description: glob pattern(s) to manifest(s)
-    required: true
+    required: false
 runs:
   using: 'node20'
   main: 'dist/index.js'
