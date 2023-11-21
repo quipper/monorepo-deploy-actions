@@ -42,7 +42,31 @@ const createDeployment = async (
 ) => {
   const environment = `${overlay}/${namespace}/${service}`
 
-  await deleteOldDeployments(octokit, context, environment)
+  core.info(`Finding the old deployments for environment ${environment}`)
+  const oldDeployments = await octokit.rest.repos.listDeployments({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    environment,
+  })
+
+  core.info(`Deleting ${oldDeployments.data.length} deployment(s)`)
+  for (const deployment of oldDeployments.data) {
+    try {
+      await octokit.rest.repos.deleteDeployment({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        deployment_id: deployment.id,
+      })
+    } catch (error) {
+      if (error instanceof RequestError) {
+        core.warning(`Could not delete the old deployment ${deployment.url}: ${error.status} ${error.message}`)
+        continue
+      }
+      throw error
+    }
+    core.info(`Deleted the old deployment ${deployment.url}`)
+  }
+  core.info(`Deleted ${oldDeployments.data.length} deployment(s)`)
 
   const ref = getDeploymentRef(context)
   core.info(`Creating a deployment for environment=${environment}, ref=${ref}`)
@@ -59,34 +83,6 @@ const createDeployment = async (
   assert.strictEqual(created.status, 201)
   core.info(`Created a deployment ${created.data.url}`)
   return created.data
-}
-
-const deleteOldDeployments = async (octokit: Octokit, context: Context, environment: string) => {
-  core.info(`Finding the old deployments for environment ${environment}`)
-  const oldDeployments = await octokit.rest.repos.listDeployments({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    environment,
-  })
-
-  core.info(`Deleting ${oldDeployments.data.length} deployment(s)`)
-  for (const deployment of oldDeployments.data) {
-    try {
-      await octokit.rest.repos.deleteDeployment({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        deployment_id: deployment.id,
-      })
-      core.info(`Deleted the old deployment ${deployment.url}`)
-    } catch (error) {
-      if (error instanceof RequestError) {
-        core.warning(`Unable to delete previous deployment ${deployment.url}: ${error.status} ${error.message}`)
-        continue
-      }
-      throw error
-    }
-  }
-  core.info(`Deleted ${oldDeployments.data.length} deployment(s)`)
 }
 
 const getDeploymentRef = (context: Context): string => {
