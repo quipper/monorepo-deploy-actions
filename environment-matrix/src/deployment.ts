@@ -7,19 +7,30 @@ import assert from 'assert'
 
 type Context = Pick<typeof github.context, 'eventName' | 'repo' | 'ref' | 'payload'>
 
+export type EnvironmentWithDeployment = Environment & {
+  // URL of the GitHub Deployment
+  // e.g. https://api.github.com/repos/octocat/example/deployments/1
+  'github-deployment-url': string
+}
+
 export const createGitHubDeploymentForEnvironments = async (
   octokit: Octokit,
   context: Context,
   environments: Environment[],
   service: string,
-) => {
+): Promise<EnvironmentWithDeployment[]> => {
+  const environmentsWithDeployments = []
   for (const environment of environments) {
     const { overlay, namespace } = environment
     if (overlay && namespace && service) {
       const deployment = await createDeployment(octokit, context, overlay, namespace, service)
-      environment['github-deployment-url'] = deployment.url
+      environmentsWithDeployments.push({
+        ...environment,
+        'github-deployment-url': deployment.url,
+      })
     }
   }
+  return environmentsWithDeployments
 }
 
 const createDeployment = async (

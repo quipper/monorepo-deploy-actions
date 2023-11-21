@@ -1,12 +1,7 @@
 import * as yaml from 'js-yaml'
 import Ajv, { JTDSchemaType } from 'ajv/dist/jtd'
 
-export type Environment = Record<string, string> & {
-  overlay?: string
-  namespace?: string
-  // The URL of GitHub Deployment, set by this action
-  'github-deployment-url'?: string
-}
+export type Environment = Record<string, string>
 
 const EnvironmentSchema: JTDSchemaType<Environment> = {
   values: {

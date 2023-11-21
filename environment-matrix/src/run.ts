@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import { Environment, parseRulesYAML } from './rule'
 import { find } from './matcher'
-import { createGitHubDeploymentForEnvironments } from './deployment'
+import { EnvironmentWithDeployment, createGitHubDeploymentForEnvironments } from './deployment'
 import { getOctokit } from './github'
 
 type Inputs = {
@@ -12,7 +12,7 @@ type Inputs = {
 }
 
 type Outputs = {
-  environments: Environment[]
+  environments: Environment[] | EnvironmentWithDeployment[]
 }
 
 export const run = async (inputs: Inputs): Promise<Outputs> => {
@@ -22,16 +22,20 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
   if (environments === undefined) {
     throw new Error(`no environment to deploy`)
   }
+
   core.info(`environments = ${JSON.stringify(environments, undefined, 2)}`)
-
-  if (inputs.service) {
-    core.info(`Creating GitHub Deployments`)
-    const octokit = getOctokit(inputs.token)
-    await createGitHubDeploymentForEnvironments(octokit, github.context, environments, inputs.service)
-    core.info(`environments = ${JSON.stringify(environments, undefined, 2)}`)
+  if (!inputs.service) {
+    return { environments }
   }
 
-  return {
+  core.info(`Creating GitHub Deployments for environments`)
+  const octokit = getOctokit(inputs.token)
+  const environmentsWithDeployments = await createGitHubDeploymentForEnvironments(
+    octokit,
+    github.context,
     environments,
-  }
+    inputs.service,
+  )
+  core.info(`environmentsWithDeployments = ${JSON.stringify(environmentsWithDeployments, undefined, 2)}`)
+  return { environments: environmentsWithDeployments }
 }
