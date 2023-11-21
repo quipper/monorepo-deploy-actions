@@ -38,17 +38,46 @@ If no rule is matched, this action fails.
 
 ## GitHub Deployment
 
-This action supports [GitHub Deployment](https://docs.github.com/en/rest/deployments/deployments) to receive the deployment status against the environment.
+This action supports [GitHub Deployment](https://docs.github.com/en/rest/deployments/deployments) to receive the deployment status from an external system, such as Argo CD.
 
-If `overlay`, `namespace` and `service` are given,
-this action creates a GitHub Deployment for each environment in the form of `{overlay}/{namespace}/{service}`.
+It creates a GitHub Deployment for each environment in the form of `{overlay}/{namespace}/{service}`,
+if the following fields are given:
 
-If the old deployment exists, this action deletes it and recreates new one.
+- `overlay` (in `environments`)
+- `namespace` (in `environments`)
+- `service` (in the inputs)
+
+If an old deployment exists, this action deletes it and recreates new one.
 
 This action sets `github-deployment-url` field to the output.
-See the example in the next section.
+For example, the below inputs are given,
 
-### Workflow example
+```yaml
+- uses: quipper/monorepo-deploy-actions/environment-matrix@v1
+  with:
+    service: backend
+    rules: |
+      - pull_request:
+          base: '**'
+          head: '**'
+        environments:
+          - overlay: pr
+            namespace: pr-${{ github.event.pull_request.number }}
+```
+
+this action creates a GitHub Deployment of `pr/pr-1/backend` and returns the following JSON:
+
+```json
+[
+  {
+    "overlay": "pr",
+    "namespace": "pr-1",
+    "github-deployment-url": "https://api.github.com/repos/octocat/example/deployments/1"
+  }
+]
+```
+
+## Example
 
 Here is the workflow of matrix jobs.
 
@@ -100,11 +129,11 @@ jobs:
 
 ### Inputs
 
-| Name      | Default        | Description               |
-| --------- | -------------- | ------------------------- |
-| `rules`   | (required)     | YAML string of rules      |
-| `service` | (optional)     | Name of service to deploy |
-| `token`   | `github.token` | GitHub token              |
+| Name      | Default        | Description                                                 |
+| --------- | -------------- | ----------------------------------------------------------- |
+| `rules`   | (required)     | YAML string of rules                                        |
+| `service` | (optional)     | Name of service to deploy. If set, create GitHub Deployment |
+| `token`   | `github.token` | GitHub token                                                |
 
 The following fields are available in the rules YAML.
 
@@ -112,12 +141,10 @@ The following fields are available in the rules YAML.
 - pull_request: # on pull_request event
     base: # base branch name (wildcard available)
     head: # head branch name (wildcard available)
-  environments:
-    -  # array of map<string, string>
+  environments: # array of map<string, string>
 - push: # on push event
     ref: refs/heads/main # ref name (wildcard available)
-  environments:
-    -  # array of map<string, string>
+  environments: # array of map<string, string>
 ```
 
 It supports the wildcard pattern.

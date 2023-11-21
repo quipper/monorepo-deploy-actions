@@ -5,7 +5,7 @@ inputs:
     description: YAML string of rules
     required: true
   service:
-    description: Name of service (optional for creating GitHub Deployment)
+    description: Name of service. If set, create GitHub Deployment
     required: false
   token:
     description: GitHub token
