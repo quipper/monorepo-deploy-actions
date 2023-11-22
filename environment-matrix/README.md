@@ -133,7 +133,7 @@ jobs:
 | --------- | -------------- | ----------------------------------------------------------- |
 | `rules`   | (required)     | YAML string of rules                                        |
 | `service` | (optional)     | Name of service to deploy. If set, create GitHub Deployment |
-| `token`   | `github.token` | GitHub token                                                |
+| `token`   | `github.token` | GitHub token, required if `service` is set                  |
 
 The following fields are available in the rules YAML.
 

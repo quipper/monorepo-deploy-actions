@@ -5,7 +5,7 @@ const main = async (): Promise<void> => {
   const outputs = await run({
     rules: core.getInput('rules', { required: true }),
     service: core.getInput('service'),
-    token: core.getInput('token', { required: true }),
+    token: core.getInput('token'),
   })
   core.setOutput('json', outputs.environments)
 }
