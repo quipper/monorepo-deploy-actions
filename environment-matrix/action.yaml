@@ -4,6 +4,13 @@ inputs:
   rules:
     description: YAML string of rules
     required: true
+  service:
+    description: Name of service. If set, create GitHub Deployment
+    required: false
+  token:
+    description: GitHub token
+    required: true
+    default: ${{ github.token }}
 outputs:
   json:
     description: JSON string of environments

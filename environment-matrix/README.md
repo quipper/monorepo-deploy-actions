@@ -36,7 +36,48 @@ For example, when `main` branch is pushed, this action returns the following JSO
 This action finds a rule in order.
 If no rule is matched, this action fails.
 
-### Workflow example
+## GitHub Deployment
+
+This action supports [GitHub Deployment](https://docs.github.com/en/rest/deployments/deployments) to receive the deployment status from an external system, such as Argo CD.
+
+It creates a GitHub Deployment for each environment in the form of `{overlay}/{namespace}/{service}`,
+if the following fields are given:
+
+- `overlay` (in `environments`)
+- `namespace` (in `environments`)
+- `service` (in the inputs)
+
+If an old deployment exists, this action deletes it and recreates new one.
+
+This action sets `github-deployment-url` field to the output.
+For example, the below inputs are given,
+
+```yaml
+- uses: quipper/monorepo-deploy-actions/environment-matrix@v1
+  with:
+    service: backend
+    rules: |
+      - pull_request:
+          base: '**'
+          head: '**'
+        environments:
+          - overlay: pr
+            namespace: pr-${{ github.event.pull_request.number }}
+```
+
+this action creates a GitHub Deployment of `pr/pr-1/backend` and returns the following JSON:
+
+```json
+[
+  {
+    "overlay": "pr",
+    "namespace": "pr-1",
+    "github-deployment-url": "https://api.github.com/repos/octocat/example/deployments/1"
+  }
+]
+```
+
+## Example
 
 Here is the workflow of matrix jobs.
 
@@ -50,6 +91,7 @@ jobs:
       - uses: quipper/monorepo-deploy-actions/environment-matrix@v1
         id: environment-matrix
         with:
+          service: example
           rules: |
             - pull_request:
                 base: '**'
@@ -78,16 +120,20 @@ jobs:
           manifests: # (omit in this example)
           overlay: ${{ matrix.environment.overlay }}
           namespace: ${{ matrix.environment.namespace }}
-          service: # (omit in this example)
+          service: example
+          application-annotations: |
+            argocd-commenter.int128.github.io/deployment-url=${{ matrix.environment.github-deployment-url }}
 ```
 
 ## Spec
 
 ### Inputs
 
-| Name    | Type     | Description          |
-| ------- | -------- | -------------------- |
-| `rules` | `string` | YAML string of rules |
+| Name      | Default        | Description                                                 |
+| --------- | -------------- | ----------------------------------------------------------- |
+| `rules`   | (required)     | YAML string of rules                                        |
+| `service` | (optional)     | Name of service to deploy. If set, create GitHub Deployment |
+| `token`   | `github.token` | GitHub token                                                |
 
 The following fields are available in the rules YAML.
 

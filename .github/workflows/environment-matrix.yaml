@@ -48,6 +48,7 @@ jobs:
       - uses: ./environment-matrix
         id: environment-matrix
         with:
+          service: example
           rules: |
             - pull_request:
                 base: '**'
@@ -75,3 +76,4 @@ jobs:
     steps:
       - run: echo 'overlay=${{ matrix.environment.overlay }}'
       - run: echo 'namespace=${{ matrix.environment.namespace }}'
+      - run: echo 'github-deployment-url=${{ matrix.environment.github-deployment-url }}'
