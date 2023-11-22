@@ -1,3 +1,4 @@
+import assert from 'assert'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import { Environment, parseRulesYAML } from './rule'
@@ -29,6 +30,7 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
   }
 
   core.info(`Creating GitHub Deployments for environments`)
+  assert(inputs.token, `inputs.token is required`)
   const octokit = getOctokit(inputs.token)
   const environmentsWithDeployments = await createGitHubDeploymentForEnvironments(
     octokit,
