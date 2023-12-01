@@ -1,20 +1,21 @@
+import assert from 'assert'
 import { ListSecretVersionIdsCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
 
 // get the current version id for the secret
 export const getCurrentVersionId = async (secretId: string): Promise<string> => {
   const client = new SecretsManagerClient({})
-  const versionIds = await client.send(new ListSecretVersionIdsCommand({ SecretId: secretId }))
-  if (versionIds.Versions === undefined) {
-    throw new Error(`SecretsManager returned Versions=undefined for secret ${secretId}`)
+  const listCommand = new ListSecretVersionIdsCommand({ SecretId: secretId })
+  let listOutput
+  try {
+    listOutput = await client.send(listCommand)
+  } catch (error) {
+    throw new Error(`could not find the secret ${secretId} from AWS Secrets Manager: ${String(error)}`)
   }
-  const currentVersion = versionIds.Versions.find(
+  assert(listOutput.Versions !== undefined)
+  const currentVersion = listOutput.Versions.find(
     (version) => version.VersionStages?.some((stage) => stage === 'AWSCURRENT'),
   )
-  if (currentVersion === undefined) {
-    throw new Error(`no current version found for secret ${secretId}`)
-  }
-  if (currentVersion.VersionId === undefined) {
-    throw new Error(`current versionId is undefined for secret ${secretId}`)
-  }
+  assert(currentVersion !== undefined)
+  assert(currentVersion.VersionId !== undefined)
   return currentVersion.VersionId
 }
