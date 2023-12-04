@@ -3,7 +3,7 @@ import { run } from '../src/run'
 
 async function main(): Promise<void> {
   const outputs = await run({
-    manifests: core.getInput('manifests', { required: true }),
+    manifests: core.getInput('manifests', { required: false }),
     overlay: core.getInput('overlay', { required: true }),
     namespace: core.getInput('namespace', { required: true }),
     service: core.getInput('service', { required: true }),
