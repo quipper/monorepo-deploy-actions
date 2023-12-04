@@ -4,11 +4,10 @@ This is a general-purpose action to substitute variable(s) in file(s).
 
 ## Inputs
 
-| Name                     | Type              | Description                        |
-| ------------------------ | ----------------- | ---------------------------------- |
-| `files`                  | multiline string  | Glob pattern of file(s)            |
-| `path-variables-pattern` | string (optional) | Path variable(s)                   |
-| `variables`              | multiline string  | Variable(s) in form of `KEY=VALUE` |
+| Name        | Type             | Description                        |
+| ----------- | ---------------- | ---------------------------------- |
+| `files`     | multiline string | Glob pattern of file(s)            |
+| `variables` | multiline string | Variable(s) in form of `KEY=VALUE` |
 
 ## Getting Started
 
@@ -30,23 +29,3 @@ steps:
 ```
 
 If no file is matched, this action does nothing.
-
-### Path variables
-
-This action tests pattern match to each path when `path-variables-pattern` is set.
-You can refer the path variable(s) in `variables`.
-
-`path-variables-pattern` supports a preliminary glob pattern. It consists of the following path elements:
-
-- `*` (any string except `/`)
-- `**` (any string)
-- `${KEY}` (path variable)
-
-A path variable key must be alphabet, number or underscore, i.e. `a-zA-Z0-9_`.
-
-For example, when the following file is given,
-
-If you set `path-variables-pattern`, this action tests each manifest path and sets the path variable(s).
-You can use the path variable(s) in `variables`.
-
-finally path variable `service` is set to `foo`.
