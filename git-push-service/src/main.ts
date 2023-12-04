@@ -10,7 +10,6 @@ async function main(): Promise<void> {
     applicationAnnotations: core.getMultilineInput('application-annotations'),
     destinationRepository: core.getInput('destination-repository', { required: true }),
     destinationBranch: core.getInput('destination-branch'),
-    prebuilt: core.getBooleanInput('prebuilt', { required: true }), // TODO: deprecated
     updateViaPullRequest: core.getBooleanInput('update-via-pull-request', { required: true }),
     token: core.getInput('token', { required: true }),
   })

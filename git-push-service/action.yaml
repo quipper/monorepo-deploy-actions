@@ -23,11 +23,6 @@ inputs:
   destination-branch:
     description: destination branch (default to ns/REPOSITORY/OVERLAY/NAMESPACE)
     required: false
-  prebuilt:
-    description: push prebuilt manifest
-    required: true
-    default: 'false'
-    deprecationMessage: use destination-branch instead # TODO: deprecated
   update-via-pull-request:
     description: update a branch via a pull request
     required: true
