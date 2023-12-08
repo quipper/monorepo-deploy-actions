@@ -4,9 +4,6 @@ inputs:
   files:
     description: glob pattern(s) to file(s) in form of multiline string
     required: false
-  path-variables-pattern:
-    description: path variable(s) pattern
-    required: false
   variables:
     description: variable(s) in form of multiline string with KEY=VALUE
     required: true

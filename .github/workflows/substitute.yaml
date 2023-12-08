@@ -49,9 +49,7 @@ jobs:
           files: |
             ${{ github.workspace }}/substitute/tests/fixtures/a/generated.yaml
             ${{ github.workspace }}/substitute/tests/fixtures/b/generated.yaml
-          path-variables-pattern: |
-            ${{ github.workspace }}/substitute/tests/fixtures/${service_name}/**
           variables: |
-            DOCKER_IMAGE=123456789012.dkr.ecr.ap-northeast-1.amazonaws.com/deploy-actions/${service_name}:latest
+            DOCKER_IMAGE=123456789012.dkr.ecr.ap-northeast-1.amazonaws.com/deploy-actions/service:latest
             NAMESPACE=develop
       - run: git diff
