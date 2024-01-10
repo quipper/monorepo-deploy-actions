@@ -25,18 +25,19 @@ export const run = async (inputs: Inputs): Promise<void> => {
   core.info(JSON.stringify(headCommit, undefined, 2))
   core.endGroup()
 
-  if (isExpired(Date.now, headCommit.committer.date, inputs.expirationDays)) {
+  core.info(`Last commit was at ${headCommit.committer.date}`)
+  if (!isExpired(Date.now, headCommit.committer.date, inputs.expirationDays)) {
     core.info(`Pull request #${inputs.pullRequestNumber} is not expired, exiting`)
     return
   }
 
-  core.info(`Updating the pull request branch #{inputs.pullRequestNumber}}`)
+  core.info(`Updating the pull request branch ${inputs.pullRequestNumber}}`)
   await octokit.rest.pulls.updateBranch({
     owner: inputs.owner,
     repo: inputs.repo,
     pull_number: inputs.pullRequestNumber,
   })
-  core.info(`Updated the pull request branch #{inputs.pullRequestNumber}}`)
+  core.info(`Updated the pull request branch ${inputs.pullRequestNumber}}`)
 }
 
 export const isExpired = (now: () => number, headCommitDate: string, expirationDays: number): boolean => {
