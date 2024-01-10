@@ -1,6 +1,6 @@
 # update-outdated-pull-request-branch [![update-outdated-pull-request-branch](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/update-outdated-pull-request-branch.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/update-outdated-pull-request-branch.yaml)
 
-This is an action to update the pull request if the head commit is outdated.
+This is an action to update the pull request branch if the head commit is outdated.
 
 ## Problem to solve
 
@@ -13,7 +13,7 @@ It would be nice to automatically update an outdated pull request.
 
 ## Getting Started
 
-To update the current pull request if the head commit is older that 14 days,
+To update the pull request branch if the head commit is older than 14 days,
 
 ```yaml
 jobs:
