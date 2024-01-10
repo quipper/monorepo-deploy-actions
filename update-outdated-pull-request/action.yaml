@@ -1,0 +1,15 @@
+name: update-outdated-pull-request
+description: Update the pull request branch if outdated
+
+inputs:
+  expiration-days:
+    description: Expiration days, must be a positive number
+    required: true
+  token:
+    description: GitHub token
+    required: true
+    default: ${{ github.token }}
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
