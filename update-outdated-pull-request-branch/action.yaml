@@ -1,4 +1,4 @@
-name: update-outdated-pull-request
+name: update-outdated-pull-request-branch
 description: Update the pull request branch if outdated
 
 inputs:

@@ -1,22 +1,22 @@
-name: update-outdated-pull-request
+name: update-outdated-pull-request-branch
 
 on:
   pull_request:
     paths:
-      - update-outdated-pull-request/**
+      - update-outdated-pull-request-branch/**
       - '*.json'
-      - .github/workflows/update-outdated-pull-request.yaml
+      - .github/workflows/update-outdated-pull-request-branch.yaml
   push:
     branches:
       - main
     paths:
-      - update-outdated-pull-request/**
+      - update-outdated-pull-request-branch/**
       - '*.json'
-      - .github/workflows/update-outdated-pull-request.yaml
+      - .github/workflows/update-outdated-pull-request-branch.yaml
 
 defaults:
   run:
-    working-directory: update-outdated-pull-request
+    working-directory: update-outdated-pull-request-branch
 
 jobs:
   test:
@@ -43,6 +43,6 @@ jobs:
       - run: yarn
       - run: yarn build
       - run: yarn package
-      - uses: ./update-outdated-pull-request
+      - uses: ./update-outdated-pull-request-branch
         with:
           expiration-days: 7

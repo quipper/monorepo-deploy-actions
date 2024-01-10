@@ -1,5 +1,5 @@
 {
-  "name": "update-outdated-pull-request",
+  "name": "update-outdated-pull-request-branch",
   "version": "0.0.0",
   "private": true,
   "main": "lib/src/main.js",
