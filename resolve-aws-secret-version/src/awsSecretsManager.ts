@@ -12,8 +12,8 @@ export const getCurrentVersionId = async (secretId: string): Promise<string> => 
     throw new Error(`could not find the secret ${secretId} from AWS Secrets Manager: ${String(error)}`)
   }
   assert(listOutput.Versions !== undefined)
-  const currentVersion = listOutput.Versions.find(
-    (version) => version.VersionStages?.some((stage) => stage === 'AWSCURRENT'),
+  const currentVersion = listOutput.Versions.find((version) =>
+    version.VersionStages?.some((stage) => stage === 'AWSCURRENT'),
   )
   assert(currentVersion !== undefined)
   assert(currentVersion.VersionId !== undefined)
