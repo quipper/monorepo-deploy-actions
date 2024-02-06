@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import * as octokitPluginRetry from '@octokit/plugin-retry'
 import { context, getOctokit } from '@actions/github'
 import { Context } from '@actions/github/lib/context'
 import { GitHub } from '@actions/github/lib/utils'
@@ -10,26 +11,28 @@ type Inputs = {
   headBranch: string
   baseBranch: string
   skipCI: boolean
+  mergePullRequest: boolean
 }
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  const octokit = getOctokit(inputs.githubToken)
+  const octokit = getOctokit(inputs.githubToken, octokitPluginRetry.retry)
 
   const { baseBranch, headBranch } = inputs
   core.setOutput('base-branch', baseBranch)
   core.setOutput('head-branch', headBranch)
 
   if (await hasDiff({ headBranch, baseBranch, octokit, context })) {
-    const pullRequestUrl = await openPullRequest(
+    const pullHtmlUrl = await openPullRequest(
       {
         headBranch,
         baseBranch,
         skipCI: inputs.skipCI,
+        mergePullRequest: inputs.mergePullRequest,
         context,
       },
       octokit,
     )
-    core.setOutput('pull-request-url', pullRequestUrl)
+    core.setOutput('pull-request-url', pullHtmlUrl)
   }
 }
 
@@ -53,6 +56,7 @@ type Backport = {
   headBranch: string
   baseBranch: string
   skipCI: boolean
+  mergePullRequest: boolean
   context: {
     actor: string
     repo: {
@@ -104,7 +108,7 @@ const openPullRequest = async (params: Backport, octokit: Octokit): Promise<stri
   })
 
   core.info(`Creating a pull request ${workingBranch} -> ${params.baseBranch}`)
-  const pr = await octokit.rest.pulls.create({
+  const { data: pull } = await octokit.rest.pulls.create({
     owner: params.context.repo.owner,
     repo: params.context.repo.repo,
     head: workingBranch,
@@ -112,18 +116,38 @@ const openPullRequest = async (params: Backport, octokit: Octokit): Promise<stri
     title: `Backport from ${params.headBranch} into ${params.baseBranch}`,
     body: commitMessage,
   })
-  core.info(`Created ${pr.data.html_url}`)
+  core.info(`Created ${pull.html_url}`)
+
+  if (params.mergePullRequest) {
+    core.info(`Trying to merge ${pull.html_url}`)
+    try {
+      // When merging a pull request, GitHub API sometimes returns 405 "Base branch was modified" error.
+      // octokit/plugin-retry will retry it.
+      // https://github.community/t/merging-via-rest-api-returns-405-base-branch-was-modified-review-and-try-the-merge-again/13787
+      const { data: merged } = await octokit.rest.pulls.merge({
+        owner: params.context.repo.owner,
+        repo: params.context.repo.repo,
+        pull_number: pull.number,
+        merge_method: 'merge',
+      })
+      core.info(`Merged ${pull.html_url} as ${merged.sha}`)
+      // If merged, return immediately without any reviewer or assignee.
+      return pull.html_url
+    } catch (e) {
+      core.warning(`Could not merge ${pull.html_url}: ${String(e)}`)
+    }
+  }
 
   core.info(`Requesting a review to ${params.context.actor}`)
   try {
     await octokit.rest.pulls.requestReviewers({
       owner: params.context.repo.owner,
       repo: params.context.repo.repo,
-      pull_number: pr.data.number,
+      pull_number: pull.number,
       reviewers: [params.context.actor],
     })
   } catch (e) {
-    core.info(`could not request a review to ${params.context.actor}: ${String(e)}`)
+    core.info(`Could not request a review to ${params.context.actor}: ${String(e)}`)
   }
 
   core.info(`Adding ${params.context.actor} to assignees`)
@@ -131,12 +155,12 @@ const openPullRequest = async (params: Backport, octokit: Octokit): Promise<stri
     await octokit.rest.issues.addAssignees({
       owner: params.context.repo.owner,
       repo: params.context.repo.repo,
-      issue_number: pr.data.number,
+      issue_number: pull.number,
       assignees: [params.context.actor],
     })
   } catch (e) {
-    core.info(`could not assign ${params.context.actor}: ${String(e)}`)
+    core.info(`Could not assign ${params.context.actor}: ${String(e)}`)
   }
 
-  return pr.data.html_url
+  return pull.html_url
 }

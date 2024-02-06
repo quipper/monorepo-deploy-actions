@@ -13,7 +13,11 @@ inputs:
     default: ${{ github.ref_name }}
   skip-ci:
     description: Add `[skip ci]` to the commit message
-    required: false
+    required: true
+    default: 'false'
+  merge-pull-request:
+    description: Try to merge the pull request
+    required: true
     default: 'false'
 outputs:
   pull-request-url:
