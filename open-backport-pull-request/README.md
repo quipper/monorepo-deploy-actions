@@ -15,12 +15,6 @@ on:
       - 'main'
       - '*/main'
 
-  workflow_dispatch:
-    inputs:
-      headBranch:
-        description: Target branch to backport from
-        required: true
-
 jobs:
   backport:
     runs-on: ubuntu-latest
@@ -38,10 +32,11 @@ When the pull request is conflicted, you can edit the working branch on GitHub.
 
 ## Inputs
 
-| Name           | Required | Default         | Description                                  |
-| -------------- | -------- | --------------- | -------------------------------------------- |
-| `github-token` | `true`   | `$github.token` | GitHub token used for opening a Pull Request |
-| `base-branch`  | `true`   |                 | Base branch of the Pull Request              |
+| Name           | Required | Default           | Description                                  |
+| -------------- | -------- | ----------------- | -------------------------------------------- |
+| `github-token` | `true`   | `github.token`    | GitHub token used for opening a Pull Request |
+| `base-branch`  | `true`   |                   | Base branch of the Pull Request              |
+| `head-branch`  | `true`   | `github.ref_name` | Head branch of the Pull Request              |
 
 ## Outputs
 

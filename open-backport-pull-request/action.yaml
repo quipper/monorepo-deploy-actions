@@ -7,6 +7,10 @@ inputs:
   base-branch:
     description: The base branch for a Pull Request
     required: true
+  head-branch:
+    description: The head branch for a Pull Request
+    required: true
+    default: ${{ github.ref_name }}
 outputs:
   pull-request-url:
     description: The URL of the opened Pull Request

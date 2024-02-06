@@ -5,16 +5,16 @@ import { GitHub } from '@actions/github/lib/utils'
 
 type Octokit = InstanceType<typeof GitHub>
 
-interface Inputs {
+type Inputs = {
   githubToken: string
+  headBranch: string
   baseBranch: string
 }
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  const headBranch = getHeadBranch(context)
-  const baseBranch = inputs.baseBranch
   const octokit = getOctokit(inputs.githubToken)
 
+  const { baseBranch, headBranch } = inputs
   core.setOutput('base-branch', baseBranch)
   core.setOutput('head-branch', headBranch)
 
@@ -29,21 +29,13 @@ export const run = async (inputs: Inputs): Promise<void> => {
   }
 }
 
-export const getHeadBranch = (context: Context): string => {
-  if (context.eventName === 'workflow_dispatch') {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return context.payload.inputs.headBranch as string
-  } else {
-    return context.ref.replace(/^refs\/heads\//, '')
-  }
-}
-
 type hasDiffParams = {
   headBranch: string
   baseBranch: string
   context: Context
   octokit: Octokit
 }
+
 const hasDiff = async (params: hasDiffParams): Promise<boolean> => {
   const compare = await params.octokit.request('GET /repos/{owner}/{repo}/compare/{basehead}', {
     owner: context.repo.owner,
