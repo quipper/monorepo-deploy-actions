@@ -6,6 +6,7 @@ const main = async (): Promise<void> => {
     githubToken: core.getInput('github-token', { required: true }),
     headBranch: core.getInput('head-branch', { required: true }),
     baseBranch: core.getInput('base-branch', { required: true }),
+    skipCI: core.getBooleanInput('skip-ci', { required: true }),
   })
 }
 

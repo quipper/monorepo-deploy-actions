@@ -11,6 +11,10 @@ inputs:
     description: The head branch for a Pull Request
     required: true
     default: ${{ github.ref_name }}
+  skip-ci:
+    description: Add `[skip ci]` to the commit message
+    required: false
+    default: 'false'
 outputs:
   pull-request-url:
     description: The URL of the opened Pull Request

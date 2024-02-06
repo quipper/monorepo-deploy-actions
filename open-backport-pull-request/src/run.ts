@@ -9,6 +9,7 @@ type Inputs = {
   githubToken: string
   headBranch: string
   baseBranch: string
+  skipCI: boolean
 }
 
 export const run = async (inputs: Inputs): Promise<void> => {
@@ -19,12 +20,15 @@ export const run = async (inputs: Inputs): Promise<void> => {
   core.setOutput('head-branch', headBranch)
 
   if (await hasDiff({ headBranch, baseBranch, octokit, context })) {
-    const pullRequestUrl = await openPullRequest({
-      headBranch,
-      baseBranch,
+    const pullRequestUrl = await openPullRequest(
+      {
+        headBranch,
+        baseBranch,
+        skipCI: inputs.skipCI,
+        context,
+      },
       octokit,
-      context,
-    })
+    )
     core.setOutput('pull-request-url', pullRequestUrl)
   }
 }
@@ -45,28 +49,42 @@ const hasDiff = async (params: hasDiffParams): Promise<boolean> => {
   return !!(compare.data.files && compare.data.files.length > 0)
 }
 
-type openPullRequestParams = {
+type Backport = {
   headBranch: string
   baseBranch: string
-  context: Context
-  octokit: Octokit
+  skipCI: boolean
+  context: {
+    actor: string
+    repo: {
+      owner: string
+      repo: string
+    }
+    runId: number
+  }
 }
 
-const openPullRequest = async (params: openPullRequestParams): Promise<string> => {
-  const commitMessage = `Backport from ${params.headBranch} into ${params.baseBranch}
+export const getCommitMessage = (params: Backport): string => {
+  // https://docs.github.com/en/actions/managing-workflow-runs/skipping-workflow-runs
+  const skipCI = params.skipCI ? ' [skip ci]' : ''
+
+  return `Backport from ${params.headBranch} into ${params.baseBranch}${skipCI}
 
 Created by GitHub Actions
-https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+https://github.com/${params.context.repo.owner}/${params.context.repo.repo}/actions/runs/${params.context.runId}`
+}
+
+const openPullRequest = async (params: Backport, octokit: Octokit): Promise<string> => {
+  const commitMessage = getCommitMessage(params)
 
   // Add an empty commit onto the head commit.
   // If a required check is set against the base branch and the head commit is failing, we cannot merge it.
-  const { data: headBranch } = await params.octokit.rest.repos.getBranch({
-    owner: params.context.repo.owner,
-    repo: params.context.repo.repo,
+  const { data: headBranch } = await octokit.rest.repos.getBranch({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
     branch: params.headBranch,
   })
   core.info(`Creating an empty commit on the head ${headBranch.commit.sha}`)
-  const { data: workingCommit } = await params.octokit.rest.git.createCommit({
+  const { data: workingCommit } = await octokit.rest.git.createCommit({
     owner: params.context.repo.owner,
     repo: params.context.repo.repo,
     parents: [headBranch.commit.sha],
@@ -78,7 +96,7 @@ https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${con
   // Generally, the head branch is protected and cannot be edited.
   const workingBranch = `backport-${params.headBranch.replaceAll('/', '-')}-${Date.now()}`
   core.info(`Creating a working branch ${workingBranch} from ${workingCommit.sha}`)
-  await params.octokit.rest.git.createRef({
+  await octokit.rest.git.createRef({
     owner: params.context.repo.owner,
     repo: params.context.repo.repo,
     ref: `refs/heads/${workingBranch}`,
@@ -86,7 +104,7 @@ https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${con
   })
 
   core.info(`Creating a pull request ${workingBranch} -> ${params.baseBranch}`)
-  const pr = await params.octokit.rest.pulls.create({
+  const pr = await octokit.rest.pulls.create({
     owner: params.context.repo.owner,
     repo: params.context.repo.repo,
     head: workingBranch,
@@ -98,7 +116,7 @@ https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${con
 
   core.info(`Requesting a review to ${params.context.actor}`)
   try {
-    await params.octokit.rest.pulls.requestReviewers({
+    await octokit.rest.pulls.requestReviewers({
       owner: params.context.repo.owner,
       repo: params.context.repo.repo,
       pull_number: pr.data.number,
@@ -110,7 +128,7 @@ https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${con
 
   core.info(`Adding ${params.context.actor} to assignees`)
   try {
-    await params.octokit.rest.issues.addAssignees({
+    await octokit.rest.issues.addAssignees({
       owner: params.context.repo.owner,
       repo: params.context.repo.repo,
       issue_number: pr.data.number,

@@ -30,15 +30,23 @@ This action creates a working branch from the latest commit of head branch.
 It creates a pull request from the working branch, because the head branch is protected typically.
 When the pull request is conflicted, you can edit the working branch on GitHub.
 
-## Inputs
+### Skip workflow runs
 
-| Name           | Required | Default           | Description                                  |
-| -------------- | -------- | ----------------- | -------------------------------------------- |
-| `github-token` | `true`   | `github.token`    | GitHub token used for opening a Pull Request |
-| `base-branch`  | `true`   |                   | Base branch of the Pull Request              |
-| `head-branch`  | `true`   | `github.ref_name` | Head branch of the Pull Request              |
+You can set `skip-ci` to skip workflow runs for the backport pull request.
+See https://docs.github.com/en/actions/managing-workflow-runs/skipping-workflow-runs for details.
 
-## Outputs
+## Specification
+
+### Inputs
+
+| Name           | Default           | Description                                  |
+| -------------- | ----------------- | -------------------------------------------- |
+| `github-token` | `github.token`    | GitHub token used for opening a Pull Request |
+| `base-branch`  | -                 | Base branch of the Pull Request              |
+| `head-branch`  | `github.ref_name` | Head branch of the Pull Request              |
+| `skip-ci`      | false             | Add `[skip ci]` to the commit message        |
+
+### Outputs
 
 | Name               | Description                                |
 | ------------------ | ------------------------------------------ |
