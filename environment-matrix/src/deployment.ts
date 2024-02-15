@@ -82,6 +82,15 @@ const createDeployment = async (
   })
   assert.strictEqual(created.status, 201)
   core.info(`Created a deployment ${created.data.url}`)
+
+  core.info(`Setting the deployment status to inactive`)
+  await octokit.rest.repos.createDeploymentStatus({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    deployment_id: created.data.id,
+    state: 'inactive',
+  })
+  core.info(`Set the deployment status to inactive`)
   return created.data
 }
 
