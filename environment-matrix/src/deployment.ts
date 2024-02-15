@@ -82,6 +82,20 @@ const createDeployment = async (
   })
   assert.strictEqual(created.status, 201)
   core.info(`Created a deployment ${created.data.url}`)
+
+  // If the deployment is not deployed for a while, it will cause the following error:
+  //   This branch had an error being deployed
+  //   1 abandoned deployment
+  //
+  // To avoid this, we set the deployment status to inactive immediately.
+  core.info(`Setting the deployment status to inactive`)
+  await octokit.rest.repos.createDeploymentStatus({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    deployment_id: created.data.id,
+    state: 'inactive',
+  })
+  core.info(`Set the deployment status to inactive`)
   return created.data
 }
 
