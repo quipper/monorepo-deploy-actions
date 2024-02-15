@@ -6,6 +6,7 @@ describe('getCommitMessage', () => {
       headBranch: 'production',
       baseBranch: 'main',
       skipCI: false,
+      mergePullRequest: false,
       context: {
         actor: 'octocat',
         repo: {
@@ -26,6 +27,7 @@ https://github.com/owner/repo/actions/runs/1`)
       headBranch: 'production',
       baseBranch: 'main',
       skipCI: true,
+      mergePullRequest: false,
       context: {
         actor: 'octocat',
         repo: {
