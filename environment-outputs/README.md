@@ -137,7 +137,9 @@ See https://github.com/isaacs/minimatch for details.
 
 ### Outputs
 
-This actions returns the `outputs` field corresponding to the rule.
+This actions returns the outputs corresponding to the rule.
+
+It also returns the below outputs.
 
 | Name                    | Description                                                           |
 | ----------------------- | --------------------------------------------------------------------- |
