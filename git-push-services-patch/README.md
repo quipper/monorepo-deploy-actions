@@ -1,6 +1,6 @@
 # git-push-services-patch
 
-This is an action to push a patch to all services in a namespace.
+This is an action to push a patch to services in a namespace.
 
 ## Inputs
 
@@ -10,9 +10,14 @@ This is an action to push a patch to all services in a namespace.
 | `operation`              | string           | Either `add` or `delete`                 |
 | `overlay`                | string           | Name of overlay                          |
 | `namespace`              | string           | Name of namespace                        |
+| `services`               | multiline string | Names of services to include (optional), If not specified, targets all services  |
 | `exclude-services`       | multiline string | Names of services to exclude (optional)  |
 | `destination-repository` | string           | Destination repository                   |
 | `token`                  | string           | GitHub token (default to `github.token`) |
+
+### Note about `services` and `exclude-services`
+
+If you define both `services` and `exclude-services`, the workflow will only apply services only both filters satisfies.
 
 ## Outputs
 
