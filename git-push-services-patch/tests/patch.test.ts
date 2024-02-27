@@ -12,7 +12,9 @@ describe('addToServices', () => {
     await fs.mkdir(path.join(workspace, `services/a`))
     await fs.mkdir(path.join(workspace, `services/b`))
 
-    await expect(addToServices({ workspace, patch, services: new Set(), excludeServices: new Set() })).resolves.toBeUndefined()
+    await expect(
+      addToServices({ workspace, patch, services: new Set(), excludeServices: new Set() }),
+    ).resolves.toBeUndefined()
 
     await fs.access(path.join(workspace, `services/a/kustomization.yaml`))
     await fs.access(path.join(workspace, `services/b/kustomization.yaml`))
@@ -62,7 +64,9 @@ describe('addToServices', () => {
 
   test('if empty directory', async () => {
     const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-services-patch-'))
-    await expect(addToServices({ workspace, patch, services: new Set(), excludeServices: new Set() })).resolves.toBeUndefined()
+    await expect(
+      addToServices({ workspace, patch, services: new Set(), excludeServices: new Set() }),
+    ).resolves.toBeUndefined()
   })
 })
 
@@ -75,7 +79,9 @@ describe('deleteFromServices', () => {
     await fs.writeFile(path.join(workspace, `services/a/kustomization.yaml`), 'dummy')
     await fs.writeFile(path.join(workspace, `services/b/kustomization.yaml`), 'dummy')
 
-    await expect(deleteFromServices({ workspace, patch, services: new Set(), excludeServices: new Set() })).resolves.toBeUndefined()
+    await expect(
+      deleteFromServices({ workspace, patch, services: new Set(), excludeServices: new Set() }),
+    ).resolves.toBeUndefined()
 
     await expect(fs.access(path.join(workspace, `services/a/kustomization.yaml`))).rejects.toThrow()
     await expect(fs.access(path.join(workspace, `services/b/kustomization.yaml`))).rejects.toThrow()
@@ -90,7 +96,9 @@ describe('deleteFromServices', () => {
     await fs.writeFile(path.join(workspace, `services/a/kustomization.yaml`), 'dummy')
     await fs.writeFile(path.join(workspace, `services/b/kustomization.yaml`), 'dummy')
 
-    await expect(deleteFromServices({ workspace, patch, services: new Set(), excludeServices })).resolves.toBeUndefined()
+    await expect(
+      deleteFromServices({ workspace, patch, services: new Set(), excludeServices }),
+    ).resolves.toBeUndefined()
 
     await expect(fs.access(path.join(workspace, `services/a/kustomization.yaml`))).rejects.toThrow()
     await fs.access(path.join(workspace, `services/b/kustomization.yaml`))
@@ -98,6 +106,8 @@ describe('deleteFromServices', () => {
 
   test('if empty directory', async () => {
     const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-services-patch-'))
-    await expect(deleteFromServices({ workspace, patch, services: new Set(), excludeServices: new Set() })).resolves.toBeUndefined()
+    await expect(
+      deleteFromServices({ workspace, patch, services: new Set(), excludeServices: new Set() }),
+    ).resolves.toBeUndefined()
   })
 })
