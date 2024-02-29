@@ -38,7 +38,9 @@ See https://docs.github.com/en/actions/managing-workflow-runs/skipping-workflow-
 ### Automatically merge the pull request
 
 You can set `merge-pull-request` to automatically merge the pull request.
-If the action could not merge due to a conflict or branch protection rule, it requests a review to the actor.
+
+You will get `merged` output to check if the pull request is merged.
+If this action could not merge due to a conflict or branch protection rule, it requests a review to the actor.
 
 ## Specification
 
@@ -54,8 +56,9 @@ If the action could not merge due to a conflict or branch protection rule, it re
 
 ### Outputs
 
-| Name               | Description                                |
-| ------------------ | ------------------------------------------ |
-| `pull-request-url` | URL of the opened Pull Request             |
-| `base-branch`      | The base branch of the opened Pull Request |
-| `head-branch`      | The head branch of the opened Pull Request |
+| Name               | Description                                   |
+| ------------------ | --------------------------------------------- |
+| `pull-request-url` | URL of the opened Pull Request                |
+| `base-branch`      | The base branch of the opened Pull Request    |
+| `head-branch`      | The head branch of the opened Pull Request    |
+| `merged`           | If the pull request is merged, returns `true` |

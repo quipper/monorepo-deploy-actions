@@ -26,6 +26,8 @@ outputs:
     description: The base branch of the opened Pull Request
   head-branch:
     description: The head branch of the opened Pull Request
+  merged:
+    description: If the pull request is merged, returns `true`
 runs:
   using: 'node20'
   main: 'dist/index.js'

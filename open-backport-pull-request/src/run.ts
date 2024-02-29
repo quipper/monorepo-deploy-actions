@@ -14,15 +14,19 @@ type Inputs = {
   mergePullRequest: boolean
 }
 
-export const run = async (inputs: Inputs): Promise<void> => {
-  const octokit = getOctokit(inputs.githubToken, octokitPluginRetry.retry)
+type Outputs = {
+  pullRequestUrl: string
+  baseBranch: string
+  headBranch: string
+  merged: boolean
+}
 
+export const run = async (inputs: Inputs): Promise<Outputs | undefined> => {
+  const octokit = getOctokit(inputs.githubToken, octokitPluginRetry.retry)
   const { baseBranch, headBranch } = inputs
-  core.setOutput('base-branch', baseBranch)
-  core.setOutput('head-branch', headBranch)
 
   if (await hasDiff({ headBranch, baseBranch, octokit, context })) {
-    const pullHtmlUrl = await openPullRequest(
+    return await openPullRequest(
       {
         headBranch,
         baseBranch,
@@ -32,7 +36,6 @@ export const run = async (inputs: Inputs): Promise<void> => {
       },
       octokit,
     )
-    core.setOutput('pull-request-url', pullHtmlUrl)
   }
 }
 
@@ -77,7 +80,7 @@ Created by GitHub Actions
 https://github.com/${params.context.repo.owner}/${params.context.repo.repo}/actions/runs/${params.context.runId}`
 }
 
-const openPullRequest = async (params: Backport, octokit: Octokit): Promise<string> => {
+const openPullRequest = async (params: Backport, octokit: Octokit): Promise<Outputs> => {
   const commitMessage = getCommitMessage(params)
 
   // Add an empty commit onto the head commit.
@@ -132,7 +135,12 @@ const openPullRequest = async (params: Backport, octokit: Octokit): Promise<stri
       })
       core.info(`Merged ${pull.html_url} as ${merged.sha}`)
       // If merged, return immediately without any reviewer or assignee.
-      return pull.html_url
+      return {
+        pullRequestUrl: pull.html_url,
+        baseBranch: params.baseBranch,
+        headBranch: params.headBranch,
+        merged: true,
+      }
     } catch (e) {
       core.warning(`Could not merge ${pull.html_url}: ${String(e)}`)
     }
@@ -162,5 +170,10 @@ const openPullRequest = async (params: Backport, octokit: Octokit): Promise<stri
     core.info(`Could not assign ${params.context.actor}: ${String(e)}`)
   }
 
-  return pull.html_url
+  return {
+    pullRequestUrl: pull.html_url,
+    baseBranch: params.baseBranch,
+    headBranch: params.headBranch,
+    merged: false,
+  }
 }
