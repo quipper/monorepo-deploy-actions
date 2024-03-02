@@ -5,6 +5,7 @@ on:
     paths:
       - '**/*.ts'
       - '*.json'
+      - '*.lock'
       - .github/workflows/autofix.yaml
 
 jobs:
@@ -16,8 +17,8 @@ jobs:
       - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: 20
-          cache: yarn
-      - run: yarn
-      - run: yarn format
-      - run: yarn lint
+      - run: corepack enable pnpm
+      - run: pnpm i
+      - run: pnpm format
+      - run: pnpm lint
       - uses: int128/update-generated-files-action@1bf39f3aec4afa88c0c7060cdb0d88332c052991 # v2.48.0

@@ -105,20 +105,14 @@ destination-repository  (branch: ns/${source-repository}/${overlay}/${namespace}
         └── generated.yaml
 ```
 
-## Actions
-
-| Name                                                                 | Description                                                                 | Status                                                                                                                                                                                                                                                                  |
-| -------------------------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [resolve-aws-secret-version](resolve-aws-secret-version)             | Resolve AWSSecret versionId placeholders in a manifest                      | [![resolve-aws-secret-version](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/resolve-aws-secret-version.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/resolve-aws-secret-version.yaml)                   |
-| [substitute](substitute)                                             | Substitute variables in manifests                                           | [![substitute](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/substitute.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/substitute.yaml)                                                                   |
-| [git-push-service](git-push-service)                                 | Push an Argo CD Application with generated manifest for service             | [![git-push-service](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-service.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-service.yaml)                                                 |
-| [git-push-services-patch](git-push-services-patch)                   | push a patch to all services in a namespace                                 | [![git-push-services-patch](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-services-patch.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-services-patch.yaml)                            |
-| [git-push-namespace](git-push-namespace)                             | Push an Argo CD Application for namespace                                   | [![git-push-namespace](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-namespace.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/git-push-namespace.yaml)                                           |
-| [open-backport-pull-request](open-backport-pull-request)             | Open Backport Pull Requests from a specific branch                          | [![open-backport-pull-request](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/open-backport-pull-request.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/open-backport-pull-request.yaml)                   |
-| [environment-matrix](environment-matrix)                             | Generate a JSON of environments for the matrix jobs                         | [![environment-matrix](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/environment-matrix.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/environment-matrix.yaml)                                           |
-| [create-deploy-pull-request](create-deploy-pull-request)             | create a pull request to deploy a service                                   | [![create-deploy-pull-request](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/create-deploy-pull-request.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/create-deploy-pull-request.yaml)                   |
-
 ## Development
+
+Node.js and pnpm is required.
+
+```sh
+brew install node@20
+corepack enable pnpm
+```
 
 ### Release workflow
 

@@ -5,6 +5,7 @@ on:
     paths:
       - cleanup-closed-pull-requests/**
       - '*.json'
+      - '*.lock'
       - .github/workflows/cleanup-closed-pull-requests.yaml
   push:
     branches:
@@ -12,6 +13,7 @@ on:
     paths:
       - cleanup-closed-pull-requests/**
       - '*.json'
+      - '*.lock'
       - .github/workflows/cleanup-closed-pull-requests.yaml
 
 concurrency:
@@ -31,9 +33,9 @@ jobs:
       - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: 20
-          cache: yarn
-      - run: yarn
-      - run: yarn test
+      - run: corepack enable pnpm
+      - run: pnpm i
+      - run: pnpm test
 
   e2e-test:
     runs-on: ubuntu-latest
@@ -43,10 +45,9 @@ jobs:
       - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: 20
-          cache: yarn
-      - run: yarn
-      - run: yarn build
-      - run: yarn package
+      - run: corepack enable pnpm
+      - run: pnpm i
+      - run: pnpm build
 
       - run: |
           git config --global user.email 'github-actions@github.com'
