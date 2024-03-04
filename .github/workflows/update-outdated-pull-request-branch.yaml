@@ -5,7 +5,7 @@ on:
     paths:
       - update-outdated-pull-request-branch/**
       - '*.json'
-      - '*.lock'
+      - '*.yaml'
       - .github/workflows/update-outdated-pull-request-branch.yaml
   push:
     branches:
@@ -13,7 +13,7 @@ on:
     paths:
       - update-outdated-pull-request-branch/**
       - '*.json'
-      - '*.lock'
+      - '*.yaml'
       - .github/workflows/update-outdated-pull-request-branch.yaml
 
 defaults:

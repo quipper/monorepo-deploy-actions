@@ -5,7 +5,7 @@ on:
     paths:
       - bootstrap-pull-request/**
       - '*.json'
-      - '*.lock'
+      - '*.yaml'
       - .github/workflows/bootstrap-pull-request.yaml
   push:
     branches:
@@ -13,7 +13,7 @@ on:
     paths:
       - bootstrap-pull-request/**
       - '*.json'
-      - '*.lock'
+      - '*.yaml'
       - .github/workflows/bootstrap-pull-request.yaml
 
 defaults:

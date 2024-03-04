@@ -5,7 +5,7 @@ on:
     paths:
       - cleanup-closed-pull-requests/**
       - '*.json'
-      - '*.lock'
+      - '*.yaml'
       - .github/workflows/cleanup-closed-pull-requests.yaml
   push:
     branches:
@@ -13,7 +13,7 @@ on:
     paths:
       - cleanup-closed-pull-requests/**
       - '*.json'
-      - '*.lock'
+      - '*.yaml'
       - .github/workflows/cleanup-closed-pull-requests.yaml
 
 concurrency:

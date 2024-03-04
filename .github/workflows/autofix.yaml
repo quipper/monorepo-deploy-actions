@@ -5,7 +5,7 @@ on:
     paths:
       - '**/*.ts'
       - '*.json'
-      - '*.lock'
+      - '*.yaml'
       - .github/workflows/autofix.yaml
 
 jobs:

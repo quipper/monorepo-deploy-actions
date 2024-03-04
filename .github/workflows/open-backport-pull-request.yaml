@@ -5,7 +5,7 @@ on:
     paths:
       - open-backport-pull-request/**
       - '*.json'
-      - '*.lock'
+      - '*.yaml'
       - .github/workflows/open-backport-pull-request.yaml
   push:
     branches:
@@ -13,7 +13,7 @@ on:
     paths:
       - open-backport-pull-request/**
       - '*.json'
-      - '*.lock'
+      - '*.yaml'
       - .github/workflows/open-backport-pull-request.yaml
 
 defaults:
