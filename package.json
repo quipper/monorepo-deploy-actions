@@ -20,9 +20,6 @@
     "format": "prettier --write **/*.ts",
     "lint": "eslint --fix **/*.ts"
   },
-  "workspaces": [
-    "*"
-  ],
   "engines": {
     "node": "20.x"
   }

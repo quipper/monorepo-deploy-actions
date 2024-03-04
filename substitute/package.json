@@ -2,12 +2,9 @@
   "name": "substitute",
   "version": "0.0.0",
   "private": true,
-  "main": "lib/src/main.js",
   "scripts": {
-    "build": "tsc",
-    "package": "ncc build --source-map --license licenses.txt",
-    "test": "jest",
-    "ci:package": "yarn build && yarn package"
+    "build": "ncc build --source-map --license licenses.txt src/main.ts",
+    "test": "jest"
   },
   "dependencies": {
     "@actions/core": "1.10.1",
