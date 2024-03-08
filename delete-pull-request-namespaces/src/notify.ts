@@ -45,8 +45,14 @@ const ignoreNotFoundError = async <T>(f: Promise<T>) => {
   try {
     return await f
   } catch (error) {
-    if (error instanceof RequestError && error.status === 404) {
-      core.info(`Ignore error: ${error.status} ${error.message}`)
+    // check type of error
+    if (error == null || typeof error !== 'object' || !('name' in error)) {
+      throw error
+    }
+    const maybeGhError = error as RequestError
+    // if error is RequestError and status is 404, ignore it
+    if (maybeGhError.name === 'HttpError' && maybeGhError.status === 404) {
+      core.info(`Ignore error: ${maybeGhError.status} ${maybeGhError.message}`)
       return
     }
     throw error
