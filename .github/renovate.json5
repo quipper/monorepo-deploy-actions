@@ -1,4 +1,5 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base",
     "helpers:pinGitHubActionDigests",
@@ -20,6 +21,16 @@
         "node",
         "@types/node",
       ],
-    }
+    },
+    {
+      // Do not update the dependencies of @actions/github.
+      // https://github.com/quipper/monorepo-deploy-actions/pull/1362
+      "matchPackageNames": [
+        "@octokit/core",
+        "@octokit/request-error",
+        "@octokit/plugin-retry",
+      ],
+      "enabled": false,
+    },
   ]
 }
