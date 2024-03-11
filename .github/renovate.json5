@@ -2,7 +2,7 @@
   "extends": [
     "config:base",
     "helpers:pinGitHubActionDigests",
-    "github>int128/typescript-action-renovate-config#v1.5.0",
+    "github>int128/typescript-action-renovate-config#v1.6.0",
     ":automergeMinor",
     ":label(renovate/{{depName}})",
     ":reviewer(team:sre)",
