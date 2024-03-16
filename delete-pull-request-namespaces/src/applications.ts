@@ -1,9 +1,9 @@
 import * as core from '@actions/core'
-import * as git from './git'
+import * as git from './git.js'
 import * as io from '@actions/io'
 import * as path from 'path'
 import { promises as fs } from 'fs'
-import { retryExponential } from './retry'
+import { retryExponential } from './retry.js'
 
 type DeleteNamespaceApplicationsOptions = {
   overlay: string
