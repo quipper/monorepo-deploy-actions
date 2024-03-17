@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { RequestError } from '@octokit/request-error'
 
 type NotifyDeletionOptions = {
   sourceRepository: string
@@ -45,10 +44,15 @@ const ignoreNotFoundError = async <T>(f: Promise<T>) => {
   try {
     return await f
   } catch (error) {
-    if (error instanceof RequestError && error.status === 404) {
+    if (isRequestError(error) && error.status === 404) {
       core.info(`Ignore error: ${error.status} ${error.message}`)
       return
     }
     throw error
   }
 }
+
+type RequestError = Error & { status: number }
+
+const isRequestError = (error: unknown): error is RequestError =>
+  error instanceof Error && 'status' in error && typeof error.status === 'number'
