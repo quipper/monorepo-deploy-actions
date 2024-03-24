@@ -242,8 +242,8 @@ importers:
         specifier: 4.0.9
         version: 4.0.9
       aws-sdk-client-mock:
-        specifier: 3.1.0
-        version: 3.1.0
+        specifier: 4.0.0
+        version: 4.0.0
 
   substitute:
     dependencies:
@@ -2385,8 +2385,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /aws-sdk-client-mock@3.1.0:
-    resolution: {integrity: sha512-3Mx5R8DDka2TB8qtr5jDbSVJsUM6uoX5tZSReBsJS8HunVtL9PHhb+RU7b+I3/53B2fJAyoEp7dJNXndBI+6MA==}
+  /aws-sdk-client-mock@4.0.0:
+    resolution: {integrity: sha512-/rxo+pzCFaUozK7TyCqo3GYwzdBGn9Ai6EsT8ytXDoUXlD/Q5hw9hj2lOkCAyubECzGJFHMmQg9GZ1GOGlN/qQ==}
     dependencies:
       '@types/sinon': 10.0.20
       sinon: 16.1.3
