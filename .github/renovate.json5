@@ -6,7 +6,7 @@
     "github>int128/typescript-action-renovate-config#v1.6.0",
     ":automergeMinor",
     ":label(renovate/{{depName}})",
-    ":reviewer(team:sre)",
+    ":reviewer(team:sre-jp)",
   ],
   // DO NOT enable platformAutomerge,
   // because this repository does not have a required check in the branch protection rules.
