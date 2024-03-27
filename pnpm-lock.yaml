@@ -232,8 +232,8 @@ importers:
         specifier: 0.4.0
         version: 0.4.0
       '@aws-sdk/client-secrets-manager':
-        specifier: 3.540.0
-        version: 3.540.0
+        specifier: 3.543.0
+        version: 3.543.0
       js-yaml:
         specifier: 4.1.0
         version: 4.1.0
@@ -373,8 +373,8 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /@aws-sdk/client-secrets-manager@3.540.0:
-    resolution: {integrity: sha512-bobnFYxHR1RLqqQCQ0EETFETUEcLKSMeEgmDU7xsNPmzvx/3iWNMbXsMvikRrkuWFcsPIr2ofEGU2epvSHrTuA==}
+  /@aws-sdk/client-secrets-manager@3.543.0:
+    resolution: {integrity: sha512-aTSsCv9UbKLilOmU3jeeu0wL9b96Uf8aZCpb/kO59dZ6a10/TB/l1VbsJjgFTkz4II4CaGnZF9Cy7PlRoVLr/g==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
