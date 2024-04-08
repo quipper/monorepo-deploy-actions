@@ -9,7 +9,7 @@ importers:
   .:
     devDependencies:
       '@eslint/js':
-        specifier: ^9.0.0
+        specifier: 9.0.0
         version: 9.0.0
       '@tsconfig/node20':
         specifier: 20.1.4
@@ -45,7 +45,7 @@ importers:
         specifier: 5.4.4
         version: 5.4.4
       typescript-eslint:
-        specifier: ^7.5.0
+        specifier: 7.5.0
         version: 7.5.0(eslint@9.0.0)(typescript@5.4.4)
 
   bootstrap-pull-request:
