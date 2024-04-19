@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@eslint/js':
-        specifier: 9.0.0
-        version: 9.0.0
+        specifier: 9.1.1
+        version: 9.1.1
       '@tsconfig/node20':
         specifier: 20.1.4
         version: 20.1.4
@@ -601,6 +601,10 @@ packages:
 
   '@eslint/js@9.0.0':
     resolution: {integrity: sha512-RThY/MnKrhubF6+s1JflwUjPEsnCEmYCWwqa/aRISKWNXGZ9epUwft4bUMM35SdKF9xvBrLydAM1RDHd1Z//ZQ==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@eslint/js@9.1.1':
+    resolution: {integrity: sha512-5WoDz3Y19Bg2BnErkZTp0en+c/i9PvgFS7MBe1+m60HjFr0hrphlAGp4yzI7pxpt4xShln4ZyYp4neJm8hmOkQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@fastify/busboy@2.1.1':
@@ -2926,6 +2930,8 @@ snapshots:
       - supports-color
 
   '@eslint/js@9.0.0': {}
+
+  '@eslint/js@9.1.1': {}
 
   '@fastify/busboy@2.1.1': {}
 
