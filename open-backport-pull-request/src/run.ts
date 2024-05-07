@@ -1,10 +1,8 @@
 import * as core from '@actions/core'
 import * as octokitPluginRetry from '@octokit/plugin-retry'
-import { context, getOctokit } from '@actions/github'
-import { Context } from '@actions/github/lib/context'
-import { GitHub } from '@actions/github/lib/utils'
+import * as github from '@actions/github'
 
-type Octokit = InstanceType<typeof GitHub>
+type Octokit = ReturnType<typeof github.getOctokit>
 
 type Inputs = {
   githubToken: string
@@ -22,37 +20,30 @@ type Outputs = {
 }
 
 export const run = async (inputs: Inputs): Promise<Outputs | undefined> => {
-  const octokit = getOctokit(inputs.githubToken, octokitPluginRetry.retry)
-  const { baseBranch, headBranch } = inputs
+  const octokit = github.getOctokit(inputs.githubToken, {}, octokitPluginRetry.retry)
 
-  if (await hasDiff({ headBranch, baseBranch, octokit, context })) {
-    return await openPullRequest(
-      {
-        headBranch,
-        baseBranch,
-        skipCI: inputs.skipCI,
-        mergePullRequest: inputs.mergePullRequest,
-        context,
-      },
-      octokit,
-    )
-  }
-}
-
-type hasDiffParams = {
-  headBranch: string
-  baseBranch: string
-  context: Context
-  octokit: Octokit
-}
-
-const hasDiff = async (params: hasDiffParams): Promise<boolean> => {
-  const compare = await params.octokit.request('GET /repos/{owner}/{repo}/compare/{basehead}', {
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    basehead: `${params.baseBranch}...${params.headBranch}`,
+  core.info(`Comparing ${inputs.baseBranch} and ${inputs.headBranch} branch`)
+  const { data: compare } = await octokit.rest.repos.compareCommitsWithBasehead({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    basehead: `${inputs.baseBranch}...${inputs.headBranch}`,
   })
-  return !!(compare.data.files && compare.data.files.length > 0)
+  if (compare.files === undefined || compare.files.length === 0) {
+    core.info(`No changes between ${inputs.baseBranch} and ${inputs.headBranch} branch. Do nothing.`)
+    return
+  }
+  core.info(`There are ${compare.files.length} changes between ${inputs.baseBranch} and ${inputs.headBranch} branch.`)
+
+  return await openPullRequest(
+    {
+      headBranch: inputs.headBranch,
+      baseBranch: inputs.baseBranch,
+      skipCI: inputs.skipCI,
+      mergePullRequest: inputs.mergePullRequest,
+      context: github.context,
+    },
+    octokit,
+  )
 }
 
 type Backport = {
@@ -86,8 +77,8 @@ const openPullRequest = async (params: Backport, octokit: Octokit): Promise<Outp
   // Add an empty commit onto the head commit.
   // If a required check is set against the base branch and the head commit is failing, we cannot merge it.
   const { data: headBranch } = await octokit.rest.repos.getBranch({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
+    owner: params.context.repo.owner,
+    repo: params.context.repo.repo,
     branch: params.headBranch,
   })
   core.info(`Creating an empty commit on the head ${headBranch.commit.sha}`)
