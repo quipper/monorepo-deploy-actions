@@ -245,8 +245,8 @@ importers:
         specifier: 4.0.9
         version: 4.0.9
       aws-sdk-client-mock:
-        specifier: 4.0.0
-        version: 4.0.0
+        specifier: 4.0.1
+        version: 4.0.1
 
   substitute:
     dependencies:
@@ -1153,8 +1153,8 @@ packages:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
     engines: {node: '>=8'}
 
-  aws-sdk-client-mock@4.0.0:
-    resolution: {integrity: sha512-/rxo+pzCFaUozK7TyCqo3GYwzdBGn9Ai6EsT8ytXDoUXlD/Q5hw9hj2lOkCAyubECzGJFHMmQg9GZ1GOGlN/qQ==}
+  aws-sdk-client-mock@4.0.1:
+    resolution: {integrity: sha512-yD2mmgy73Xce097G5hIpr1k7j50qzvJ49/+6osGZiCyk4m6cwhb+2x7kKFY1gEMwTzaS8+m8fXv9SB29SkRYyQ==}
 
   babel-jest@29.7.0:
     resolution: {integrity: sha512-BrvGY3xZSwEcCzKvKsCi2GgHqDqsYkOP4/by5xCgIwGXQxIEh+8ew3gmrE1y7XRR6LHZIj6yLYnUi/mm2KXKBg==}
@@ -3727,7 +3727,7 @@ snapshots:
 
   array-union@2.1.0: {}
 
-  aws-sdk-client-mock@4.0.0:
+  aws-sdk-client-mock@4.0.1:
     dependencies:
       '@types/sinon': 10.0.20
       sinon: 16.1.3
