@@ -53,7 +53,7 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           git config --global user.name 'github-actions'
 
-      - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+      - uses: actions/checkout@e2f20e631ae6d7dd3b768f56a5d2af784dd54791 # v2.5.0
         with:
           ref: ${{ github.head_ref }} # avoid "shallow update not allowed" error
           path: overlay-branch
