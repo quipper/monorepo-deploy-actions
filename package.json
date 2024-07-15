@@ -15,7 +15,7 @@
     "prettier": "3.3.3",
     "ts-jest": "29.2.0",
     "typescript": "5.5.3",
-    "typescript-eslint": "7.16.0"
+    "typescript-eslint": "7.16.1"
   },
   "scripts": {
     "format": "prettier --write **/*.ts",
