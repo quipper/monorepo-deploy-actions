@@ -53,5 +53,5 @@ spec:
     secretsManagerSecretRef:
       secretId: this-has-no-versionId-field
 `
-  await expect(resolve(manifest, manager)).rejects.toThrow('invalid AWSSecret')
+  await expect(resolve(manifest, manager)).rejects.toThrow('AWSSecret must have versionId field')
 })
