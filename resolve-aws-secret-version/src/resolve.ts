@@ -49,6 +49,7 @@ const findAWSSecrets = (manifest: string): AWSSecret[] => {
     if (d.kind !== 'AWSSecret') {
       continue
     }
+    core.info(`Parsing the AWSSecret:\n${JSON.stringify(d, undefined, 2)}`)
     assertKubernetesAWSSecret(d)
 
     const name = d.metadata.name
