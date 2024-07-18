@@ -39,5 +39,5 @@ export function assertKubernetesAWSSecret(a: KubernetesObject): asserts a is Kub
 
 function assertHasField<K extends string>(o: unknown, key: K): asserts o is Record<K, unknown> {
   assert(typeof o === 'object' && o !== null, `must be an object`)
-  assert(key in o, `must have ${key} field`)
+  assert(key in o, `AWSSecret must have ${key} field`)
 }
