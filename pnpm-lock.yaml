@@ -12,7 +12,7 @@ importers:
         specifier: 9.7.0
         version: 9.7.0
       '@tsconfig/recommended':
-        specifier: ^1.0.7
+        specifier: 1.0.7
         version: 1.0.7
       '@types/jest':
         specifier: 29.5.12
@@ -114,8 +114,6 @@ importers:
       '@octokit/request-error':
         specifier: 5.0.1
         version: 5.0.1
-
-  delete-pull-request-namespaces/dist: {}
 
   environment-matrix:
     dependencies:

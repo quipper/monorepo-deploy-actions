@@ -4,7 +4,7 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "9.7.0",
-    "@tsconfig/recommended": "^1.0.7",
+    "@tsconfig/recommended": "1.0.7",
     "@types/jest": "29.5.12",
     "@types/node": "20.14.11",
     "@typescript-eslint/parser": "7.16.1",
