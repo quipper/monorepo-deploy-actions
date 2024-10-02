@@ -51,8 +51,8 @@ importers:
   bootstrap-pull-request:
     dependencies:
       '@actions/core':
-        specifier: 1.10.1
-        version: 1.10.1
+        specifier: 1.11.0
+        version: 1.11.0
       '@actions/exec':
         specifier: 1.1.1
         version: 1.1.1
@@ -280,6 +280,9 @@ packages:
 
   '@actions/core@1.10.1':
     resolution: {integrity: sha512-3lBR9EDAY+iYIpTnTIXmWcNbX3T2kCkAEQGIQx4NVQ0575nk2k3GRZDTPQG+vVtS2izSLmINlxXf0uLtnrTP+g==}
+
+  '@actions/core@1.11.0':
+    resolution: {integrity: sha512-I21jQUzEjbZolw3jFZ/0iHGCb+rePCww9MaA0SbVFae4FpBTQWP1GIvr/m5Y6GVaxrDz7p3RhBtpBzwkA3rPSA==}
 
   '@actions/exec@1.1.1':
     resolution: {integrity: sha512-+sCcHHbVdk93a0XT19ECtO/gIXoxvdsgQLzb2fE2/5sIZmWQuluYyjPQtrtTHdU1YzTZ7bAPN4sITq2xi1679w==}
@@ -2329,6 +2332,11 @@ snapshots:
       '@actions/http-client': 2.2.0
       uuid: 8.3.2
 
+  '@actions/core@1.11.0':
+    dependencies:
+      '@actions/exec': 1.1.1
+      '@actions/http-client': 2.2.0
+
   '@actions/exec@1.1.1':
     dependencies:
       '@actions/io': 1.1.3
@@ -2342,7 +2350,7 @@ snapshots:
 
   '@actions/glob@0.5.0':
     dependencies:
-      '@actions/core': 1.10.1
+      '@actions/core': 1.11.0
       minimatch: 3.1.2
 
   '@actions/http-client@2.2.0':
