@@ -1,8 +1,6 @@
 import * as core from '@actions/core'
-import * as octokitPluginRetry from '@octokit/plugin-retry'
-import * as github from '@actions/github'
-
-type Octokit = ReturnType<typeof github.getOctokit>
+import * as format from './format'
+import { Context, getOctokit, Octokit } from './github'
 
 type Inputs = {
   githubToken: string
@@ -10,6 +8,8 @@ type Inputs = {
   baseBranch: string
   skipCI: boolean
   mergePullRequest: boolean
+  pullRequestTitle: string
+  pullRequestBody: string
 }
 
 type Outputs = {
@@ -19,13 +19,13 @@ type Outputs = {
   merged: boolean
 }
 
-export const run = async (inputs: Inputs): Promise<Outputs | undefined> => {
-  const octokit = github.getOctokit(inputs.githubToken, {}, octokitPluginRetry.retry)
+export const run = async (inputs: Inputs, context: Context): Promise<Outputs | undefined> => {
+  const octokit = getOctokit(inputs.githubToken)
 
   core.info(`Comparing ${inputs.baseBranch} and ${inputs.headBranch} branch`)
   const { data: compare } = await octokit.rest.repos.compareCommitsWithBasehead({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
     basehead: `${inputs.baseBranch}...${inputs.headBranch}`,
   })
   if (compare.files === undefined || compare.files.length === 0) {
@@ -40,7 +40,10 @@ export const run = async (inputs: Inputs): Promise<Outputs | undefined> => {
       baseBranch: inputs.baseBranch,
       skipCI: inputs.skipCI,
       mergePullRequest: inputs.mergePullRequest,
-      context: github.context,
+      commitMessage: format.getCommitMessage(inputs, context),
+      pullRequestTitle: format.getPullRequestTitle(inputs),
+      pullRequestBody: format.getPullRequestBody(inputs, context),
+      context,
     },
     octokit,
   )
@@ -51,29 +54,13 @@ type Backport = {
   baseBranch: string
   skipCI: boolean
   mergePullRequest: boolean
-  context: {
-    actor: string
-    repo: {
-      owner: string
-      repo: string
-    }
-    runId: number
-  }
-}
-
-export const getCommitMessage = (params: Backport): string => {
-  // https://docs.github.com/en/actions/managing-workflow-runs/skipping-workflow-runs
-  const skipCI = params.skipCI ? ' [skip ci]' : ''
-
-  return `Backport from ${params.headBranch} into ${params.baseBranch}${skipCI}
-
-Created by GitHub Actions
-https://github.com/${params.context.repo.owner}/${params.context.repo.repo}/actions/runs/${params.context.runId}`
+  commitMessage: string
+  pullRequestTitle: string
+  pullRequestBody: string
+  context: Context
 }
 
 const openPullRequest = async (params: Backport, octokit: Octokit): Promise<Outputs> => {
-  const commitMessage = getCommitMessage(params)
-
   // Add an empty commit onto the head commit.
   // If a required check is set against the base branch and the head commit is failing, we cannot merge it.
   const { data: headBranch } = await octokit.rest.repos.getBranch({
@@ -87,7 +74,7 @@ const openPullRequest = async (params: Backport, octokit: Octokit): Promise<Outp
     repo: params.context.repo.repo,
     parents: [headBranch.commit.sha],
     tree: headBranch.commit.commit.tree.sha,
-    message: commitMessage,
+    message: params.commitMessage,
   })
 
   // Create a working branch so that we can edit it if conflicted.
@@ -107,8 +94,8 @@ const openPullRequest = async (params: Backport, octokit: Octokit): Promise<Outp
     repo: params.context.repo.repo,
     head: workingBranch,
     base: params.baseBranch,
-    title: `Backport from ${params.headBranch} into ${params.baseBranch}`,
-    body: commitMessage,
+    title: params.pullRequestTitle,
+    body: params.pullRequestBody,
   })
   core.info(`Created ${pull.html_url}`)
 

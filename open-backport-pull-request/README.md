@@ -53,6 +53,8 @@ If this action could not merge due to a conflict or branch protection rule, it r
 | `head-branch`        | `github.ref_name` | Head branch of the pull request              |
 | `skip-ci`            | false             | Add `[skip ci]` to the commit message        |
 | `merge-pull-request` | false             | Try to merge the pull request                |
+| `pull-request-title` | See action.yaml   | Title of the pull request                    |
+| `pull-request-body`  | See action.yaml   | Body of the pull request                     |
 
 ### Outputs
 
