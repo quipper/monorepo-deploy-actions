@@ -251,8 +251,8 @@ importers:
   substitute:
     dependencies:
       '@actions/core':
-        specifier: 1.10.1
-        version: 1.10.1
+        specifier: 1.11.0
+        version: 1.11.0
       '@actions/glob':
         specifier: 0.5.0
         version: 0.5.0
