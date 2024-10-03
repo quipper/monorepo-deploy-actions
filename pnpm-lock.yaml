@@ -149,8 +149,8 @@ importers:
   git-push-namespace:
     dependencies:
       '@actions/core':
-        specifier: 1.10.1
-        version: 1.10.1
+        specifier: 1.11.0
+        version: 1.11.0
       '@actions/exec':
         specifier: 1.1.1
         version: 1.1.1
