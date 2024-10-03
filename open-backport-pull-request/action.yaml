@@ -19,6 +19,14 @@ inputs:
     description: Try to merge the pull request
     required: true
     default: 'false'
+  pull-request-title:
+    description: The title of the Pull Request
+    required: true
+    default: Backport from HEAD_BRANCH to BASE_BRANCH
+  pull-request-body:
+    description: The body of the Pull Request
+    required: true
+    default: This is an automated backport from HEAD_BRANCH to BASE_BRANCH.
 outputs:
   pull-request-url:
     description: The URL of the opened Pull Request
