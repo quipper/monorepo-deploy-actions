@@ -53,8 +53,12 @@ If this action could not merge due to a conflict or branch protection rule, it r
 | `head-branch`        | `github.ref_name` | Head branch of the pull request              |
 | `skip-ci`            | false             | Add `[skip ci]` to the commit message        |
 | `merge-pull-request` | false             | Try to merge the pull request                |
-| `pull-request-title` | See action.yaml   | Title of the pull request                    |
-| `pull-request-body`  | See action.yaml   | Body of the pull request                     |
+| `pull-request-title` | \*1               | Title of the pull request                    |
+| `pull-request-body`  | \*1               | Body of the pull request                     |
+
+\*1:
+See [action.yaml](./action.yaml) for the default value.
+`HEAD_BRANCH` and `BASE_BRANCH` are replaced with the actual branch names.
 
 ### Outputs
 
