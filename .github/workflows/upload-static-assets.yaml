@@ -1,0 +1,27 @@
+name: upload-static-assets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - upload-static-assets/**
+      - '*.json'
+      - .github/workflows/upload-static-assets.yaml
+  pull_request:
+    branches: [main]
+    paths:
+      - upload-static-assets/**
+      - '*.json'
+      - .github/workflows/upload-static-assets.yaml
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./upload-static-assets
+        with:
+          source-image: nginx
+          source-path: /usr/share/nginx/html
+          bucket-uri: s3://bucket/dir
