@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { createPull } from './pull'
-import { checkIfBranchExists, createBranch } from './branch'
+import { createPull } from './pull.js'
+import { checkIfBranchExists, createBranch } from './branch.js'
 
 type Inputs = {
   head: string
