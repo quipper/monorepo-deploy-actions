@@ -1,8 +1,8 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { Environment } from './rule'
+import { Environment } from './rule.js'
 import { RequestError } from '@octokit/request-error'
-import { Octokit, assertPullRequestPayload } from './github'
+import { Octokit, assertPullRequestPayload } from './github.js'
 import assert from 'assert'
 
 type Context = Pick<typeof github.context, 'eventName' | 'repo' | 'ref' | 'payload'>

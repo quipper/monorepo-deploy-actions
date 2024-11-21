@@ -1,10 +1,10 @@
 import assert from 'assert'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { Environment, parseRulesYAML } from './rule'
-import { find } from './matcher'
-import { EnvironmentWithDeployment, createGitHubDeploymentForEnvironments } from './deployment'
-import { getOctokit } from './github'
+import { Environment, parseRulesYAML } from './rule.js'
+import { find } from './matcher.js'
+import { EnvironmentWithDeployment, createGitHubDeploymentForEnvironments } from './deployment.js'
+import { getOctokit } from './github.js'
 
 type Inputs = {
   rules: string
