@@ -1,6 +1,6 @@
 import * as glob from '@actions/glob'
 import * as awsSecretsManager from './awsSecretsManager'
-import { resolveInplace } from './resolve'
+import { resolveInplace } from './resolve.js'
 
 type Inputs = {
   manifests: string

@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs'
 import * as os from 'os'
-import { resolve, resolveInplace } from '../src/resolve'
+import { resolve, resolveInplace } from '../src/resolve.js'
 
 test('the placeholder is replaced with the current version id by in-place', async () => {
   const manager = { getCurrentVersionId: jest.fn() }

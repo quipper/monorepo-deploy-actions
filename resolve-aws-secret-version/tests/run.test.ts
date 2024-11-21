@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs'
 import * as awsSecretsManager from '../src/awsSecretsManager'
 import * as os from 'os'
-import { run } from '../src/run'
+import { run } from '../src/run.js'
 
 jest.mock('../src/awsSecretsManager')
 const getCurrentVersionId = awsSecretsManager.getCurrentVersionId as jest.Mock
