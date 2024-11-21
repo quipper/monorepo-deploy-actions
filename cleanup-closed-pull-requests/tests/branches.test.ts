@@ -1,5 +1,5 @@
 import * as github from '@actions/github'
-import { deleteNamespaceBranches } from '../src/branches'
+import { deleteNamespaceBranches } from '../src/branches.js'
 
 const octokitMock = {
   paginate: <T>(f: (...args: unknown[]) => T, ...args: unknown[]) => f(args),

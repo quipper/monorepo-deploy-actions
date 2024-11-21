@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { deleteNamespaceApplicationsWithRetry } from './applications'
-import { deleteNamespaceBranches } from './branches'
+import { deleteNamespaceApplicationsWithRetry } from './applications.js'
+import { deleteNamespaceBranches } from './branches.js'
 
 type Inputs = {
   overlay: string
