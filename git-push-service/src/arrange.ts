@@ -2,7 +2,7 @@ import { promises as fs } from 'fs'
 import * as core from '@actions/core'
 import * as io from '@actions/io'
 import * as path from 'path'
-import { Application, generateApplicationManifest } from './application'
+import { Application, generateApplicationManifest } from './application.js'
 
 type Inputs = {
   workspace: string

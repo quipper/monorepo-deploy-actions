@@ -3,11 +3,11 @@ import { promises as fs } from 'fs'
 import * as path from 'path'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as git from './git'
+import * as git from './git.js'
 import * as glob from '@actions/glob'
-import { arrangeManifests } from './arrange'
-import { retry } from './retry'
-import { updateBranchByPullRequest } from './pull'
+import { arrangeManifests } from './arrange.js'
+import { retry } from './retry.js'
+import { updateBranchByPullRequest } from './pull.js'
 
 type Inputs = {
   manifests: string

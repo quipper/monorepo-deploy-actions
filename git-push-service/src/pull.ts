@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as git from './git'
-import { catchHttpStatus, retry } from './retry'
+import * as git from './git.js'
+import { catchHttpStatus, retry } from './retry.js'
 
 type Inputs = {
   owner: string
