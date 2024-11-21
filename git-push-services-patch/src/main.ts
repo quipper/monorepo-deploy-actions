@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { operationOf, run } from './run'
+import { operationOf, run } from './run.js'
 
 const main = async (): Promise<void> => {
   await run({
