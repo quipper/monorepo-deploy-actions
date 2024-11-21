@@ -1,5 +1,5 @@
-import { Context } from '../src/github'
-import { getCommitMessage, getPullRequestBody, getPullRequestTitle } from '../src/format'
+import { Context } from '../src/github.js'
+import { getCommitMessage, getPullRequestBody, getPullRequestTitle } from '../src/format.js'
 
 const context: Context = {
   actor: 'octocat',
