@@ -1,4 +1,4 @@
-import { Context } from './github'
+import { Context } from './github.js'
 
 type CommitMessageParams = {
   headBranch: string
