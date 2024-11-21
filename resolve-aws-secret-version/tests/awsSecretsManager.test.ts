@@ -1,6 +1,6 @@
 import { mockClient } from 'aws-sdk-client-mock'
 import { ListSecretVersionIdsCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
-import * as awsSecretsManager from '../src/awsSecretsManager'
+import * as awsSecretsManager from '../src/awsSecretsManager.js'
 
 const secretsManagerMock = mockClient(SecretsManagerClient)
 

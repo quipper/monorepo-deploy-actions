@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs'
 import * as core from '@actions/core'
 import * as yaml from 'js-yaml'
-import { assertKubernetesAWSSecret, isKubernetesObject } from './kubernetes'
+import { assertKubernetesAWSSecret, isKubernetesObject } from './kubernetes.js'
 
 interface AWSSecretsManager {
   getCurrentVersionId(secretId: string): Promise<string>
