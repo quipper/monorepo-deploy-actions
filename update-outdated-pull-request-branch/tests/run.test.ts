@@ -1,4 +1,4 @@
-import { isExpired } from '../src/run'
+import { isExpired } from '../src/run.js'
 
 describe('isExpired', () => {
   const now = () => Date.parse('2021-02-03T04:05:06Z')
