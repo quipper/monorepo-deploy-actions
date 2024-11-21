@@ -1,7 +1,7 @@
 import * as os from 'os'
 import { promises as fs } from 'fs'
 import * as path from 'path'
-import { arrangeManifests } from '../src/arrange'
+import { arrangeManifests } from '../src/arrange.js'
 
 const readContent = async (f: string) => (await fs.readFile(f)).toString()
 
