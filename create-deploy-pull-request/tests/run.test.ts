@@ -1,4 +1,4 @@
-import { run } from '../src/run'
+import { run } from '../src/run.js'
 import { RequestError } from '@octokit/request-error'
 
 const octokitMock = {
