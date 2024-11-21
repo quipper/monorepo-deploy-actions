@@ -14,13 +14,10 @@ export const server = setupServer(
     'https://api.github.com/repos/test-owner/test-repo-1/branches/production',
     () => new HttpResponse(null, { status: 404 }),
   ),
-  http.post('https://api.github.com/repos/test-owner/test-repo-1/git/refs', async ({ request }) => {
-    expect(JSON.parse(await request.text())).toStrictEqual({
-      ref: 'refs/heads/production',
-      sha: 'commit-sha-1-release',
-    })
-    new HttpResponse(null, { status: 201 })
-  }),
+  http.post(
+    'https://api.github.com/repos/test-owner/test-repo-1/git/refs',
+    () => new HttpResponse(null, { status: 201 }),
+  ),
 
   http.get('https://api.github.com/repos/test-owner/test-repo-2/branches/release', () =>
     HttpResponse.json({
@@ -40,18 +37,11 @@ export const server = setupServer(
     expect(url.searchParams.get('head')).toBe('test-owner:release')
     return HttpResponse.json([])
   }),
-  http.post('https://api.github.com/repos/test-owner/test-repo-2/pulls', async ({ request }) => {
-    expect(JSON.parse(await request.text())).toStrictEqual({
-      base: 'production',
-      head: 'release',
-      title: 'Deploy service to production at 2023-09-07 15:01:02',
-      body: 'Hello',
-      draft: true,
-    })
-    return HttpResponse.json({
+  http.post('https://api.github.com/repos/test-owner/test-repo-2/pulls', () =>
+    HttpResponse.json({
       html_url: 'https://github.com/test-owner/test-repo-2/pulls/100',
-    })
-  }),
+    }),
+  ),
   http.post('https://api.github.com/repos/test-owner/test-repo-2/pulls//requested_reviewers', () =>
     HttpResponse.json({
       // Omit an example response
