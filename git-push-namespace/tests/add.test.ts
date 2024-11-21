@@ -1,7 +1,7 @@
 import * as os from 'os'
 import { promises as fs } from 'fs'
 import * as path from 'path'
-import { addNamespace } from '../src/add'
+import { addNamespace } from '../src/add.js'
 
 test('add a namespace', async () => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-namespace-'))
