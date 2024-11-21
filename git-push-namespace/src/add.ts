@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as io from '@actions/io'
 import { promises as fs } from 'fs'
-import { generateApplicationManifest } from './application'
+import { generateApplicationManifest } from './application.js'
 
 type Inputs = {
   workspace: string

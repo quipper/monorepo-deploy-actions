@@ -3,9 +3,9 @@ import { promises as fs } from 'fs'
 import * as path from 'path'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as git from './git'
-import { addNamespace } from './add'
-import { retry } from './retry'
+import * as git from './git.js'
+import { addNamespace } from './add.js'
+import { retry } from './retry.js'
 
 interface Inputs {
   overlay: string
