@@ -1,7 +1,7 @@
 import * as github from '@actions/github'
 import { minimatch } from 'minimatch'
-import { Environment, Rule, Rules } from './rule'
-import { assertPullRequestPayload } from './github'
+import { Environment, Rule, Rules } from './rule.js'
+import { assertPullRequestPayload } from './github.js'
 
 type Context = Pick<typeof github.context, 'eventName' | 'ref' | 'payload'>
 

@@ -1,4 +1,4 @@
-import { Rules, parseRulesYAML } from '../src/rule'
+import { Rules, parseRulesYAML } from '../src/rule.js'
 
 test('parse a valid YAML', () => {
   const yaml = `

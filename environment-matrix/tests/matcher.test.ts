@@ -1,5 +1,5 @@
-import { find } from '../src/matcher'
-import { Rules } from '../src/rule'
+import { find } from '../src/matcher.js'
+import { Rules } from '../src/rule.js'
 
 const rules: Rules = [
   {
