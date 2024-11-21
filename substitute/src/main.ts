@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { parseVariables, run } from '../src/run'
+import { parseVariables, run } from '../src/run.js'
 
 async function main(): Promise<void> {
   await run({
