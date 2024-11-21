@@ -1,9 +1,9 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as git from './git'
-import { syncServicesFromPrebuilt } from './prebuilt'
-import { retryExponential } from './retry'
-import { writeNamespaceManifest } from './namespace'
+import * as git from './git.js'
+import { syncServicesFromPrebuilt } from './prebuilt.js'
+import { retryExponential } from './retry.js'
+import { writeNamespaceManifest } from './namespace.js'
 
 type Inputs = {
   overlay: string

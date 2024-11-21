@@ -1,7 +1,7 @@
 import * as os from 'os'
 import * as path from 'path'
 import { promises as fs } from 'fs'
-import { syncServicesFromPrebuilt } from '../src/prebuilt'
+import { syncServicesFromPrebuilt } from '../src/prebuilt.js'
 
 const readContent = async (filename: string) => (await fs.readFile(filename)).toString()
 
