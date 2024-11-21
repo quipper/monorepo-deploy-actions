@@ -11,5 +11,8 @@
     "@actions/core": "1.11.1",
     "@actions/github": "6.0.0",
     "@octokit/request-error": "5.0.1"
+  },
+  "devDependencies": {
+    "msw": "2.6.5"
   }
 }
