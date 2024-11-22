@@ -71,4 +71,6 @@ jobs:
 
 ### Outputs
 
-None.
+| Name               | Description                        |
+| ------------------ | ---------------------------------- |
+| `pull-request-url` | URL of the pull request if created |

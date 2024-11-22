@@ -29,6 +29,10 @@ inputs:
     required: true
     default: ${{ github.token }}
 
+outputs:
+  pull-request-url:
+    description: URL of the pull request if created
+
 runs:
   using: 'node20'
   main: 'dist/index.js'

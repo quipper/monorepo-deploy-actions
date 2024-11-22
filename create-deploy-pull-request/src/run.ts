@@ -19,7 +19,11 @@ type Inputs = {
   timeZone: string | undefined
 }
 
-export const run = async (inputs: Inputs, octokit: Octokit): Promise<void> => {
+type Outputs = {
+  pullRequestUrl?: string
+}
+
+export const run = async (inputs: Inputs, octokit: Octokit): Promise<Outputs> => {
   core.info(`Checking if ${inputs.base} branch exists`)
   const baseBranchExists = await checkIfBranchExists(octokit, {
     owner: inputs.owner,
@@ -35,12 +39,12 @@ export const run = async (inputs: Inputs, octokit: Octokit): Promise<void> => {
       toBranch: inputs.base,
     })
     core.summary.addRaw(`Created ${inputs.base} branch`, true)
-    return
+    return {}
   }
 
   core.info(`Creating a pull request from ${inputs.head} to ${inputs.base}`)
   const timestamp = formatISO8601LocalTime(inputs.now(), inputs.timeZone)
-  await createPull(octokit, {
+  const pull = await createPull(octokit, {
     owner: inputs.owner,
     repo: inputs.repo,
     head: inputs.head,
@@ -52,6 +56,9 @@ export const run = async (inputs: Inputs, octokit: Octokit): Promise<void> => {
     reviewers: [inputs.actor],
     assignees: [inputs.actor],
   })
+  return {
+    pullRequestUrl: pull.html_url,
+  }
 }
 
 // https://stackoverflow.com/questions/25050034/get-iso-8601-using-intl-datetimeformat
