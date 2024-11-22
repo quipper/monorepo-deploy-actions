@@ -3,7 +3,7 @@ import * as github from '@actions/github'
 import { run } from './run.js'
 
 const main = async (): Promise<void> => {
-  await run(
+  const outputs = await run(
     {
       head: core.getInput('head-branch', { required: true }),
       base: core.getInput('base-branch', { required: true }),
@@ -20,6 +20,9 @@ const main = async (): Promise<void> => {
     github.getOctokit(core.getInput('token', { required: true })),
   )
   await core.summary.write()
+  if (outputs.pullRequestUrl) {
+    core.setOutput('pull-request-url', outputs.pullRequestUrl)
+  }
 }
 
 main().catch((e: Error) => {

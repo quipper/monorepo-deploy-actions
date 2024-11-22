@@ -24,7 +24,7 @@ it('should create base branch if not exist', async () => {
       () => new HttpResponse(null, { status: 201 }),
     ),
   )
-  await run(
+  const outputs = await run(
     {
       head: 'release',
       base: 'production',
@@ -40,6 +40,7 @@ it('should create base branch if not exist', async () => {
     },
     getOctokit(),
   )
+  expect(outputs.pullRequestUrl).toBeUndefined()
 })
 
 it('should create pull request if base branch exists', async () => {
@@ -78,7 +79,7 @@ it('should create pull request if base branch exists', async () => {
       }),
     ),
   )
-  await run(
+  const outputs = await run(
     {
       head: 'release',
       base: 'production',
@@ -94,4 +95,5 @@ it('should create pull request if base branch exists', async () => {
     },
     getOctokit(),
   )
+  expect(outputs.pullRequestUrl).toBe('https://github.com/test-owner/test-repo-2/pulls/100')
 })

@@ -16,7 +16,11 @@ type CreatePullOptions = {
   assignees: string[]
 }
 
-export const createPull = async (octokit: Octokit, options: CreatePullOptions) => {
+type Pull = {
+  html_url: string
+}
+
+export const createPull = async (octokit: Octokit, options: CreatePullOptions): Promise<Pull> => {
   core.info(`Finding an existing pull request of ${options.head} -> ${options.base}`)
   const { data: exists } = await octokit.rest.pulls.list({
     owner: options.owner,
@@ -30,7 +34,7 @@ export const createPull = async (octokit: Octokit, options: CreatePullOptions) =
     core.info(`Already exists: ${exists.map((pull) => pull.html_url).join()}`)
     const pull = exists[0]
     core.summary.addRaw(`Already exists [#${pull.number} ${pull.title}](${pull.html_url})`, true)
-    return
+    return pull
   }
 
   core.info(`Creating a pull request from ${options.head} to ${options.base}`)
@@ -73,4 +77,5 @@ export const createPull = async (octokit: Octokit, options: CreatePullOptions) =
       labels: options.labels,
     })
   }
+  return pull
 }
