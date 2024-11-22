@@ -3,6 +3,8 @@ import * as github from '@actions/github'
 import { createPull } from './pull.js'
 import { checkIfBranchExists, createBranch } from './branch.js'
 
+type Octokit = ReturnType<typeof github.getOctokit>
+
 type Inputs = {
   head: string
   base: string
@@ -15,12 +17,9 @@ type Inputs = {
   actor: string
   now: () => Date
   timeZone: string | undefined
-  token: string
 }
 
-export const run = async (inputs: Inputs): Promise<void> => {
-  const octokit = github.getOctokit(inputs.token)
-
+export const run = async (inputs: Inputs, octokit: Octokit): Promise<void> => {
   core.info(`Checking if ${inputs.base} branch exists`)
   const baseBranchExists = await checkIfBranchExists(octokit, {
     owner: inputs.owner,
