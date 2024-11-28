@@ -1,7 +1,7 @@
 import * as git from '../src/git.js'
 import * as os from 'os'
 import * as path from 'path'
-import { deleteNamespaceApplicationsWithRetry } from '../src/applications.js'
+import { deleteNamespaceApplicationsWithRetry, extractPullRequestNumber } from '../src/applications.js'
 import { promises as fs } from 'fs'
 
 jest.mock('../src/git')
@@ -114,3 +114,13 @@ const listFilenames = async (dir: string) =>
   (await fs.readdir(dir, { withFileTypes: true })).filter((e) => e.isFile()).map((e) => e.name)
 
 const dateMinutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60 * 1000)
+
+describe('extractPullRequestNumber', () => {
+  it('should extract pull request number', () => {
+    expect(extractPullRequestNumber('pr-1234567.yaml', 'pr-')).toEqual(1234567)
+  })
+
+  it('should return undefined if not matched', () => {
+    expect(extractPullRequestNumber('foo-123.yaml', 'pr-')).toBeUndefined()
+  })
+})
