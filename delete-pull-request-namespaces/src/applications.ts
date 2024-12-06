@@ -119,12 +119,12 @@ const findApplications = async (cwd: string, opts: DeleteNamespaceApplicationsOp
   return applications
 }
 
-const extractPullRequestNumber = (filename: string, prefix: string, suffix = '.yaml'): number | undefined => {
-  if (!filename.startsWith(prefix) || !filename.endsWith(suffix)) {
+const extractPullRequestNumber = (filename: string, prefix: string): number | undefined => {
+  if (!filename.startsWith(prefix)) {
     return
   }
   const withoutPrefix = filename.substring(prefix.length)
-  const withoutSuffix = withoutPrefix.substring(0, suffix.length)
+  const withoutSuffix = withoutPrefix.replace(/\..+$/, '')
   const n = Number.parseInt(withoutSuffix)
   if (Number.isSafeInteger(n)) {
     return n
