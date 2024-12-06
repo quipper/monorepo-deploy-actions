@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import { GitHub } from '@actions/github/lib/utils'
+import { extractPullRequestNumber } from './applications'
 
 type Octokit = InstanceType<typeof GitHub>
 
@@ -87,15 +88,4 @@ const findBranches = async (octokit: Octokit, opts: DeleteNamespaceBranchesOptio
     })
   }
   return branches
-}
-
-const extractPullRequestNumber = (namespace: string, prefix: string): number | undefined => {
-  if (!namespace.startsWith(prefix)) {
-    return
-  }
-  const withoutPrefix = namespace.substring(prefix.length)
-  const n = Number.parseInt(withoutPrefix)
-  if (Number.isSafeInteger(n)) {
-    return n
-  }
 }
