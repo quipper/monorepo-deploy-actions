@@ -8,7 +8,7 @@
     "@tsconfig/recommended": "1.0.8",
     "@types/jest": "29.5.14",
     "@types/node": "20.17.9",
-    "@typescript-eslint/parser": "8.17.0",
+    "@typescript-eslint/parser": "8.18.0",
     "@vercel/ncc": "0.38.3",
     "eslint": "9.16.0",
     "eslint-plugin-jest": "28.9.0",
@@ -16,7 +16,7 @@
     "prettier": "3.4.2",
     "ts-jest": "29.2.5",
     "typescript": "5.7.2",
-    "typescript-eslint": "8.17.0"
+    "typescript-eslint": "8.18.0"
   },
   "scripts": {
     "format": "prettier --write **/*.ts",
