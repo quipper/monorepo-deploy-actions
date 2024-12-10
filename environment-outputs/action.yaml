@@ -1,0 +1,19 @@
+name: environment-matrix
+description: generate a JSON for matrix deploy
+inputs:
+  rules:
+    description: YAML string of rules
+    required: true
+  service:
+    description: Name of service. If set, create GitHub Deployment
+    required: false
+  token:
+    description: GitHub token, required if service is set
+    required: false
+    default: ${{ github.token }}
+outputs:
+  github-deployment-url:
+    description: URL of the GitHub Deployment, e.g. https://api.github.com/repos/octocat/example/deployments/1
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

@@ -1,0 +1,65 @@
+name: environment-outputs
+
+on:
+  pull_request:
+    paths:
+      - environment-outputs/**
+      - '*.json'
+      - '*.yaml'
+      - .github/workflows/environment-outputs.yaml
+  push:
+    branches:
+      - main
+    paths:
+      - environment-outputs/**
+      - '*.json'
+      - '*.yaml'
+      - .github/workflows/environment-outputs.yaml
+
+defaults:
+  run:
+    working-directory: environment-outputs
+  
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: 20
+      - run: corepack enable pnpm
+      - run: pnpm i
+      - run: pnpm test
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: 20
+      - run: corepack enable pnpm
+      - run: pnpm i
+      - run: pnpm build
+      - uses: ./environment-outputs
+        id: environment
+        with:
+          service: example
+          rules: |
+            - pull_request:
+                base: '**'
+                head: '**'
+              outputs:
+                overlay: pr
+                namespace: pr-${{ github.event.pull_request.number }}
+            - push:
+                ref: refs/heads/main
+              outputs:
+                overlay: development
+                namespace: development
+      - run: echo 'overlay=${{ steps.environment.outputs.overlay }}'
+      - run: echo 'namespace=${{ steps.environment.outputs.namespace }}'
+      - run: echo 'github-deployment-url=${{ steps.environment.outputs.github-deployment-url }}'
