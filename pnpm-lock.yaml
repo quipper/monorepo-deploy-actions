@@ -98,8 +98,8 @@ importers:
         version: 5.0.1
     devDependencies:
       msw:
-        specifier: 2.6.8
-        version: 2.6.8(@types/node@20.17.10)(typescript@5.7.2)
+        specifier: 2.6.9
+        version: 2.6.9(@types/node@20.17.10)(typescript@5.7.2)
 
   delete-pull-request-namespaces:
     dependencies:
@@ -1987,8 +1987,8 @@ packages:
   ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
 
-  msw@2.6.8:
-    resolution: {integrity: sha512-nxXxnH6WALZ9a7rsQp4HU2AaD4iGAiouMmE/MY4al7pXTibgA6OZOuKhmN2WBIM6w9qMKwRtX8p2iOb45B2M/Q==}
+  msw@2.6.9:
+    resolution: {integrity: sha512-b2z9MvsEOYG5G7jtJasXO3ucHDcqCjf046e9wELIixBbYCRZCEmB4gqcb+C7ASyXBafNBR0D2u31YtG01OdX3A==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -4899,7 +4899,7 @@ snapshots:
 
   ms@2.1.2: {}
 
-  msw@2.6.8(@types/node@20.17.10)(typescript@5.7.2):
+  msw@2.6.9(@types/node@20.17.10)(typescript@5.7.2):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
