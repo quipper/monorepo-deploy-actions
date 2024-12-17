@@ -2,19 +2,23 @@ import { promises as fs } from 'fs'
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 
-interface Inputs {
+type Inputs = {
   files: string
   variables: Map<string, string>
 }
 
 export const parseVariables = (variables: string[]): Map<string, string> => {
-  const m = new Map<string, string>()
+  const map = new Map<string, string>()
   for (const s of variables) {
-    const k = s.substring(0, s.indexOf('='))
-    const v = s.substring(s.indexOf('=') + 1)
-    m.set(k, v)
+    const equalIndex = s.indexOf('=')
+    if (equalIndex === -1) {
+      throw new Error(`variable must be in the form of key=value: ${s}`)
+    }
+    const k = s.substring(0, equalIndex)
+    const v = s.substring(equalIndex + 1)
+    map.set(k, v)
   }
-  return m
+  return map
 }
 
 export const run = async (inputs: Inputs): Promise<void> => {

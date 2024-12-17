@@ -1,7 +1,7 @@
 import * as os from 'os'
 import { promises as fs } from 'fs'
 import * as path from 'path'
-import { run } from '../src/run.js'
+import { parseVariables, run } from '../src/run.js'
 
 test('variables are replaced', async () => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'substitute-action-'))
@@ -27,3 +27,21 @@ image: 123456789012.dkr.ecr.ap-northeast-1.amazonaws.com/example:latest
 })
 
 const readContent = async (f: string): Promise<string> => (await fs.readFile(f)).toString()
+
+describe('parseVariables', () => {
+  it('parses variables', () => {
+    expect(parseVariables(['DOCKER_IMAGE=123', 'NAMESPACE=develop', 'VERSION='])).toStrictEqual(
+      new Map([
+        ['DOCKER_IMAGE', '123'],
+        ['NAMESPACE', 'develop'],
+        ['VERSION', ''],
+      ]),
+    )
+  })
+
+  it('throws an error if variable is not in the form of key=value', () => {
+    expect(() => parseVariables(['DOCKER_IMAGE=123', 'NAMESPACE'])).toThrow(
+      'variable must be in the form of key=value: NAMESPACE',
+    )
+  })
+})
