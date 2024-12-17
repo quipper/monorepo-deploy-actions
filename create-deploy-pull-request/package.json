@@ -13,6 +13,6 @@
     "@octokit/request-error": "5.0.1"
   },
   "devDependencies": {
-    "msw": "2.6.9"
+    "msw": "2.7.0"
   }
 }
