@@ -60,7 +60,6 @@ Here are the definitions of words.
 
 | Name                     | Description                                 | Example    |
 | ------------------------ | ------------------------------------------- | ---------- |
-| `source-repository-name` | Name of the source repository               | `monorepo` |
 | `overlay`                | Name of the overlay to build with Kustomize | `staging`  |
 | `namespace`              | Namespace to deploy into a cluster          | `pr-12345` |
 | `service`                | Name of a microservice                      | `backend`  |
@@ -69,7 +68,25 @@ Here are the definitions of words.
 
 We adopt [App of Apps pattern of Argo CD](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/) for deployment hierarchy.
 
-### Destination repository
+For a typical namespace such as develop or production, it is deployed with the below applications.
+
+```mermaid
+graph LR
+  App[Application monorepo--develop]
+  subgraph "generated-manifests"
+    App --> AppService[Application develop--SERVICE] --> Resources
+  end
+```
+
+For a pull request namespace, it is deployed with the below applications and [the pull request generator](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Pull-Request/).
+
+```mermaid
+graph LR
+  subgraph "generated-manifests"
+    AppService[Application pr-NUMBER--SERVICE] --> Resources
+  end
+  AppSet[ApplicationSet monorepo--pr] --> AppPr[Application pr-NUMBER] --> AppService
+```
 
 A namespace branch contains a set of generated manifest and Application manifest per a service.
 

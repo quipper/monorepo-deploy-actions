@@ -1,3 +1,10 @@
+# :warning: DEPRECATED
+
+Use [the pull request generator](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Pull-Request/) instead.
+This action will be removed in the future.
+
+---
+
 # cleanup-closed-pull-requests [![cleanup-closed-pull-requests](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/cleanup-closed-pull-requests.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/cleanup-closed-pull-requests.yaml)
 
 This is an action to delete the namespaces of closed pull requests.

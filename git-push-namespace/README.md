@@ -1,3 +1,10 @@
+# :warning: DEPRECATED
+
+Use [the pull request generator](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Pull-Request/) instead.
+This action will be removed in the future.
+
+---
+
 # git-push-namespace
 
 This is an action to push an Argo CD `Application` manifest to deploy a namespace.
