@@ -73,9 +73,9 @@ For a typical namespace such as develop or production, it is deployed with the b
 ```mermaid
 graph LR
   subgraph "generated-manifests"
-    App --> AppService[Application develop--SERVICE] --> Resources
+    AppService[Application develop--SERVICE] --> Resources
   end
-  App[Application monorepo--develop]
+  App[Application monorepo--develop] --> AppService
 ```
 
 For a pull request namespace, it is deployed with the below applications and [the pull request generator](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Pull-Request/).
