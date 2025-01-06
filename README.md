@@ -2,15 +2,12 @@
 
 This is a set of GitHub Actions to deploy microservices in a mono-repository (monorepo).
 
-## Motivation
-
-TODO
-
-## Concept
+## Design
 
 ### Structure of monorepo
 
-In Quipper, our monorepo contains a set of microservices with Kubernetes manifests, for example,
+Our monorepo contains a set of microservices with application code and Kubernetes manifests.
+Here is the directory structure.
 
 ```
 monorepo
@@ -81,18 +78,6 @@ Here are the definitions of words.
 | `service`                | name of microservice                    | `backend` or `frontend` |
 
 ### Destination repository
-
-We stores generated manifests into a repository.
-Argo CD syncs between the repository and cluster.
-
-main branch of the repository contains Application manifests.
-
-```
-destination-repository  (branch: main)
-└── ${source-repository-name}
-    └── ${overlay}
-        └── ${namespace}.yaml  (Application)
-```
 
 A namespace branch contains a set of generated manifest and Application manifest per a service.
 
