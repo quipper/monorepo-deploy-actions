@@ -7,7 +7,7 @@ This is a set of GitHub Actions to deploy microservices in a mono-repository (mo
 ### Structure of monorepo
 
 Our monorepo contains a set of microservices with application code and Kubernetes manifests.
-Here is the directory structure.
+Here is the example of directory structure.
 
 ```
 monorepo
@@ -56,26 +56,18 @@ monorepo
                 └── kustomization.yaml
 ```
 
+Here are the definitions of words.
+
+| Name                     | Description                                 | Example    |
+| ------------------------ | ------------------------------------------- | ---------- |
+| `source-repository-name` | Name of the source repository               | `monorepo` |
+| `overlay`                | Name of the overlay to build with Kustomize | `staging`  |
+| `namespace`              | Namespace to deploy into a cluster          | `pr-12345` |
+| `service`                | Name of a microservice                      | `backend`  |
+
 ### Structure of Argo CD Applications
 
 We adopt [App of Apps pattern of Argo CD](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/) for deployment hierarchy.
-To deploy multiple microservices (which are built from an overlay) to a namespace, we creates the following applications into Argo CD:
-
-```
-${source-repository-name}  (Application)
-└── ${overlay}  (Application)
-    └── ${namespace}  (Application)
-        └── ${service}  (Application)
-```
-
-Here are the definitions of words.
-
-| Name                     | Description                             | Example                 |
-| ------------------------ | --------------------------------------- | ----------------------- |
-| `source-repository-name` | name of source repository               | `monorepo`              |
-| `overlay`                | name of overlay to build with Kustomize | `staging`               |
-| `namespace`              | namespace to deploy into a cluster      | `pr-12345`              |
-| `service`                | name of microservice                    | `backend` or `frontend` |
 
 ### Destination repository
 
