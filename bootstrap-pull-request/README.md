@@ -37,7 +37,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      # This action needs to be run after all services are pushed.
+      - uses: int128/wait-for-workflows-action@v1
+        with:
+          filter-workflow-names: |
+            * / deploy
       - uses: quipper/monorepo-deploy-actions/bootstrap-pull-request@v1
         with:
           overlay: pr
@@ -75,10 +80,41 @@ prebuilt/${source-repository}/${overlay}
 
 It bootstraps the namespace branch by the following steps:
 
-- Sync the services from prebuilt branch.
-- Write the namespace manifest
+1. Delete the outdated application manifests
+2. Copy the services from prebuilt branch
+3. Write the namespace manifest
 
-### Sync the services from prebuilt branch
+### 1. Delete the outdated application manifests
+
+This action deletes the outdated application manifests in the namespace branch.
+If an application manifest is pushed by `git-push-service` action on the current commit, this action preserves the application manifest.
+Otherwise, this action deletes the application manifest.
+
+For example, if the namespace branch has the below application manifests,
+this action deletes `applications/pr-123--backend.yaml`.
+
+```yaml
+# applications/pr-123--backend.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    github.action: bootstrap-pull-request
+```
+
+```yaml
+# applications/pr-123--frontend.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    github.action: git-push-service
+    github.sha: 0123456789abcdef0123456789abcdef01234567 # The current commit
+```
+
+Note that this action needs to be run after all of `git-push-service` actions.
+
+### 2. Copy the services from prebuilt branch
 
 This action copies the services from prebuilt branch to the namespace branch.
 
@@ -97,49 +133,13 @@ the namespace branch will be the below structure.
         └── generated.yaml
 ```
 
+If the namespace branch contains any application manifests, this action will not overwrite them.
+
 All placeholders will be replaced during copying the service manifests.
 For example, if `NAMESPACE=pr-123` is given by `substitute-variables` input,
-this action will replace `${NAMESPACE}` with `pr-123`. 
+this action will replace `${NAMESPACE}` with `pr-123`.
 
-If a service was pushed by `git-push-service` action,
-this action does not overwrite it.
-
-**Case 1**: If a service is not changed in a pull request,
-
-1. When a pull request is created, this action copies the service from prebuilt branch.
-1. When the pull request is updated, this action copies the service from prebuilt branch.
-   This is needed to follow the latest change of prebuilt branch.
-
-**Case 2**: If a service is changed in a pull request,
-
-1. When a pull request is created,
-   - This action copies the service from prebuilt branch.
-   - `git-push-service` action overwrites the service.
-1. When the pull request is synchronized,
-   - This action does not overwrite the service.
-
-If the namespace branch has the outdated applications, this action will delete them.
-For the below example,
-this action will delete `pr-123--outdated.yaml` because the prebuilt branch does not have `outdated` service.
-
-```
-Prebuilt branch:
-.
-└── services
-    ├── backend
-    └── frontend
-
-Namespace branch:
-.
-├── applications
-|   ├── pr-123--backend.yaml
-|   └── pr-123--frontend.yaml
-|   └── pr-123--outdated.yaml    <-- deleted
-└── services
-    └── ...
-```
-
-### Write the namespace manifest
+### 3. Write the namespace manifest
 
 This action copies the namespace manifest to path `/applications/namespace.yaml` in the namespace branch.
 
@@ -151,7 +151,7 @@ This action copies the namespace manifest to path `/applications/namespace.yaml`
 
 All placeholders will be replaced during copying the namespace manifest.
 For example, if `NAMESPACE=pr-123` is given by `substitute-variables` input,
-this action will replace `${NAMESPACE}` with `pr-123`. 
+this action will replace `${NAMESPACE}` with `pr-123`.
 
 ## Specification
 
