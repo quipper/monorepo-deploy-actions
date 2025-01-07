@@ -5,7 +5,7 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as git from './git.js'
 import * as glob from '@actions/glob'
-import { arrangeManifests } from './arrange.js'
+import { writeManifests } from './arrange.js'
 import { retry } from './retry.js'
 import { updateBranchByPullRequest } from './pull.js'
 
@@ -54,7 +54,7 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
 
 const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-service-action-'))
-  core.info(`created workspace at ${workspace}`)
+  core.info(`Created a workspace at ${workspace}`)
 
   const [owner, repo] = inputs.destinationRepository.split('/')
   const project = github.context.repo.repo
@@ -63,42 +63,37 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
     branch = inputs.destinationBranch
   }
 
-  core.startGroup(`checkout branch ${branch} if exist`)
+  core.startGroup(`Checking out the branch ${branch} if exist`)
   await git.init(workspace, owner, repo, inputs.token)
   const branchNotExist = (await git.checkoutIfExist(workspace, branch)) > 0
   core.endGroup()
 
-  const applicationAnnotations = [
-    ...inputs.applicationAnnotations,
-    `github.ref=${github.context.ref}`,
-    `github.sha=${github.context.sha}`,
-    `github.action=git-push-service`,
-  ]
-
-  core.startGroup(`arrange manifests into workspace ${workspace}`)
-  await arrangeManifests({
+  core.startGroup(`Writing the manifests into workspace ${workspace}`)
+  await writeManifests({
     workspace,
     manifests,
     service: inputs.service,
     namespace: inputs.namespace,
     project,
     branch,
-    applicationAnnotations,
+    applicationAnnotations: inputs.applicationAnnotations,
     destinationRepository: inputs.destinationRepository,
+    currentRef: github.context.ref,
+    currentSha: github.context.sha,
   })
   core.endGroup()
 
   const status = await git.status(workspace)
   if (status === '') {
-    core.info('nothing to commit')
+    core.info('Nothing to commit')
     return {}
   }
   const message = `Deploy ${project}/${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
   core.summary.addHeading(`Deploy ${project}/${inputs.namespace}/${inputs.service}`)
-  await core.group(`create a commit`, () => git.commit(workspace, message))
+  await core.group(`Creating a commit`, () => git.commit(workspace, message))
 
   if (!inputs.updateViaPullRequest) {
-    const code = await core.group(`push branch ${branch}`, () => git.pushByFastForward(workspace, branch))
+    const code = await core.group(`Pushing the branch ${branch}`, () => git.pushByFastForward(workspace, branch))
     if (code > 0) {
       return new Error(`failed to push branch ${branch} by fast-forward`)
     }
@@ -108,7 +103,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
   }
 
   if (branchNotExist) {
-    const code = await core.group(`push a new branch ${branch}`, () => git.pushByFastForward(workspace, branch))
+    const code = await core.group(`Pushing a new branch ${branch}`, () => git.pushByFastForward(workspace, branch))
     if (code > 0) {
       return new Error(`failed to push a new branch ${branch} by fast-forward`)
     }
@@ -117,7 +112,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
     return {}
   }
 
-  core.info(`updating branch ${branch} by a pull request`)
+  core.info(`Updating branch ${branch} by a pull request`)
   return await updateBranchByPullRequest({
     owner,
     repo,
