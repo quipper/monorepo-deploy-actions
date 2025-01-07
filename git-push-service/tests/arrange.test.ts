@@ -1,22 +1,24 @@
 import * as os from 'os'
-import { promises as fs } from 'fs'
+import * as fs from 'fs/promises'
 import * as path from 'path'
-import { arrangeManifests } from '../src/arrange.js'
+import { writeManifests } from '../src/arrange.js'
 
-const readContent = async (f: string) => (await fs.readFile(f)).toString()
+const readContent = async (f: string) => await fs.readFile(f, 'utf-8')
 
-test('arrange a service manifest', async () => {
+it('writes the service and application manifests', async () => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-action-'))
 
-  await arrangeManifests({
+  await writeManifests({
     workspace,
     manifests: [path.join(__dirname, `fixtures/a/generated.yaml`)],
     branch: `ns/project/overlay/namespace`,
     namespace: 'namespace',
     service: 'a',
     project: 'project',
-    applicationAnnotations: ['github.ref=refs/heads/main'],
+    applicationAnnotations: ['example=foo'],
     destinationRepository: 'octocat/manifests',
+    currentRef: 'refs/heads/main',
+    currentSha: '1234567890abcdef',
   })
 
   expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
@@ -25,18 +27,20 @@ test('arrange a service manifest', async () => {
   )
 })
 
-it('should concatenate service manifests if multiple are given', async () => {
+it('concatenates the service manifests if multiple are given', async () => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-action-'))
 
-  await arrangeManifests({
+  await writeManifests({
     workspace,
     manifests: [path.join(__dirname, `fixtures/a/generated.yaml`), path.join(__dirname, `fixtures/b/generated.yaml`)],
     branch: `ns/project/overlay/namespace`,
     namespace: 'namespace',
     service: 'service',
     project: 'project',
-    applicationAnnotations: ['github.ref=refs/heads/main'],
+    applicationAnnotations: ['example=foo'],
     destinationRepository: 'octocat/manifests',
+    currentRef: 'refs/heads/main',
+    currentSha: '1234567890abcdef',
   })
 
   expect(await readContent(path.join(workspace, `services/service/generated.yaml`))).toBe(`\
@@ -45,7 +49,7 @@ ${await readContent(path.join(__dirname, `fixtures/a/generated.yaml`))}
 ${await readContent(path.join(__dirname, `fixtures/b/generated.yaml`))}`)
 })
 
-test('overwrite even if a file exists', async () => {
+it('overwrites if a file exists', async () => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-action-'))
 
   // put dummy files
@@ -55,15 +59,17 @@ test('overwrite even if a file exists', async () => {
   await fs.mkdir(path.join(workspace, `services/a`))
   await fs.writeFile(path.join(workspace, `services/a/generated.yaml`), 'fixture-generated-manifest')
 
-  await arrangeManifests({
+  await writeManifests({
     workspace,
     manifests: [path.join(__dirname, `fixtures/a/generated.yaml`)],
     branch: `ns/project/overlay/namespace`,
     namespace: 'namespace',
     service: 'a',
     project: 'project',
-    applicationAnnotations: ['github.ref=refs/heads/main'],
+    applicationAnnotations: ['example=foo'],
     destinationRepository: 'octocat/manifests',
+    currentRef: 'refs/heads/main',
+    currentSha: '1234567890abcdef',
   })
 
   expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
@@ -81,7 +87,10 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
+    example: foo
     github.ref: refs/heads/main
+    github.sha: 1234567890abcdef
+    github.action: git-push-service
 spec:
   project: project
   source:
