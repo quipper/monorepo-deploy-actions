@@ -65,7 +65,10 @@ It generates an `Application` manifest with the following properties:
 - metadata
   - name: `${namespace}--${service}`
   - namespace: `argocd`
-  - annotations: if given
+  - annotations
+    - `github.head-ref`: Ref name of the current head branch
+    - `github.head-sha`: SHA of the current head commit
+    - `github.action`: `git-push-service`
 - source
   - repoURL: `https://github.com/${destination-repository}.git`
   - targetRevision: `ns/${project}/${overlay}/${namespace}`

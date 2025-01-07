@@ -12,6 +12,8 @@ async function main(): Promise<void> {
     destinationBranch: core.getInput('destination-branch'),
     updateViaPullRequest: core.getBooleanInput('update-via-pull-request', { required: true }),
     token: core.getInput('token', { required: true }),
+    currentHeadRef: core.getInput('current-head-ref', { required: true }),
+    currentHeadSha: core.getInput('current-head-sha', { required: true }),
   })
   if (outputs.destinationPullRequestNumber !== undefined) {
     core.setOutput('destination-pull-request-number', outputs.destinationPullRequestNumber)
