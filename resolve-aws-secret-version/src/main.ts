@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import { run } from './run.js'
 
-async function main(): Promise<void> {
+const main = async () => {
   const inputs = {
     manifests: core.getInput('manifests'),
   }

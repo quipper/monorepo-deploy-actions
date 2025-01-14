@@ -1,13 +1,13 @@
 # resolve-aws-secret-version
 
-This is an action to resolve version IDs of `AWSSecret` in a manifest.
+This is an action to resolve the secret versions of manifests.
 It is designed for https://github.com/mumoshu/aws-secret-operator.
 
 ## Inputs
 
 | Name        | Type             | Description                    |
 | ----------- | ---------------- | ------------------------------ |
-| `manifests` | multiline string | Glob pattern(s) to manifest(s) |
+| `manifests` | Multiline string | Glob pattern(s) to manifest(s) |
 
 ## Example
 
