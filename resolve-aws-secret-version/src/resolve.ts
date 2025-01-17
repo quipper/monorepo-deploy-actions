@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises'
 import * as core from '@actions/core'
 import * as yaml from 'js-yaml'
-import { assertKubernetesAWSSecret, isKubernetesObject } from './kubernetes.js'
+import { assertKubernetesAWSSecret, assertKubernetesExternalSecret, isKubernetesObject } from './kubernetes.js'
 import assert from 'assert'
 
 type AWSSecretsManager = {
@@ -25,8 +25,8 @@ export const replaceSecretVersionIds = async (manifest: string, manager: AWSSecr
       `Finding the current versionId of ${awsSecret.kind}: name=${awsSecret.name}, secretId=${awsSecret.secretId}`,
     )
     const currentVersionId = await manager.getCurrentVersionId(awsSecret.secretId)
-    core.info(`Replacing ${awsSecret.versionId} with the current versionId ${currentVersionId}`)
-    resolved = resolved.replaceAll(awsSecret.versionId, currentVersionId)
+    core.info(`Replacing ${awsSecret.versionIdPlaceholder} with the current versionId ${currentVersionId}`)
+    resolved = resolved.replaceAll(awsSecret.versionIdPlaceholder, currentVersionId)
   }
   return resolved
 }
@@ -35,7 +35,7 @@ type AWSSecret = {
   kind: string
   name: string
   secretId: string
-  versionId: string
+  versionIdPlaceholder: string
 }
 
 const findAWSSecretsFromManifest = (manifest: string): AWSSecret[] => {
@@ -45,28 +45,49 @@ const findAWSSecretsFromManifest = (manifest: string): AWSSecret[] => {
     if (!isKubernetesObject(doc)) {
       continue
     }
-    if (doc.kind !== 'AWSSecret') {
-      continue
-    }
-    try {
-      assertKubernetesAWSSecret(doc)
-    } catch (error) {
-      if (error instanceof assert.AssertionError) {
-        core.error(`Invalid AWSSecret object: ${JSON.stringify(doc)}`)
-      }
-      throw error
-    }
-    const versionId = doc.spec.stringDataFrom.secretsManagerSecretRef.versionId
-    if (!versionId.startsWith('${') || !versionId.endsWith('}')) {
-      continue
-    }
 
-    secrets.push({
-      kind: doc.kind,
-      name: doc.metadata.name,
-      secretId: doc.spec.stringDataFrom.secretsManagerSecretRef.secretId,
-      versionId,
-    })
+    if (doc.kind === 'AWSSecret') {
+      try {
+        assertKubernetesAWSSecret(doc)
+      } catch (error) {
+        if (error instanceof assert.AssertionError) {
+          core.error(`Invalid AWSSecret object: ${JSON.stringify(doc)}`)
+        }
+        throw error
+      }
+      const versionIdPlaceholder = doc.spec.stringDataFrom.secretsManagerSecretRef.versionId
+      if (!versionIdPlaceholder.startsWith('${') || !versionIdPlaceholder.endsWith('}')) {
+        continue
+      }
+      secrets.push({
+        kind: doc.kind,
+        name: doc.metadata.name,
+        secretId: doc.spec.stringDataFrom.secretsManagerSecretRef.secretId,
+        versionIdPlaceholder,
+      })
+    } else if (doc.kind === 'ExternalSecret') {
+      try {
+        assertKubernetesExternalSecret(doc)
+      } catch (error) {
+        if (error instanceof assert.AssertionError) {
+          core.error(`Invalid ExternalSecret object: ${JSON.stringify(doc)}`)
+        }
+        throw error
+      }
+      for (const dataFrom of doc.spec.dataFrom) {
+        const version = dataFrom.extract.version
+        if (!version.startsWith('uuid/${') || !version.endsWith('}')) {
+          continue
+        }
+        const versionIdPlaceholder = version.substring('uuid/'.length)
+        secrets.push({
+          kind: doc.kind,
+          name: doc.metadata.name,
+          secretId: dataFrom.extract.key,
+          versionIdPlaceholder,
+        })
+      }
+    }
   }
   return secrets
 }

@@ -2,7 +2,7 @@ import { promises as fs } from 'fs'
 import * as os from 'os'
 import { replaceSecretVersionIds, updateManifest } from '../src/resolve.js'
 
-it('replaces the placeholder with the current version id', async () => {
+it('replaces the placeholder of AWSSecret with the current version id', async () => {
   const manager = { getCurrentVersionId: jest.fn() }
   manager.getCurrentVersionId.mockResolvedValue('c7ea50c5-b2be-4970-bf90-2237bef3b4cf')
 
@@ -13,6 +13,20 @@ it('replaces the placeholder with the current version id', async () => {
   await updateManifest(fixtureFile, manager)
   const output = (await fs.readFile(fixtureFile)).toString()
   const expected = (await fs.readFile(`${__dirname}/fixtures/expected-with-awssecret-placeholder.yaml`)).toString()
+  expect(output).toBe(expected)
+})
+
+it('replaces the placeholder of ExternalSecret with the current version id', async () => {
+  const manager = { getCurrentVersionId: jest.fn() }
+  manager.getCurrentVersionId.mockResolvedValue('c7ea50c5-b2be-4970-bf90-2237bef3b4cf')
+
+  const tempdir = await fs.mkdtemp(`${os.tmpdir()}/resolve-aws-secret-version-action-`)
+  const fixtureFile = `${tempdir}/fixture.yaml`
+  await fs.copyFile(`${__dirname}/fixtures/input-with-externalsecret-placeholder.yaml`, fixtureFile)
+
+  await updateManifest(fixtureFile, manager)
+  const output = (await fs.readFile(fixtureFile)).toString()
+  const expected = (await fs.readFile(`${__dirname}/fixtures/expected-with-externalsecret-placeholder.yaml`)).toString()
   expect(output).toBe(expected)
 })
 
