@@ -31,6 +31,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<void | Error> => {
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
 
   await syncServicesFromPrebuilt({
+    currentSha: github.context.sha,
     overlay: inputs.overlay,
     namespace: inputs.namespace,
     sourceRepositoryName,

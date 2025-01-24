@@ -3,15 +3,16 @@ import * as path from 'path'
 import { promises as fs } from 'fs'
 import { syncServicesFromPrebuilt } from '../src/prebuilt.js'
 
-const readContent = async (filename: string) => (await fs.readFile(filename)).toString()
+const readContent = async (filename: string) => await fs.readFile(filename, 'utf-8')
 
 const createEmptyDirectory = async () => await fs.mkdtemp(path.join(os.tmpdir(), 'bootstrap-pull-request-'))
 
 describe('syncServicesFromPrebuilt', () => {
-  it('should create the manifests if empty', async () => {
+  it('creates the manifests if empty', async () => {
     const namespaceDirectory = await createEmptyDirectory()
 
     await syncServicesFromPrebuilt({
+      currentSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
@@ -28,14 +29,15 @@ describe('syncServicesFromPrebuilt', () => {
     expect(await readContent(`${namespaceDirectory}/services/b/generated.yaml`)).toBe(serviceB)
   })
 
-  it('should overwrite a manifest if it was pushed by this action', async () => {
+  it('overwrites an outdated manifest', async () => {
     const namespaceDirectory = await createEmptyDirectory()
     await fs.mkdir(`${namespaceDirectory}/applications`)
     await fs.mkdir(`${namespaceDirectory}/services/a`, { recursive: true })
-    await fs.writeFile(`${namespaceDirectory}/applications/pr-123--a.yaml`, applicationA)
+    await fs.writeFile(`${namespaceDirectory}/applications/pr-123--a.yaml`, applicationPushedOnOutdatedCommit)
     await fs.writeFile(`${namespaceDirectory}/services/a/generated.yaml`, 'this-should-be-overwritten')
 
     await syncServicesFromPrebuilt({
+      currentSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
@@ -52,14 +54,15 @@ describe('syncServicesFromPrebuilt', () => {
     expect(await readContent(`${namespaceDirectory}/services/b/generated.yaml`)).toBe(serviceB)
   })
 
-  it('should not overwrite a manifest if it was pushed by git-push-service action', async () => {
+  it('preserves a service if it was pushed by git-push-action on the current commit', async () => {
     const namespaceDirectory = await createEmptyDirectory()
     await fs.mkdir(`${namespaceDirectory}/applications`)
     await fs.mkdir(`${namespaceDirectory}/services/a`, { recursive: true })
-    await fs.writeFile(`${namespaceDirectory}/applications/pr-123--a.yaml`, applicationAPushedByGitPushServiceAction)
+    await fs.writeFile(`${namespaceDirectory}/applications/pr-123--a.yaml`, applicationPushedOnCurrentCommit)
     await fs.writeFile(`${namespaceDirectory}/services/a/generated.yaml`, 'this-should-be-kept')
 
     await syncServicesFromPrebuilt({
+      currentSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
@@ -71,19 +74,20 @@ describe('syncServicesFromPrebuilt', () => {
 
     expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(
-      applicationAPushedByGitPushServiceAction,
+      applicationPushedOnCurrentCommit,
     )
     expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe('this-should-be-kept')
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--b.yaml`)).toBe(applicationB)
     expect(await readContent(`${namespaceDirectory}/services/b/generated.yaml`)).toBe(serviceB)
   })
 
-  it('should delete an outdated application manifest', async () => {
+  it('deletes a service which does not exist in the prebuilt branch', async () => {
     const namespaceDirectory = await createEmptyDirectory()
     await fs.mkdir(`${namespaceDirectory}/applications`)
-    await fs.writeFile(`${namespaceDirectory}/applications/pr-123--outdated.yaml`, applicationA)
+    await fs.writeFile(`${namespaceDirectory}/applications/pr-123--outdated.yaml`, applicationPushedOnOutdatedCommit)
 
     await syncServicesFromPrebuilt({
+      currentSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
@@ -102,15 +106,15 @@ describe('syncServicesFromPrebuilt', () => {
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--b.yaml`)).toBe(applicationB)
   })
 
-  it('should not delete an application manifest if it was pushed by git-push-service action', async () => {
+  it('preserves a service if it was pushed by old implementation of git-push-action', async () => {
     const namespaceDirectory = await createEmptyDirectory()
     await fs.mkdir(`${namespaceDirectory}/applications`)
-    await fs.writeFile(
-      `${namespaceDirectory}/applications/pr-123--outdated.yaml`,
-      applicationAPushedByGitPushServiceAction,
-    )
+    await fs.mkdir(`${namespaceDirectory}/services/a`, { recursive: true })
+    await fs.writeFile(`${namespaceDirectory}/applications/pr-123--a.yaml`, applicationPushedWithoutSha)
+    await fs.writeFile(`${namespaceDirectory}/services/a/generated.yaml`, 'this-should-be-kept')
 
     await syncServicesFromPrebuilt({
+      currentSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
@@ -120,16 +124,11 @@ describe('syncServicesFromPrebuilt', () => {
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual([
-      'pr-123--a.yaml',
-      'pr-123--b.yaml',
-      'pr-123--outdated.yaml', // should exist
-    ])
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
+    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
+    expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationPushedWithoutSha)
+    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe('this-should-be-kept')
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--b.yaml`)).toBe(applicationB)
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--outdated.yaml`)).toBe(
-      applicationAPushedByGitPushServiceAction,
-    )
+    expect(await readContent(`${namespaceDirectory}/services/b/generated.yaml`)).toBe(serviceB)
   })
 })
 
@@ -157,7 +156,7 @@ spec:
       prune: true
 `
 
-const applicationAPushedByGitPushServiceAction = `\
+const applicationPushedOnCurrentCommit = `\
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -167,6 +166,58 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
     github.action: git-push-service
+    github.head-sha: current-sha
+spec:
+  project: source-repository
+  source:
+    repoURL: https://github.com/octocat/destination-repository.git
+    targetRevision: ns/source-repository/pr/pr-123
+    path: services/a
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: pr-123
+  syncPolicy:
+    automated:
+      prune: true
+`
+
+// For the backward compatibility.
+const applicationPushedWithoutSha = `\
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pr-123--a
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    github.action: git-push-service
+    github.sha: this-annotation-was-used-in-the-old-implementation
+spec:
+  project: source-repository
+  source:
+    repoURL: https://github.com/octocat/destination-repository.git
+    targetRevision: ns/source-repository/pr/pr-123
+    path: services/a
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: pr-123
+  syncPolicy:
+    automated:
+      prune: true
+`
+
+const applicationPushedOnOutdatedCommit = `\
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pr-123--a
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    github.action: git-push-service
+    github.head-sha: outdated-sha
 spec:
   project: source-repository
   source:
