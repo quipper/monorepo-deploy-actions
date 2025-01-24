@@ -169,7 +169,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
     github.action: git-push-service
-    github.sha: current-sha
+    github.head-sha: current-sha
 spec:
   project: source-repository
   source:
@@ -194,7 +194,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
     github.action: git-push-service
-    github.sha: outdated-sha
+    github.head-sha: outdated-sha
 spec:
   project: source-repository
   source:

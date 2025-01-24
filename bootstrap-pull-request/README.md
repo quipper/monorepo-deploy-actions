@@ -109,7 +109,7 @@ kind: Application
 metadata:
   annotations:
     github.action: git-push-service
-    github.sha: 0123456789abcdef0123456789abcdef01234567 # The current commit
+    github.head-sha: 0123456789abcdef0123456789abcdef01234567 # The current commit
 ```
 
 Note that this action needs to be run after all of `git-push-service` actions.

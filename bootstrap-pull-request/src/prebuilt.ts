@@ -59,17 +59,28 @@ const isApplicationManifestPushedOnCurrentCommit = async (
     }
     throw error
   }
-  return (
-    application.metadata.annotations['github.action'] === 'git-push-service' &&
-    application.metadata.annotations['github.sha'] === currentSha
-  )
+
+  // bootstrap-pull-request action needs to be run after git-push-service action.
+  // See https://github.com/quipper/monorepo-deploy-actions/pull/1763 for the details.
+  if (application.metadata.annotations['github.action'] === 'git-push-service') {
+    if (application.metadata.annotations['github.head-sha'] === currentSha) {
+      return true
+    }
+    // For the backward compatibility.
+    // Before https://github.com/quipper/monorepo-deploy-actions/pull/1768, the head SHA was not recorded.
+    // When this action is called for an old pull request, we assume that the application manifest was pushed on the current commit.
+    if (application.metadata.annotations['github.head-sha'] === undefined) {
+      return true
+    }
+  }
+  return false
 }
 
 type PartialApplication = {
   metadata: {
     annotations: {
       'github.action': string
-      'github.sha': string
+      'github.head-sha': string | undefined
     }
   }
 }
@@ -85,8 +96,10 @@ function assertIsPartialApplication(o: unknown): asserts o is PartialApplication
   assert(o.metadata.annotations !== null, 'annotations must not be null')
   assert('github.action' in o.metadata.annotations, 'annotations must have github.action property')
   assert(typeof o.metadata.annotations['github.action'] === 'string', 'github.action must be a string')
-  assert('github.sha' in o.metadata.annotations, 'annotations must have github.sha property')
-  assert(typeof o.metadata.annotations['github.sha'] === 'string', 'github.sha must be a string')
+  assert('github.head-sha' in o.metadata.annotations, 'annotations must have github.head-sha property')
+  if (o.metadata.annotations['github.head-sha'] !== undefined) {
+    assert(typeof o.metadata.annotations['github.head-sha'] === 'string', 'github.head-sha must be a string')
+  }
 }
 
 const writeServices = async (inputs: Inputs): Promise<void> => {
