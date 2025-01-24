@@ -17,8 +17,8 @@ it('writes the service and application manifests', async () => {
     project: 'project',
     applicationAnnotations: ['example=foo'],
     destinationRepository: 'octocat/manifests',
-    currentRef: 'refs/heads/main',
-    currentSha: '1234567890abcdef',
+    currentHeadRef: 'refs/heads/main',
+    currentHeadSha: '1234567890abcdef',
   })
 
   expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
@@ -39,8 +39,8 @@ it('concatenates the service manifests if multiple are given', async () => {
     project: 'project',
     applicationAnnotations: ['example=foo'],
     destinationRepository: 'octocat/manifests',
-    currentRef: 'refs/heads/main',
-    currentSha: '1234567890abcdef',
+    currentHeadRef: 'refs/heads/main',
+    currentHeadSha: '1234567890abcdef',
   })
 
   expect(await readContent(path.join(workspace, `services/service/generated.yaml`))).toBe(`\
@@ -68,8 +68,8 @@ it('overwrites if a file exists', async () => {
     project: 'project',
     applicationAnnotations: ['example=foo'],
     destinationRepository: 'octocat/manifests',
-    currentRef: 'refs/heads/main',
-    currentSha: '1234567890abcdef',
+    currentHeadRef: 'refs/heads/main',
+    currentHeadSha: '1234567890abcdef',
   })
 
   expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
@@ -88,8 +88,8 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
     example: foo
-    github.ref: refs/heads/main
-    github.sha: 1234567890abcdef
+    github.head-ref: refs/heads/main
+    github.head-sha: 1234567890abcdef
     github.action: git-push-service
 spec:
   project: project

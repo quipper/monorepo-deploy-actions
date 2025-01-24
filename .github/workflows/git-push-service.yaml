@@ -59,8 +59,8 @@ jobs:
           ref: ns/monorepo-deploy-actions/e2e-git-push-service/ns-${{ github.run_number }}
           path: git-push-service/actual
       - run: find actual -type f
-      - run: test -f actual/applications/ns-${{ github.run_number }}--a.yaml
-      - run: test -f actual/services/a/generated.yaml
+      - run: yq . actual/applications/ns-${{ github.run_number }}--a.yaml
+      - run: yq . actual/services/a/generated.yaml
 
       - name: clean up the branch
         continue-on-error: true

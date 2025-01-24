@@ -19,6 +19,8 @@ type Inputs = {
   destinationBranch: string
   updateViaPullRequest: boolean
   token: string
+  currentHeadRef: string
+  currentHeadSha: string
 }
 
 type Outputs = {
@@ -78,8 +80,8 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
     branch,
     applicationAnnotations: inputs.applicationAnnotations,
     destinationRepository: inputs.destinationRepository,
-    currentRef: github.context.ref,
-    currentSha: github.context.sha,
+    currentHeadRef: inputs.currentHeadRef,
+    currentHeadSha: inputs.currentHeadSha,
   })
   core.endGroup()
 

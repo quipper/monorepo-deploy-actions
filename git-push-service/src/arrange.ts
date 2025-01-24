@@ -13,8 +13,8 @@ type Inputs = {
   branch: string
   applicationAnnotations: string[]
   destinationRepository: string
-  currentRef: string
-  currentSha: string
+  currentHeadRef: string
+  currentHeadSha: string
 }
 
 export const writeManifests = async (inputs: Inputs): Promise<void> => {
@@ -42,8 +42,8 @@ const writeApplicationManifest = async (inputs: Inputs) => {
       finalizers: ['resources-finalizer.argocd.argoproj.io'],
       annotations: {
         ...parseApplicationAnnotations(inputs.applicationAnnotations),
-        'github.ref': inputs.currentRef,
-        'github.sha': inputs.currentSha,
+        'github.head-ref': inputs.currentHeadRef,
+        'github.head-sha': inputs.currentHeadSha,
         'github.action': 'git-push-service',
       },
     },
