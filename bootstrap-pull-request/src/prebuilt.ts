@@ -96,8 +96,7 @@ function assertIsPartialApplication(o: unknown): asserts o is PartialApplication
   assert(o.metadata.annotations !== null, 'annotations must not be null')
   assert('github.action' in o.metadata.annotations, 'annotations must have github.action property')
   assert(typeof o.metadata.annotations['github.action'] === 'string', 'github.action must be a string')
-  assert('github.head-sha' in o.metadata.annotations, 'annotations must have github.head-sha property')
-  if (o.metadata.annotations['github.head-sha'] !== undefined) {
+  if ('github.head-sha' in o.metadata.annotations) {
     assert(typeof o.metadata.annotations['github.head-sha'] === 'string', 'github.head-sha must be a string')
   }
 }
