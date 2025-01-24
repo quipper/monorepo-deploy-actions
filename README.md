@@ -2,15 +2,12 @@
 
 This is a set of GitHub Actions to deploy microservices in a mono-repository (monorepo).
 
-## Motivation
-
-TODO
-
-## Concept
+## Design
 
 ### Structure of monorepo
 
-In Quipper, our monorepo contains a set of microservices with Kubernetes manifests, for example,
+Our monorepo contains a set of microservices with application code and Kubernetes manifests.
+Here is the example of directory structure.
 
 ```
 monorepo
@@ -59,39 +56,36 @@ monorepo
                 └── kustomization.yaml
 ```
 
+Here are the definitions of words.
+
+| Name                     | Description                                 | Example    |
+| ------------------------ | ------------------------------------------- | ---------- |
+| `overlay`                | Name of the overlay to build with Kustomize | `staging`  |
+| `namespace`              | Namespace to deploy into a cluster          | `pr-12345` |
+| `service`                | Name of a microservice                      | `backend`  |
+
 ### Structure of Argo CD Applications
 
 We adopt [App of Apps pattern of Argo CD](https://argoproj.github.io/argo-cd/operator-manual/cluster-bootstrapping/) for deployment hierarchy.
-To deploy multiple microservices (which are built from an overlay) to a namespace, we creates the following applications into Argo CD:
 
+For a typical namespace such as develop or production, it is deployed with the below applications.
+
+```mermaid
+graph LR
+  subgraph "generated-manifests"
+    AppService[Application develop--SERVICE] --> Resources
+  end
+  App[Application monorepo--develop] --> AppService
 ```
-${source-repository-name}  (Application)
-└── ${overlay}  (Application)
-    └── ${namespace}  (Application)
-        └── ${service}  (Application)
-```
 
-Here are the definitions of words.
+For a pull request namespace, it is deployed with the below applications and [the pull request generator](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Pull-Request/).
 
-| Name                     | Description                             | Example                 |
-| ------------------------ | --------------------------------------- | ----------------------- |
-| `source-repository-name` | name of source repository               | `monorepo`              |
-| `overlay`                | name of overlay to build with Kustomize | `staging`               |
-| `namespace`              | namespace to deploy into a cluster      | `pr-12345`              |
-| `service`                | name of microservice                    | `backend` or `frontend` |
-
-### Destination repository
-
-We stores generated manifests into a repository.
-Argo CD syncs between the repository and cluster.
-
-main branch of the repository contains Application manifests.
-
-```
-destination-repository  (branch: main)
-└── ${source-repository-name}
-    └── ${overlay}
-        └── ${namespace}.yaml  (Application)
+```mermaid
+graph LR
+  subgraph "generated-manifests"
+    AppService[Application pr-NUMBER--SERVICE] --> Resources
+  end
+  AppSet[ApplicationSet monorepo--pr] --> AppPr[Application pr-NUMBER] --> AppService
 ```
 
 A namespace branch contains a set of generated manifest and Application manifest per a service.

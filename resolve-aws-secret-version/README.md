@@ -1,13 +1,16 @@
 # resolve-aws-secret-version
 
-This is an action to resolve version IDs of `AWSSecret` in a manifest.
-It is designed for https://github.com/mumoshu/aws-secret-operator.
+This is an action to resolve the secret versions of manifests.
+It supports the following operators:
+
+- `AWSSecret` resource of https://github.com/mumoshu/aws-secret-operator
+- `ExternalSecret` resource of https://github.com/external-secrets/external-secrets
 
 ## Inputs
 
 | Name        | Type             | Description                    |
 | ----------- | ---------------- | ------------------------------ |
-| `manifests` | multiline string | Glob pattern(s) to manifest(s) |
+| `manifests` | Multiline string | Glob pattern(s) to manifest(s) |
 
 ## Example
 
@@ -43,24 +46,25 @@ spec:
             - secretRef:
                 name: microservice-${AWS_SECRETS_MANAGER_VERSION_ID}
 ---
-apiVersion: mumoshu.github.io/v1alpha1
-kind: AWSSecret
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
 metadata:
   name: microservice-${AWS_SECRETS_MANAGER_VERSION_ID}
 spec:
-  stringDataFrom:
-    secretsManagerSecretRef:
-      secretId: microservice/develop
-      versionId: ${AWS_SECRETS_MANAGER_VERSION_ID}
+  dataFrom:
+    - extract:
+        key: microservice/develop
+        version: uuid/${AWS_SECRETS_MANAGER_VERSION_ID}
 ```
 
-This action replaces a placeholder in `versionId` field with the current version ID.
-In this example, it replaces `${AWS_SECRETS_MANAGER_VERSION_ID}` with the current one.
+This action replaces a placeholder in `version` field with the current version ID.
+In this example, it replaces `${AWS_SECRETS_MANAGER_VERSION_ID}` with the current version ID.
 
-Here are some rules:
+This action replaces the placeholders by the following rules:
 
-- If a manifest does not contain any `AWSSecret`, do nothing
-- If `versionId` field is not placeholder in form of `${...}`, it is ignored
+- If a manifest does not contain any `ExternalSecret` or `AWSSecret`, do nothing.
+- It replaces the placeholder if `version` field of `ExternalSecret` has a placeholder in form of `uuid/${...}`.
+- It replaces the placeholder if `versionId` field of `AWSSecret` has a placeholder in form of `${...}`.
 
 Finally this action writes the below manifest:
 
@@ -78,15 +82,15 @@ spec:
             - secretRef:
                 name: microservice-c7ea50c5-b2be-4970-bf90-2237bef3b4cf
 ---
-apiVersion: mumoshu.github.io/v1alpha1
-kind: AWSSecret
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
 metadata:
   name: microservice-c7ea50c5-b2be-4970-bf90-2237bef3b4cf
 spec:
-  stringDataFrom:
-    secretsManagerSecretRef:
-      secretId: microservice/develop
-      versionId: c7ea50c5-b2be-4970-bf90-2237bef3b4cf
+  dataFrom:
+    - extract:
+        key: microservice/develop
+        version: uuid/c7ea50c5-b2be-4970-bf90-2237bef3b4cf
 ```
 
 This action accepts multi-line paths.

@@ -4,7 +4,7 @@ import * as awsSecretsManager from '../src/awsSecretsManager.js'
 
 const secretsManagerMock = mockClient(SecretsManagerClient)
 
-test('getCurrentVersionId returns the current version id', async () => {
+it('returns the current version id', async () => {
   secretsManagerMock.on(ListSecretVersionIdsCommand, { SecretId: 'microservice/develop' }).resolves(
     // this is an actual payload of the command:
     // $ aws secretsmanager list-secret-version-ids --secret-id microservice/develop

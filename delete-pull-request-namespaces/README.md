@@ -1,3 +1,10 @@
+# :warning: DEPRECATED
+
+Use [the pull request generator](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Pull-Request/) instead.
+This action will be removed in the future.
+
+---
+
 # delete-pull-request-namespaces [![delete-pull-request-namespaces](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/delete-pull-request-namespaces.yaml/badge.svg)](https://github.com/quipper/monorepo-deploy-actions/actions/workflows/delete-pull-request-namespaces.yaml)
 
 This is an action to delete pull request namespaces.
