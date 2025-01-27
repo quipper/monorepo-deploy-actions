@@ -25,6 +25,9 @@ inputs:
   substitute-variables:
     description: Pairs of key=value to substitute the prebuilt manifests (multiline)
     required: false
+  current-head-sha:
+    description: SHA of current head commit (For internal use)
+    default: ${{ github.event.pull_request.head.sha || github.sha }}
 
 runs:
   using: 'node20'

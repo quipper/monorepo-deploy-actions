@@ -13,6 +13,7 @@ type Inputs = {
   destinationRepositoryToken: string
   namespaceManifest: string | undefined
   substituteVariables: string[]
+  currentHeadSha: string
 }
 
 export const run = async (inputs: Inputs): Promise<void> =>
@@ -31,7 +32,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<void | Error> => {
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
 
   await syncServicesFromPrebuilt({
-    currentSha: github.context.sha,
+    currentSha: inputs.currentHeadSha,
     overlay: inputs.overlay,
     namespace: inputs.namespace,
     sourceRepositoryName,
