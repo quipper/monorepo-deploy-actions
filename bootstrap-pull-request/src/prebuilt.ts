@@ -7,7 +7,7 @@ import * as path from 'path'
 import * as yaml from 'js-yaml'
 
 type Inputs = {
-  currentSha: string
+  currentHeadSha: string
   overlay: string
   namespace: string
   sourceRepositoryName: string
@@ -28,7 +28,7 @@ const deleteOutdatedApplications = async (inputs: Inputs): Promise<void> => {
     matchDirectories: false,
   })
   for await (const applicationManifestPath of applicationManifestGlob.globGenerator()) {
-    if (await isApplicationManifestPushedOnCurrentCommit(applicationManifestPath, inputs.currentSha)) {
+    if (await isApplicationManifestPushedOnCurrentCommit(applicationManifestPath, inputs.currentHeadSha)) {
       core.info(`Preserving the application manifest: ${applicationManifestPath}`)
       continue
     }
@@ -39,7 +39,7 @@ const deleteOutdatedApplications = async (inputs: Inputs): Promise<void> => {
 
 const isApplicationManifestPushedOnCurrentCommit = async (
   applicationManifestPath: string,
-  currentSha: string,
+  currentHeadSha: string,
 ): Promise<boolean> => {
   const application = await parseApplicationManifest(applicationManifestPath)
   if (application instanceof Error) {
@@ -50,7 +50,7 @@ const isApplicationManifestPushedOnCurrentCommit = async (
   // bootstrap-pull-request action needs to be run after git-push-service action.
   // See https://github.com/quipper/monorepo-deploy-actions/pull/1763 for the details.
   if (application.metadata.annotations['github.action'] === 'git-push-service') {
-    if (application.metadata.annotations['github.head-sha'] === currentSha) {
+    if (application.metadata.annotations['github.head-sha'] === currentHeadSha) {
       return true
     }
     // For the backward compatibility.
@@ -61,65 +61,6 @@ const isApplicationManifestPushedOnCurrentCommit = async (
     }
   }
   return false
-}
-
-type PartialApplication = {
-  metadata: {
-    annotations: {
-      'github.action': string
-      'github.head-sha': string | undefined
-    }
-  }
-  spec: {
-    source: {
-      path: string
-    }
-  }
-}
-
-function assertIsPartialApplication(o: unknown): asserts o is PartialApplication {
-  assert(typeof o === 'object', 'must be an object')
-  assert(o !== null, 'must not be null')
-  assert('metadata' in o, 'must have metadata property')
-  assert(typeof o.metadata === 'object', 'metadata must be an object')
-  assert(o.metadata !== null, 'metadata must not be null')
-  assert('annotations' in o.metadata, 'metadata must have annotations property')
-  assert(typeof o.metadata.annotations === 'object', 'annotations must be an object')
-  assert(o.metadata.annotations !== null, 'annotations must not be null')
-  assert('github.action' in o.metadata.annotations, 'annotations must have github.action property')
-  assert(typeof o.metadata.annotations['github.action'] === 'string', 'github.action must be a string')
-  if ('github.head-sha' in o.metadata.annotations) {
-    assert(typeof o.metadata.annotations['github.head-sha'] === 'string', 'github.head-sha must be a string')
-  }
-  assert('spec' in o, 'must have spec property')
-  assert(typeof o.spec === 'object', 'spec must be an object')
-  assert(o.spec !== null, 'spec must not be null')
-  assert('source' in o.spec, 'spec must have source property')
-  assert(typeof o.spec.source === 'object', 'source must be an object')
-  assert(o.spec.source !== null, 'source must not be null')
-  assert('path' in o.spec.source, 'source must have path property')
-  assert(typeof o.spec.source.path === 'string', 'path must be a string')
-}
-
-const parseApplicationManifest = async (applicationManifestPath: string): Promise<PartialApplication | Error> => {
-  let application
-  try {
-    application = yaml.load(await fs.readFile(applicationManifestPath, 'utf-8'))
-  } catch (error) {
-    if (error instanceof yaml.YAMLException) {
-      return error
-    }
-    throw error
-  }
-  try {
-    assertIsPartialApplication(application)
-  } catch (error) {
-    if (error instanceof assert.AssertionError) {
-      return error
-    }
-    throw error
-  }
-  return application
 }
 
 const writeServices = async (inputs: Inputs): Promise<void> => {
@@ -182,6 +123,65 @@ const writeServiceManifests = async (inputs: Inputs, service: string) => {
     await io.mkdirP(`${inputs.namespaceDirectory}/services/${service}`)
     await fs.writeFile(namespacePath, content)
   }
+}
+
+type PartialApplication = {
+  metadata: {
+    annotations: {
+      'github.action': string
+      'github.head-sha': string | undefined
+    }
+  }
+  spec: {
+    source: {
+      path: string
+    }
+  }
+}
+
+function assertIsPartialApplication(o: unknown): asserts o is PartialApplication {
+  assert(typeof o === 'object', 'must be an object')
+  assert(o !== null, 'must not be null')
+  assert('metadata' in o, 'must have metadata property')
+  assert(typeof o.metadata === 'object', 'metadata must be an object')
+  assert(o.metadata !== null, 'metadata must not be null')
+  assert('annotations' in o.metadata, 'metadata must have annotations property')
+  assert(typeof o.metadata.annotations === 'object', 'annotations must be an object')
+  assert(o.metadata.annotations !== null, 'annotations must not be null')
+  assert('github.action' in o.metadata.annotations, 'annotations must have github.action property')
+  assert(typeof o.metadata.annotations['github.action'] === 'string', 'github.action must be a string')
+  if ('github.head-sha' in o.metadata.annotations) {
+    assert(typeof o.metadata.annotations['github.head-sha'] === 'string', 'github.head-sha must be a string')
+  }
+  assert('spec' in o, 'must have spec property')
+  assert(typeof o.spec === 'object', 'spec must be an object')
+  assert(o.spec !== null, 'spec must not be null')
+  assert('source' in o.spec, 'spec must have source property')
+  assert(typeof o.spec.source === 'object', 'source must be an object')
+  assert(o.spec.source !== null, 'source must not be null')
+  assert('path' in o.spec.source, 'source must have path property')
+  assert(typeof o.spec.source.path === 'string', 'path must be a string')
+}
+
+const parseApplicationManifest = async (applicationManifestPath: string): Promise<PartialApplication | Error> => {
+  let application
+  try {
+    application = yaml.load(await fs.readFile(applicationManifestPath, 'utf-8'))
+  } catch (error) {
+    if (error instanceof yaml.YAMLException) {
+      return error
+    }
+    throw error
+  }
+  try {
+    assertIsPartialApplication(application)
+  } catch (error) {
+    if (error instanceof assert.AssertionError) {
+      return error
+    }
+    throw error
+  }
+  return application
 }
 
 const buildApplicationManifest = (inputs: Inputs, service: string, prebuiltApplication: PartialApplication) => {
