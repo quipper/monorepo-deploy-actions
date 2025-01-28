@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as git from './git.js'
-import { syncServicesFromPrebuilt } from './prebuilt.js'
+import * as prebuilt from './prebuilt.js'
 import { retryExponential } from './retry.js'
 import { writeNamespaceManifest } from './namespace.js'
 
@@ -16,13 +16,28 @@ type Inputs = {
   currentHeadSha: string
 }
 
-export const run = async (inputs: Inputs): Promise<void> =>
-  await retryExponential(() => bootstrapNamespace(inputs), {
+export const run = async (inputs: Inputs): Promise<void> => {
+  const services = await retryExponential(() => bootstrapNamespace(inputs), {
     maxAttempts: 50,
     waitMs: 10000,
   })
+  core.summary.addHeading('bootstrap-pull-request summary', 2)
+  if (services) {
+    core.summary.addTable([
+      [
+        { data: 'Service', header: true },
+        { data: 'Deployed commit', header: true },
+      ],
+      ...services.map((service) => [
+        service.service,
+        `[${service.headRef}@${service.headSha}](${github.context.serverUrl}/${inputs.sourceRepository}/commit/${service.headSha})`,
+      ]),
+    ])
+  }
+  await core.summary.write()
+}
 
-const bootstrapNamespace = async (inputs: Inputs): Promise<void | Error> => {
+const bootstrapNamespace = async (inputs: Inputs): Promise<prebuilt.Service[] | void | Error> => {
   core.info(`Checking out the prebuilt branch`)
   const prebuiltDirectory = await checkoutPrebuiltBranch(inputs)
   core.info(`Checking out the namespace branch`)
@@ -31,7 +46,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<void | Error> => {
   const substituteVariables = parseSubstituteVariables(inputs.substituteVariables)
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
 
-  await syncServicesFromPrebuilt({
+  const services = await prebuilt.syncServicesFromPrebuilt({
     currentHeadSha: inputs.currentHeadSha,
     overlay: inputs.overlay,
     namespace: inputs.namespace,
@@ -60,6 +75,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<void | Error> => {
     // Retry from checkout if fast-forward was failed
     return new Error(`git-push returned code ${pushCode}`)
   }
+  return services
 }
 
 const checkoutPrebuiltBranch = async (inputs: Inputs) => {

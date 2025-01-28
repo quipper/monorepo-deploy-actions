@@ -17,53 +17,76 @@ type Inputs = {
   substituteVariables: Map<string, string>
 }
 
-export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<void> => {
-  core.info(`Syncing from the prebuilt branch to the namespace branch`)
-  await deleteOutdatedApplications(inputs)
-  await writeServices(inputs)
+export type Service = {
+  service: string
+  headRef: string | undefined
+  headSha: string | undefined
 }
 
-const deleteOutdatedApplications = async (inputs: Inputs): Promise<void> => {
+export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[]> => {
+  core.info(`Syncing from the prebuilt branch to the namespace branch`)
+  const preservedServices = await deleteOutdatedApplicationManifests(inputs)
+  const wroteServices = await writeServices(inputs)
+  return [...preservedServices, ...wroteServices]
+}
+
+const deleteOutdatedApplicationManifests = async (inputs: Inputs): Promise<Service[]> => {
+  const preservedServices = []
   const applicationManifestGlob = await glob.create(`${inputs.namespaceDirectory}/applications/**`, {
     matchDirectories: false,
   })
   for await (const applicationManifestPath of applicationManifestGlob.globGenerator()) {
-    if (await isApplicationManifestPushedOnCurrentCommit(applicationManifestPath, inputs.currentHeadSha)) {
-      core.info(`Preserving the application manifest: ${applicationManifestPath}`)
-      continue
+    const preservedService = await deleteOutdatedApplicationManifest(applicationManifestPath, inputs.currentHeadSha)
+    if (preservedService !== undefined) {
+      preservedServices.push(preservedService)
     }
-    core.info(`Deleting the outdated application manifest: ${applicationManifestPath}`)
-    await io.rmRF(applicationManifestPath)
   }
+  return preservedServices
 }
 
-const isApplicationManifestPushedOnCurrentCommit = async (
+const deleteOutdatedApplicationManifest = async (
   applicationManifestPath: string,
   currentHeadSha: string,
-): Promise<boolean> => {
-  const application = await parseApplicationManifest(applicationManifestPath)
-  if (application instanceof Error) {
-    const error: Error = application
-    core.info(`Ignored an invalid application manifest: ${applicationManifestPath}: ${String(error)}`)
-    return false
+): Promise<Service | undefined> => {
+  const existingApplication = await parseApplicationManifest(applicationManifestPath)
+  if (existingApplication instanceof Error) {
+    const error: Error = existingApplication
+    core.info(`Deleting the invalid application manifest: ${applicationManifestPath}: ${String(error)}`)
+    await io.rmRF(applicationManifestPath)
+    return
   }
+
   // bootstrap-pull-request action needs to be run after git-push-service action.
   // See https://github.com/quipper/monorepo-deploy-actions/pull/1763 for the details.
-  if (application.metadata.annotations['github.action'] === 'git-push-service') {
-    if (application.metadata.annotations['github.head-sha'] === currentHeadSha) {
-      return true
+  if (existingApplication.metadata.annotations['github.action'] === 'git-push-service') {
+    const service = path.basename(existingApplication.spec.source.path)
+    if (existingApplication.metadata.annotations['github.head-sha'] === currentHeadSha) {
+      core.info(`Preserving the application manifest: ${applicationManifestPath}`)
+      return {
+        service,
+        headRef: existingApplication.metadata.annotations['github.head-ref'],
+        headSha: existingApplication.metadata.annotations['github.head-sha'],
+      }
     }
     // For the backward compatibility.
     // Before https://github.com/quipper/monorepo-deploy-actions/pull/1768, the head SHA was not recorded.
     // When this action is called for an old pull request, we assume that the application manifest was pushed on the current commit.
-    if (application.metadata.annotations['github.head-sha'] === undefined) {
-      return true
+    if (existingApplication.metadata.annotations['github.head-sha'] === undefined) {
+      core.info(`Preserving the application manifest: ${applicationManifestPath}`)
+      return {
+        service,
+        headRef: existingApplication.metadata.annotations['github.head-ref'],
+        headSha: existingApplication.metadata.annotations['github.head-sha'],
+      }
     }
   }
-  return false
+
+  core.info(`Deleting the outdated application manifest: ${applicationManifestPath}`)
+  await io.rmRF(applicationManifestPath)
 }
 
-const writeServices = async (inputs: Inputs): Promise<void> => {
+const writeServices = async (inputs: Inputs): Promise<Service[]> => {
+  const wroteServices = []
   const existingApplicationManifestPaths = await (
     await glob.create(`${inputs.namespaceDirectory}/applications/*.yaml`, { matchDirectories: false })
   ).glob()
@@ -93,7 +116,13 @@ const writeServices = async (inputs: Inputs): Promise<void> => {
       continue
     }
     await writeService(inputs, service, prebuiltApplication)
+    wroteServices.push({
+      service,
+      headRef: prebuiltApplication.metadata.annotations['github.head-ref'],
+      headSha: prebuiltApplication.metadata.annotations['github.head-sha'],
+    })
   }
+  return wroteServices
 }
 
 const writeService = async (inputs: Inputs, service: string, prebuiltApplication: PartialApplication) => {
@@ -130,6 +159,7 @@ type PartialApplication = {
   metadata: {
     annotations: {
       'github.action': string
+      'github.head-ref': string | undefined
       'github.head-sha': string | undefined
     }
   }
@@ -151,6 +181,9 @@ function assertIsPartialApplication(o: unknown): asserts o is PartialApplication
   assert(o.metadata.annotations !== null, 'annotations must not be null')
   assert('github.action' in o.metadata.annotations, 'annotations must have github.action property')
   assert(typeof o.metadata.annotations['github.action'] === 'string', 'github.action must be a string')
+  if ('github.head-ref' in o.metadata.annotations) {
+    assert(typeof o.metadata.annotations['github.head-ref'] === 'string', 'github.head-ref must be a string')
+  }
   if ('github.head-sha' in o.metadata.annotations) {
     assert(typeof o.metadata.annotations['github.head-sha'] === 'string', 'github.head-sha must be a string')
   }
@@ -195,6 +228,7 @@ const buildApplicationManifest = (inputs: Inputs, service: string, prebuiltAppli
       finalizers: ['resources-finalizer.argocd.argoproj.io'],
       annotations: {
         'github.action': 'bootstrap-pull-request',
+        'github.head-ref': prebuiltApplication.metadata.annotations['github.head-ref'],
         'github.head-sha': prebuiltApplication.metadata.annotations['github.head-sha'],
       },
     },
