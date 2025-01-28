@@ -70,6 +70,11 @@ type PartialApplication = {
       'github.head-sha': string | undefined
     }
   }
+  spec: {
+    source: {
+      path: string
+    }
+  }
 }
 
 function assertIsPartialApplication(o: unknown): asserts o is PartialApplication {
@@ -86,6 +91,14 @@ function assertIsPartialApplication(o: unknown): asserts o is PartialApplication
   if ('github.head-sha' in o.metadata.annotations) {
     assert(typeof o.metadata.annotations['github.head-sha'] === 'string', 'github.head-sha must be a string')
   }
+  assert('spec' in o, 'must have spec property')
+  assert(typeof o.spec === 'object', 'spec must be an object')
+  assert(o.spec !== null, 'spec must not be null')
+  assert('source' in o.spec, 'spec must have source property')
+  assert(typeof o.spec.source === 'object', 'source must be an object')
+  assert(o.spec.source !== null, 'source must not be null')
+  assert('path' in o.spec.source, 'source must have path property')
+  assert(typeof o.spec.source.path === 'string', 'path must be a string')
 }
 
 const parseApplicationManifest = async (applicationManifestPath: string): Promise<PartialApplication | Error> => {
@@ -117,17 +130,14 @@ const writeServices = async (inputs: Inputs): Promise<void> => {
     await glob.create(`${inputs.prebuiltDirectory}/applications/*.yaml`, { matchDirectories: false })
   ).glob()
   for (const prebuiltApplicationManifestPath of prebuiltApplicationManifestPaths) {
-    const service = extractServiceNameFromApplicationManifestPath(prebuiltApplicationManifestPath, inputs.namespace)
-    if (service === undefined) {
-      core.info(`Ignored non-prefixed file: ${prebuiltApplicationManifestPath}`)
-      continue
-    }
     const prebuiltApplication = await parseApplicationManifest(prebuiltApplicationManifestPath)
     if (prebuiltApplication instanceof Error) {
       const error: Error = prebuiltApplication
       core.info(`Ignored an invalid application manifest: ${prebuiltApplicationManifestPath}: ${String(error)}`)
       continue
     }
+    const service = path.basename(prebuiltApplication.spec.source.path)
+    core.info(`Found the prebuilt service ${service}`)
     const namespaceApplicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.namespace}--${service}.yaml`
     if (existingApplicationManifestPaths.includes(namespaceApplicationManifestPath)) {
       core.info(`Preserving the existing application manifest: ${namespaceApplicationManifestPath}`)
@@ -135,14 +145,6 @@ const writeServices = async (inputs: Inputs): Promise<void> => {
     }
     core.info(`Writing the service ${service}`)
     await writeService(inputs, service, prebuiltApplication)
-  }
-}
-
-const extractServiceNameFromApplicationManifestPath = (applicationManifestPath: string, namespace: string) => {
-  const basename = path.basename(applicationManifestPath, '.yaml')
-  const prefix = `${namespace}--`
-  if (basename.startsWith(prefix)) {
-    return basename.slice(prefix.length)
   }
 }
 

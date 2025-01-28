@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: pr-123--a
+  name: prebuilt--b
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: https://github.com/octocat/destination-repository.git
     targetRevision: prebuilt/source-repository/pr
-    path: services/a
+    path: services/b
   destination:
     server: https://kubernetes.default.svc
     namespace: prebuilt
