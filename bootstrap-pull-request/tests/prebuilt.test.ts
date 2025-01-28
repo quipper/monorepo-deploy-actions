@@ -12,7 +12,7 @@ describe('syncServicesFromPrebuilt', () => {
     const namespaceDirectory = await createEmptyDirectory()
 
     await syncServicesFromPrebuilt({
-      currentSha: 'current-sha',
+      currentHeadSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
@@ -37,7 +37,7 @@ describe('syncServicesFromPrebuilt', () => {
     await fs.writeFile(`${namespaceDirectory}/services/a/generated.yaml`, 'this-should-be-overwritten')
 
     await syncServicesFromPrebuilt({
-      currentSha: 'current-sha',
+      currentHeadSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
@@ -62,7 +62,7 @@ describe('syncServicesFromPrebuilt', () => {
     await fs.writeFile(`${namespaceDirectory}/services/a/generated.yaml`, 'this-should-be-kept')
 
     await syncServicesFromPrebuilt({
-      currentSha: 'current-sha',
+      currentHeadSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
@@ -87,7 +87,7 @@ describe('syncServicesFromPrebuilt', () => {
     await fs.writeFile(`${namespaceDirectory}/applications/pr-123--outdated.yaml`, applicationPushedOnOutdatedCommit)
 
     await syncServicesFromPrebuilt({
-      currentSha: 'current-sha',
+      currentHeadSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
@@ -114,7 +114,7 @@ describe('syncServicesFromPrebuilt', () => {
     await fs.writeFile(`${namespaceDirectory}/services/a/generated.yaml`, 'this-should-be-kept')
 
     await syncServicesFromPrebuilt({
-      currentSha: 'current-sha',
+      currentHeadSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',

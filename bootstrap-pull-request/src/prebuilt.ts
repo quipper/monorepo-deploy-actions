@@ -7,7 +7,7 @@ import * as path from 'path'
 import * as yaml from 'js-yaml'
 
 type Inputs = {
-  currentSha: string
+  currentHeadSha: string
   overlay: string
   namespace: string
   sourceRepositoryName: string
@@ -28,7 +28,7 @@ const deleteOutdatedApplications = async (inputs: Inputs): Promise<void> => {
     matchDirectories: false,
   })
   for await (const applicationManifestPath of applicationManifestGlob.globGenerator()) {
-    if (await isApplicationManifestPushedOnCurrentCommit(applicationManifestPath, inputs.currentSha)) {
+    if (await isApplicationManifestPushedOnCurrentCommit(applicationManifestPath, inputs.currentHeadSha)) {
       core.info(`Preserving the application manifest: ${applicationManifestPath}`)
       continue
     }
@@ -39,7 +39,7 @@ const deleteOutdatedApplications = async (inputs: Inputs): Promise<void> => {
 
 const isApplicationManifestPushedOnCurrentCommit = async (
   applicationManifestPath: string,
-  currentSha: string,
+  currentHeadSha: string,
 ): Promise<boolean> => {
   const application = await parseApplicationManifest(applicationManifestPath)
   if (application instanceof Error) {
@@ -50,7 +50,7 @@ const isApplicationManifestPushedOnCurrentCommit = async (
   // bootstrap-pull-request action needs to be run after git-push-service action.
   // See https://github.com/quipper/monorepo-deploy-actions/pull/1763 for the details.
   if (application.metadata.annotations['github.action'] === 'git-push-service') {
-    if (application.metadata.annotations['github.head-sha'] === currentSha) {
+    if (application.metadata.annotations['github.head-sha'] === currentHeadSha) {
       return true
     }
     // For the backward compatibility.
@@ -61,6 +61,69 @@ const isApplicationManifestPushedOnCurrentCommit = async (
     }
   }
   return false
+}
+
+const writeServices = async (inputs: Inputs): Promise<void> => {
+  const existingApplicationManifestPaths = await (
+    await glob.create(`${inputs.namespaceDirectory}/applications/*.yaml`, { matchDirectories: false })
+  ).glob()
+  const prebuiltApplicationManifestPaths = await (
+    await glob.create(`${inputs.prebuiltDirectory}/applications/*.yaml`, { matchDirectories: false })
+  ).glob()
+  for (const prebuiltApplicationManifestPath of prebuiltApplicationManifestPaths) {
+    const prebuiltApplication = await parseApplicationManifest(prebuiltApplicationManifestPath)
+    if (prebuiltApplication instanceof Error) {
+      const error: Error = prebuiltApplication
+      core.info(`Ignored an invalid application manifest: ${prebuiltApplicationManifestPath}: ${String(error)}`)
+      continue
+    }
+
+    if (!prebuiltApplication.spec.source.path.startsWith('services/')) {
+      core.info(`Ignored a non-service application manifest: ${prebuiltApplicationManifestPath}`)
+      continue
+    }
+    const service = path.basename(prebuiltApplication.spec.source.path)
+    core.info(
+      `Found the service ${service} prebuilt from ${prebuiltApplication.metadata.annotations['github.head-sha']}`,
+    )
+
+    const namespaceApplicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.namespace}--${service}.yaml`
+    if (existingApplicationManifestPaths.includes(namespaceApplicationManifestPath)) {
+      core.info(`Preserving the existing application manifest: ${namespaceApplicationManifestPath}`)
+      continue
+    }
+    await writeService(inputs, service, prebuiltApplication)
+  }
+}
+
+const writeService = async (inputs: Inputs, service: string, prebuiltApplication: PartialApplication) => {
+  const applicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.namespace}--${service}.yaml`
+  core.info(`Writing the application manifest: ${applicationManifestPath}`)
+  await io.mkdirP(`${inputs.namespaceDirectory}/applications`)
+  const application = buildApplicationManifest(inputs, service, prebuiltApplication)
+  await fs.writeFile(applicationManifestPath, yaml.dump(application))
+
+  await writeServiceManifests(inputs, service)
+}
+
+const writeServiceManifests = async (inputs: Inputs, service: string) => {
+  const filenames = (await fs.readdir(`${inputs.prebuiltDirectory}/services/${service}`, { withFileTypes: true }))
+    .filter((e) => e.isFile())
+    .map((e) => e.name)
+
+  for (const filename of filenames) {
+    const prebuiltPath = `${inputs.prebuiltDirectory}/services/${service}/${filename}`
+    core.info(`Reading the prebuilt manifest: ${prebuiltPath}`)
+    let content = await fs.readFile(prebuiltPath, 'utf-8')
+    for (const [k, v] of inputs.substituteVariables) {
+      const placeholder = '${' + k + '}'
+      content = content.replaceAll(placeholder, v)
+    }
+    const namespacePath = `${inputs.namespaceDirectory}/services/${service}/${filename}`
+    core.info(`Writing the service manifest: ${namespacePath}`)
+    await io.mkdirP(`${inputs.namespaceDirectory}/services/${service}`)
+    await fs.writeFile(namespacePath, content)
+  }
 }
 
 type PartialApplication = {
@@ -120,68 +183,6 @@ const parseApplicationManifest = async (applicationManifestPath: string): Promis
     throw error
   }
   return application
-}
-
-const writeServices = async (inputs: Inputs): Promise<void> => {
-  const existingApplicationManifestPaths = await (
-    await glob.create(`${inputs.namespaceDirectory}/applications/*.yaml`, { matchDirectories: false })
-  ).glob()
-  const prebuiltApplicationManifestPaths = await (
-    await glob.create(`${inputs.prebuiltDirectory}/applications/*.yaml`, { matchDirectories: false })
-  ).glob()
-  for (const prebuiltApplicationManifestPath of prebuiltApplicationManifestPaths) {
-    const prebuiltApplication = await parseApplicationManifest(prebuiltApplicationManifestPath)
-    if (prebuiltApplication instanceof Error) {
-      const error: Error = prebuiltApplication
-      core.info(`Ignored an invalid application manifest: ${prebuiltApplicationManifestPath}: ${String(error)}`)
-      continue
-    }
-
-    if (!prebuiltApplication.spec.source.path.startsWith('services/')) {
-      core.info(`Ignored a non-service application manifest: ${prebuiltApplicationManifestPath}`)
-      continue
-    }
-    const service = path.basename(prebuiltApplication.spec.source.path)
-    core.info(`Found the prebuilt service ${service}`)
-
-    const namespaceApplicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.namespace}--${service}.yaml`
-    if (existingApplicationManifestPaths.includes(namespaceApplicationManifestPath)) {
-      core.info(`Preserving the existing application manifest: ${namespaceApplicationManifestPath}`)
-      continue
-    }
-    core.info(`Writing the service ${service}`)
-    await writeService(inputs, service, prebuiltApplication)
-  }
-}
-
-const writeService = async (inputs: Inputs, service: string, prebuiltApplication: PartialApplication) => {
-  const applicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.namespace}--${service}.yaml`
-  core.info(`Writing the application manifest: ${applicationManifestPath}`)
-  await io.mkdirP(`${inputs.namespaceDirectory}/applications`)
-  const application = buildApplicationManifest(inputs, service, prebuiltApplication)
-  await fs.writeFile(applicationManifestPath, yaml.dump(application))
-
-  await writeServiceManifests(inputs, service)
-}
-
-const writeServiceManifests = async (inputs: Inputs, service: string) => {
-  const filenames = (await fs.readdir(`${inputs.prebuiltDirectory}/services/${service}`, { withFileTypes: true }))
-    .filter((e) => e.isFile())
-    .map((e) => e.name)
-
-  for (const filename of filenames) {
-    const prebuiltPath = `${inputs.prebuiltDirectory}/services/${service}/${filename}`
-    core.info(`Reading the prebuilt manifest: ${prebuiltPath}`)
-    let content = await fs.readFile(prebuiltPath, 'utf-8')
-    for (const [k, v] of inputs.substituteVariables) {
-      const placeholder = '${' + k + '}'
-      content = content.replaceAll(placeholder, v)
-    }
-    const namespacePath = `${inputs.namespaceDirectory}/services/${service}/${filename}`
-    core.info(`Writing the service manifest: ${namespacePath}`)
-    await io.mkdirP(`${inputs.namespaceDirectory}/services/${service}`)
-    await fs.writeFile(namespacePath, content)
-  }
 }
 
 const buildApplicationManifest = (inputs: Inputs, service: string, prebuiltApplication: PartialApplication) => {
