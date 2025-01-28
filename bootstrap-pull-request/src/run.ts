@@ -30,7 +30,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
       ],
       ...services.map((service) => [
         service.service,
-        `[${service.headRef}@${service.headSha}](${github.context.serverUrl}/${inputs.sourceRepository}/commit/${service.headSha})`,
+        `<a href="${github.context.serverUrl}/${inputs.sourceRepository}/commit/${service.headSha}">${service.headRef}@${service.headSha}</a>`,
       ]),
     ])
   }
