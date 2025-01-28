@@ -142,6 +142,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
     github.action: bootstrap-pull-request
+    github.head-sha: main-branch-sha
 spec:
   project: source-repository
   source:
@@ -242,6 +243,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
     github.action: bootstrap-pull-request
+    github.head-sha: main-branch-sha
 spec:
   project: source-repository
   source:
