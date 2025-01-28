@@ -48,9 +48,9 @@ const deleteOutdatedApplicationManifest = async (
   applicationManifestPath: string,
   currentHeadSha: string,
 ): Promise<Service | undefined> => {
-  const existingApplication = await parseApplicationManifest(applicationManifestPath)
-  if (existingApplication instanceof Error) {
-    const error: Error = existingApplication
+  const application = await parseApplicationManifest(applicationManifestPath)
+  if (application instanceof Error) {
+    const error: Error = application
     core.info(`Deleting the invalid application manifest: ${applicationManifestPath}: ${String(error)}`)
     await io.rmRF(applicationManifestPath)
     return
@@ -58,25 +58,25 @@ const deleteOutdatedApplicationManifest = async (
 
   // bootstrap-pull-request action needs to be run after git-push-service action.
   // See https://github.com/quipper/monorepo-deploy-actions/pull/1763 for the details.
-  if (existingApplication.metadata.annotations['github.action'] === 'git-push-service') {
-    const service = path.basename(existingApplication.spec.source.path)
-    if (existingApplication.metadata.annotations['github.head-sha'] === currentHeadSha) {
+  if (application.metadata.annotations['github.action'] === 'git-push-service') {
+    const service = path.basename(application.spec.source.path)
+    if (application.metadata.annotations['github.head-sha'] === currentHeadSha) {
       core.info(`Preserving the application manifest: ${applicationManifestPath}`)
       return {
         service,
-        headRef: existingApplication.metadata.annotations['github.head-ref'],
-        headSha: existingApplication.metadata.annotations['github.head-sha'],
+        headRef: application.metadata.annotations['github.head-ref'],
+        headSha: application.metadata.annotations['github.head-sha'],
       }
     }
     // For the backward compatibility.
     // Before https://github.com/quipper/monorepo-deploy-actions/pull/1768, the head SHA was not recorded.
     // When this action is called for an old pull request, we assume that the application manifest was pushed on the current commit.
-    if (existingApplication.metadata.annotations['github.head-sha'] === undefined) {
+    if (application.metadata.annotations['github.head-sha'] === undefined) {
       core.info(`Preserving the application manifest: ${applicationManifestPath}`)
       return {
         service,
-        headRef: existingApplication.metadata.annotations['github.head-ref'],
-        headSha: existingApplication.metadata.annotations['github.head-sha'],
+        headRef: application.metadata.annotations['github.head-ref'],
+        headSha: application.metadata.annotations['github.head-sha'],
       }
     }
   }
