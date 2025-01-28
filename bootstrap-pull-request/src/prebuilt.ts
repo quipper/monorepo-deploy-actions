@@ -136,8 +136,14 @@ const writeServices = async (inputs: Inputs): Promise<void> => {
       core.info(`Ignored an invalid application manifest: ${prebuiltApplicationManifestPath}: ${String(error)}`)
       continue
     }
+
+    if (!prebuiltApplication.spec.source.path.startsWith('services/')) {
+      core.info(`Ignored a non-service application manifest: ${prebuiltApplicationManifestPath}`)
+      continue
+    }
     const service = path.basename(prebuiltApplication.spec.source.path)
     core.info(`Found the prebuilt service ${service}`)
+
     const namespaceApplicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.namespace}--${service}.yaml`
     if (existingApplicationManifestPaths.includes(namespaceApplicationManifestPath)) {
       core.info(`Preserving the existing application manifest: ${namespaceApplicationManifestPath}`)
