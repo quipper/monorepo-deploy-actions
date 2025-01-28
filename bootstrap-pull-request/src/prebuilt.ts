@@ -83,14 +83,15 @@ const writeServices = async (inputs: Inputs): Promise<void> => {
       continue
     }
     const service = path.basename(prebuiltApplication.spec.source.path)
-    core.info(`Found the prebuilt service ${service}`)
+    core.info(
+      `Found the service ${service} prebuilt from ${prebuiltApplication.metadata.annotations['github.head-sha']}`,
+    )
 
     const namespaceApplicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.namespace}--${service}.yaml`
     if (existingApplicationManifestPaths.includes(namespaceApplicationManifestPath)) {
       core.info(`Preserving the existing application manifest: ${namespaceApplicationManifestPath}`)
       continue
     }
-    core.info(`Writing the service ${service}`)
     await writeService(inputs, service, prebuiltApplication)
   }
 }
