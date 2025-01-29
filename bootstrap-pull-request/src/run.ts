@@ -3,7 +3,7 @@ import * as github from '@actions/github'
 import * as git from './git.js'
 import * as prebuilt from './prebuilt.js'
 import { retryExponential } from './retry.js'
-import { writeNamespaceManifest } from './namespace.js'
+import { getNamespaceBranch, writeNamespaceManifest } from './namespace.js'
 
 type Inputs = {
   overlay: string
@@ -21,26 +21,14 @@ export const run = async (inputs: Inputs): Promise<void> => {
     maxAttempts: 50,
     waitMs: 10000,
   })
-  core.summary.addHeading('bootstrap-pull-request summary', 2)
   if (services) {
-    core.summary.addTable([
-      [
-        { data: 'Service', header: true },
-        { data: 'Deployed commit', header: true },
-      ],
-      ...services.map((service) => [
-        service.service,
-        `<a href="${github.context.serverUrl}/${inputs.sourceRepository}/commit/${service.headSha}">${service.headRef}@${service.headSha}</a>`,
-      ]),
-    ])
+    writeSummary(inputs, services)
   }
   await core.summary.write()
 }
 
 const bootstrapNamespace = async (inputs: Inputs): Promise<prebuilt.Service[] | void | Error> => {
-  core.info(`Checking out the prebuilt branch`)
   const prebuiltDirectory = await checkoutPrebuiltBranch(inputs)
-  core.info(`Checking out the namespace branch`)
   const namespaceDirectory = await checkoutNamespaceBranch(inputs)
 
   const substituteVariables = parseSubstituteVariables(inputs.substituteVariables)
@@ -69,31 +57,42 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<prebuilt.Service[] | 
     core.info('Nothing to commit')
     return
   }
-  await git.commit(namespaceDirectory, commitMessage(inputs.namespace))
-  const pushCode = await git.pushByFastForward(namespaceDirectory)
-  if (pushCode > 0) {
-    // Retry from checkout if fast-forward was failed
-    return new Error(`git-push returned code ${pushCode}`)
-  }
-  return services
+  return await core.group(`Pushing the namespace branch`, async () => {
+    await git.commit(namespaceDirectory, commitMessage(inputs.namespace))
+    const pushCode = await git.pushByFastForward(namespaceDirectory)
+    if (pushCode > 0) {
+      // Retry from checkout if fast-forward was failed
+      return new Error(`git-push returned code ${pushCode}`)
+    }
+    return services
+  })
 }
 
 const checkoutPrebuiltBranch = async (inputs: Inputs) => {
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
-  return await git.checkout({
-    repository: inputs.destinationRepository,
-    branch: `prebuilt/${sourceRepositoryName}/${inputs.overlay}`,
-    token: inputs.destinationRepositoryToken,
-  })
+  const branch = `prebuilt/${sourceRepositoryName}/${inputs.overlay}`
+  return await core.group(
+    `Checking out the prebuilt branch: ${branch}`,
+    async () =>
+      await git.checkout({
+        repository: inputs.destinationRepository,
+        branch,
+        token: inputs.destinationRepositoryToken,
+      }),
+  )
 }
 
 const checkoutNamespaceBranch = async (inputs: Inputs) => {
-  const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
-  return await git.checkoutOrInitRepository({
-    repository: inputs.destinationRepository,
-    branch: `ns/${sourceRepositoryName}/${inputs.overlay}/${inputs.namespace}`,
-    token: inputs.destinationRepositoryToken,
-  })
+  const namespaceBranch = getNamespaceBranch(inputs)
+  return await core.group(
+    `Checking out the namespace branch: ${namespaceBranch}`,
+    async () =>
+      await git.checkoutOrInitRepository({
+        repository: inputs.destinationRepository,
+        branch: namespaceBranch,
+        token: inputs.destinationRepositoryToken,
+      }),
+  )
 }
 
 const parseSubstituteVariables = (substituteVariables: string[]): Map<string, string> => {
@@ -104,6 +103,31 @@ const parseSubstituteVariables = (substituteVariables: string[]): Map<string, st
     m.set(k, v)
   }
   return m
+}
+
+const writeSummary = (inputs: Inputs, services: prebuilt.Service[]) => {
+  core.summary.addHeading('bootstrap-pull-request summary', 2)
+
+  core.summary.addRaw('Pushed to the namespace branch: ')
+  const namespaceBranch = getNamespaceBranch(inputs)
+  const namespaceBranchUrl = `${github.context.serverUrl}/${inputs.destinationRepository}/tree/ns/${namespaceBranch}`
+  core.summary.addLink(namespaceBranchUrl, namespaceBranchUrl)
+  core.summary.addEOL()
+
+  core.summary.addTable([
+    [
+      { data: 'Service', header: true },
+      { data: 'Source branch', header: true },
+      { data: 'Source commit', header: true },
+    ],
+    ...services.map((service) => [
+      service.service,
+      service.headRef ?? '(unknown)',
+      service.headSha
+        ? `<a href="${github.context.serverUrl}/${inputs.sourceRepository}/tree/${service.headSha}">${service.headSha}</a>`
+        : '(unknown)',
+    ]),
+  ])
 }
 
 const commitMessage = (namespace: string) => `Bootstrap namespace ${namespace}

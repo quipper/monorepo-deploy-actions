@@ -33,7 +33,7 @@ inputs:
     default: ${{ github.token }}
   current-head-ref:
     description: Ref of current head branch (For internal use)
-    default: ${{ github.event.pull_request.head.ref || github.ref }}
+    default: ${{ github.head_ref }}
   current-head-sha:
     description: SHA of current head commit (For internal use)
     default: ${{ github.event.pull_request.head.sha || github.sha }}
