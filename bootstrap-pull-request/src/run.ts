@@ -15,6 +15,7 @@ type Inputs = {
   namespaceManifest: string | undefined
   substituteVariables: string[]
   currentHeadSha: string
+  excludeServices: string[]
 }
 
 type Outputs = {
@@ -54,6 +55,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
     prebuiltDirectory,
     namespaceDirectory,
     substituteVariables,
+    excludeServices: inputs.excludeServices,
   })
 
   if (inputs.namespaceManifest) {
