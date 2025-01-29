@@ -1,0 +1,19 @@
+{
+  "name": "get-service-versions",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "ncc build --source-map --license licenses.txt src/main.ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@actions/core": "1.11.1",
+    "@actions/exec": "1.1.1",
+    "@actions/glob": "0.5.0",
+    "js-yaml": "4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "4.0.9"
+  }
+}
