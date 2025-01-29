@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pr-12345--a
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    github.head-ref: main
+    github.head-sha: main-branch-sha
+    github.action: git-push-service
+spec:
+  project: source-repository
+  source:
+    repoURL: https://github.com/octocat/destination-repository.git
+    targetRevision: pr/source-repository/pr-12345
+    path: services/a
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: pr-12345
+  syncPolicy:
+    automated:
+      prune: true
