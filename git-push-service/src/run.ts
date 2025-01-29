@@ -149,7 +149,7 @@ const writeSummary = (inputs: Inputs, outputs: Outputs) => {
   core.summary.addHeading(`git-push-service summary`, 2)
 
   core.summary.addRaw(`<p>`)
-  core.summary.addRaw(`Pushed the service ${inputs.service} to the namespace branch: `)
+  core.summary.addRaw(`Pushed the service <code>${inputs.service}</code> to the namespace branch: `)
   const destinationBranchUrl = `${github.context.serverUrl}/${inputs.destinationRepository}/tree/${outputs.destinationBranch}`
   core.summary.addLink(destinationBranchUrl, destinationBranchUrl)
   core.summary.addRaw(`</p>`)
