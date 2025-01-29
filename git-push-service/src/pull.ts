@@ -16,12 +16,12 @@ type Inputs = {
   token: string
 }
 
-type Outputs = {
-  destinationPullRequestNumber: number
-  destinationPullRequestUrl: string
+type PullRequest = {
+  number: number
+  url: string
 }
 
-export const updateBranchByPullRequest = async (inputs: Inputs): Promise<Outputs | Error> => {
+export const updateBranchByPullRequest = async (inputs: Inputs): Promise<PullRequest | Error> => {
   const topicBranch = `git-push-service--${inputs.namespace}--${inputs.service}--${Date.now()}`
   const code = await core.group(`push branch ${topicBranch}`, () =>
     git.pushByFastForward(inputs.workspace, topicBranch),
@@ -41,8 +41,6 @@ export const updateBranchByPullRequest = async (inputs: Inputs): Promise<Outputs
     body: inputs.body,
   })
   core.info(`created ${pull.html_url}`)
-  core.summary.addRaw(`Created a pull request: `)
-  core.summary.addLink(`${inputs.owner}/${inputs.repo}#${pull.number}`, pull.html_url)
 
   core.info(`adding labels to #${pull.number}`)
   await octokit.rest.issues.addLabels({
@@ -76,8 +74,8 @@ export const updateBranchByPullRequest = async (inputs: Inputs): Promise<Outputs
             })
             core.info(`merged ${pull.html_url} as ${merge.sha}`)
             return {
-              destinationPullRequestNumber: pull.number,
-              destinationPullRequestUrl: pull.html_url,
+              number: pull.number,
+              url: pull.html_url,
             }
           }),
         {

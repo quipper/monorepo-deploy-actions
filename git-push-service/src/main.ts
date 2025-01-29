@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import { run } from '../src/run.js'
 
-async function main(): Promise<void> {
+const main = async (): Promise<void> => {
   const outputs = await run({
     manifests: core.getInput('manifests', { required: true }),
     overlay: core.getInput('overlay', { required: true }),
@@ -15,13 +15,10 @@ async function main(): Promise<void> {
     currentHeadRef: core.getInput('current-head-ref', { required: true }),
     currentHeadSha: core.getInput('current-head-sha', { required: true }),
   })
-  if (outputs.destinationPullRequestNumber !== undefined) {
-    core.setOutput('destination-pull-request-number', outputs.destinationPullRequestNumber)
+  if (outputs?.destinationPullRequest !== undefined) {
+    core.setOutput('destination-pull-request-number', outputs.destinationPullRequest.number)
+    core.setOutput('destination-pull-request-url', outputs.destinationPullRequest.url)
   }
-  if (outputs.destinationPullRequestUrl !== undefined) {
-    core.setOutput('destination-pull-request-url', outputs.destinationPullRequestUrl)
-  }
-  await core.summary.write()
 }
 
 main().catch((e: Error) => {
