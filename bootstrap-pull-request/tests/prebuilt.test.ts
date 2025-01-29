@@ -11,7 +11,7 @@ describe('syncServicesFromPrebuilt', () => {
   it('creates the manifests if empty', async () => {
     const namespaceDirectory = await createEmptyDirectory()
 
-    await syncServicesFromPrebuilt({
+    const services = await syncServicesFromPrebuilt({
       currentHeadSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
@@ -22,6 +22,10 @@ describe('syncServicesFromPrebuilt', () => {
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
+    expect(services).toStrictEqual([
+      { service: 'a', headRef: 'main', headSha: 'main-branch-sha' },
+      { service: 'b', headRef: 'main', headSha: 'main-branch-sha' },
+    ])
     expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
     expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe(serviceA)
@@ -36,7 +40,7 @@ describe('syncServicesFromPrebuilt', () => {
     await fs.writeFile(`${namespaceDirectory}/applications/pr-123--a.yaml`, applicationPushedOnOutdatedCommit)
     await fs.writeFile(`${namespaceDirectory}/services/a/generated.yaml`, 'this-should-be-overwritten')
 
-    await syncServicesFromPrebuilt({
+    const services = await syncServicesFromPrebuilt({
       currentHeadSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
@@ -47,6 +51,10 @@ describe('syncServicesFromPrebuilt', () => {
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
+    expect(services).toStrictEqual([
+      { service: 'a', headRef: 'main', headSha: 'main-branch-sha' },
+      { service: 'b', headRef: 'main', headSha: 'main-branch-sha' },
+    ])
     expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
     expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe(serviceA)
@@ -61,7 +69,7 @@ describe('syncServicesFromPrebuilt', () => {
     await fs.writeFile(`${namespaceDirectory}/applications/pr-123--a.yaml`, applicationPushedOnCurrentCommit)
     await fs.writeFile(`${namespaceDirectory}/services/a/generated.yaml`, 'this-should-be-kept')
 
-    await syncServicesFromPrebuilt({
+    const services = await syncServicesFromPrebuilt({
       currentHeadSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
@@ -72,6 +80,10 @@ describe('syncServicesFromPrebuilt', () => {
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
+    expect(services).toStrictEqual([
+      { service: 'a', headRef: 'topic-branch', headSha: 'current-sha' },
+      { service: 'b', headRef: 'main', headSha: 'main-branch-sha' },
+    ])
     expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(
       applicationPushedOnCurrentCommit,
@@ -86,7 +98,7 @@ describe('syncServicesFromPrebuilt', () => {
     await fs.mkdir(`${namespaceDirectory}/applications`)
     await fs.writeFile(`${namespaceDirectory}/applications/pr-123--outdated.yaml`, applicationPushedOnOutdatedCommit)
 
-    await syncServicesFromPrebuilt({
+    const services = await syncServicesFromPrebuilt({
       currentHeadSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
@@ -97,6 +109,10 @@ describe('syncServicesFromPrebuilt', () => {
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
+    expect(services).toStrictEqual([
+      { service: 'a', headRef: 'main', headSha: 'main-branch-sha' },
+      { service: 'b', headRef: 'main', headSha: 'main-branch-sha' },
+    ])
     expect(await fs.readdir(`${namespaceDirectory}/applications`, { recursive: true })).toStrictEqual([
       'pr-123--a.yaml',
       'pr-123--b.yaml',
@@ -113,7 +129,7 @@ describe('syncServicesFromPrebuilt', () => {
     await fs.writeFile(`${namespaceDirectory}/applications/pr-123--a.yaml`, applicationPushedWithoutSha)
     await fs.writeFile(`${namespaceDirectory}/services/a/generated.yaml`, 'this-should-be-kept')
 
-    await syncServicesFromPrebuilt({
+    const services = await syncServicesFromPrebuilt({
       currentHeadSha: 'current-sha',
       overlay: 'pr',
       namespace: 'pr-123',
@@ -124,6 +140,10 @@ describe('syncServicesFromPrebuilt', () => {
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
+    expect(services).toStrictEqual([
+      { service: 'a', headRef: undefined, headSha: undefined },
+      { service: 'b', headRef: 'main', headSha: 'main-branch-sha' },
+    ])
     expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationPushedWithoutSha)
     expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe('this-should-be-kept')
@@ -142,6 +162,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
     github.action: bootstrap-pull-request
+    github.head-ref: main
     github.head-sha: main-branch-sha
 spec:
   project: source-repository
@@ -167,6 +188,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
     github.action: git-push-service
+    github.head-ref: topic-branch
     github.head-sha: current-sha
 spec:
   project: source-repository
@@ -218,6 +240,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
     github.action: git-push-service
+    github.head-ref: topic-branch
     github.head-sha: outdated-sha
 spec:
   project: source-repository
@@ -243,6 +266,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
     github.action: bootstrap-pull-request
+    github.head-ref: main
     github.head-sha: main-branch-sha
 spec:
   project: source-repository

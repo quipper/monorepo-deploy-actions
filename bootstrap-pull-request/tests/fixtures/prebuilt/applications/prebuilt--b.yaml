@@ -6,7 +6,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
-    github.head-ref: refs/heads/main
+    github.head-ref: main
     github.head-sha: main-branch-sha
     github.action: git-push-service
 spec:
