@@ -108,11 +108,12 @@ const parseSubstituteVariables = (substituteVariables: string[]): Map<string, st
 const writeSummary = (inputs: Inputs, services: prebuilt.Service[]) => {
   core.summary.addHeading('bootstrap-pull-request summary', 2)
 
+  core.summary.addRaw('<p>')
   core.summary.addRaw('Pushed to the namespace branch: ')
   const namespaceBranch = getNamespaceBranch(inputs)
   const namespaceBranchUrl = `${github.context.serverUrl}/${inputs.destinationRepository}/tree/ns/${namespaceBranch}`
   core.summary.addLink(namespaceBranchUrl, namespaceBranchUrl)
-  core.summary.addEOL()
+  core.summary.addRaw('</p>')
 
   core.summary.addTable([
     [
