@@ -111,7 +111,7 @@ const writeSummary = (inputs: Inputs, services: prebuilt.Service[]) => {
   core.summary.addRaw('<p>')
   core.summary.addRaw('Pushed to the namespace branch: ')
   const namespaceBranch = getNamespaceBranch(inputs)
-  const namespaceBranchUrl = `${github.context.serverUrl}/${inputs.destinationRepository}/tree/ns/${namespaceBranch}`
+  const namespaceBranchUrl = `${github.context.serverUrl}/${inputs.destinationRepository}/tree/${namespaceBranch}`
   core.summary.addLink(namespaceBranchUrl, namespaceBranchUrl)
   core.summary.addRaw('</p>')
 
