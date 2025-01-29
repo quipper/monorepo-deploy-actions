@@ -24,50 +24,63 @@ type Inputs = {
 }
 
 type Outputs = {
-  destinationPullRequestNumber?: number
-  destinationPullRequestUrl?: string
+  destinationBranch: string
+  destinationPullRequest?: {
+    number: number
+    url: string
+  }
 }
 
-export const run = async (inputs: Inputs): Promise<Outputs> => {
+export const run = async (inputs: Inputs): Promise<Outputs | void> => {
   const globber = await glob.create(inputs.manifests, { matchDirectories: false })
   const manifests = await globber.glob()
   core.info(`found ${manifests.length} manifest(s) in ${inputs.manifests}`)
   if (manifests.length === 0) {
-    return {}
+    return
   }
 
   if (!inputs.updateViaPullRequest) {
-    // retry when fast-forward is failed
-    return await retry(async () => push(manifests, inputs), {
+    // Retry when fast-forward is failed
+    const outputs = await retry(async () => push(manifests, inputs), {
       maxAttempts: 50,
       waitMillisecond: 10000,
     })
+    if (outputs) {
+      writeSummary(inputs, outputs)
+    }
+    await core.summary.write()
+    return outputs
   }
 
   // Retry in the following cases:
   // - Branch already exists, i.e., other job created the branch.
   // - Pull request is conflicted.
   //   This should not be happen if you enable the concurrency option in the workflow.
-  return await retry(async () => push(manifests, inputs), {
+  const outputs = await retry(async () => push(manifests, inputs), {
     maxAttempts: 3,
     waitMillisecond: 10000,
   })
+  if (outputs) {
+    writeSummary(inputs, outputs)
+  }
+  await core.summary.write()
+  return outputs
 }
 
-const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Error> => {
+const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | void | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-service-action-'))
   core.info(`Created a workspace at ${workspace}`)
 
   const [owner, repo] = inputs.destinationRepository.split('/')
   const project = github.context.repo.repo
-  let branch = `ns/${project}/${inputs.overlay}/${inputs.namespace}`
+  let destinationBranch = `ns/${project}/${inputs.overlay}/${inputs.namespace}`
   if (inputs.destinationBranch) {
-    branch = inputs.destinationBranch
+    destinationBranch = inputs.destinationBranch
   }
 
-  core.startGroup(`Checking out the branch ${branch} if exist`)
+  core.startGroup(`Checking out the branch ${destinationBranch} if exist`)
   await git.init(workspace, owner, repo, inputs.token)
-  const branchNotExist = (await git.checkoutIfExist(workspace, branch)) > 0
+  const branchNotExist = (await git.checkoutIfExist(workspace, destinationBranch)) > 0
   core.endGroup()
 
   core.startGroup(`Writing the manifests into workspace ${workspace}`)
@@ -77,7 +90,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
     service: inputs.service,
     namespace: inputs.namespace,
     project,
-    branch,
+    branch: destinationBranch,
     applicationAnnotations: inputs.applicationAnnotations,
     destinationRepository: inputs.destinationRepository,
     currentHeadRef: inputs.currentHeadRef,
@@ -88,45 +101,65 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | Erro
   const status = await git.status(workspace)
   if (status === '') {
     core.info('Nothing to commit')
-    return {}
+    return
   }
   const message = `Deploy ${project}/${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
-  core.summary.addHeading(`Deploy ${project}/${inputs.namespace}/${inputs.service}`)
   await core.group(`Creating a commit`, () => git.commit(workspace, message))
 
   if (!inputs.updateViaPullRequest) {
-    const code = await core.group(`Pushing the branch ${branch}`, () => git.pushByFastForward(workspace, branch))
+    const code = await core.group(`Pushing the branch ${destinationBranch}`, () =>
+      git.pushByFastForward(workspace, destinationBranch),
+    )
     if (code > 0) {
-      return new Error(`failed to push branch ${branch} by fast-forward`)
+      return new Error(`failed to push branch ${destinationBranch} by fast-forward`)
     }
-    core.summary.addRaw(`Updated the branch: `)
-    core.summary.addLink(branch, `${github.context.serverUrl}/${owner}/${repo}/tree/${branch}`)
-    return {}
+    return { destinationBranch: destinationBranch }
   }
 
   if (branchNotExist) {
-    const code = await core.group(`Pushing a new branch ${branch}`, () => git.pushByFastForward(workspace, branch))
+    const code = await core.group(`Pushing a new branch ${destinationBranch}`, () =>
+      git.pushByFastForward(workspace, destinationBranch),
+    )
     if (code > 0) {
-      return new Error(`failed to push a new branch ${branch} by fast-forward`)
+      return new Error(`failed to push a new branch ${destinationBranch} by fast-forward`)
     }
-    core.summary.addRaw(`Created a new branch: `)
-    core.summary.addLink(branch, `${github.context.serverUrl}/${owner}/${repo}/tree/${branch}`)
-    return {}
+    return { destinationBranch: destinationBranch }
   }
 
-  core.info(`Updating branch ${branch} by a pull request`)
-  return await updateBranchByPullRequest({
+  core.info(`Updating branch ${destinationBranch} by a pull request`)
+  const destinationPullRequest = await updateBranchByPullRequest({
     owner,
     repo,
     title: `Deploy ${project}/${inputs.namespace}/${inputs.service}`,
     body: commitMessageFooter,
-    branch,
+    branch: destinationBranch,
     workspace,
     project,
     namespace: inputs.namespace,
     service: inputs.service,
     token: inputs.token,
   })
+  if (destinationPullRequest instanceof Error) {
+    return destinationPullRequest
+  }
+  return { destinationBranch, destinationPullRequest }
+}
+
+const writeSummary = (inputs: Inputs, outputs: Outputs) => {
+  core.summary.addHeading(`git-push-service summary`, 2)
+
+  core.summary.addRaw(`<p>`)
+  core.summary.addRaw(`Pushed the service ${inputs.service} to the namespace branch: `)
+  const destinationBranchUrl = `${github.context.serverUrl}/${inputs.destinationRepository}/tree/${outputs.destinationBranch}`
+  core.summary.addLink(destinationBranchUrl, destinationBranchUrl)
+  core.summary.addRaw(`</p>`)
+
+  if (outputs.destinationPullRequest) {
+    core.summary.addRaw(`<p>`)
+    core.summary.addRaw(`See the pull request: `)
+    core.summary.addLink(outputs.destinationPullRequest.url, outputs.destinationPullRequest.url)
+    core.summary.addRaw(`</p>`)
+  }
 }
 
 const commitMessageFooter = [
