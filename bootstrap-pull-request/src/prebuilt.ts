@@ -16,6 +16,7 @@ type Inputs = {
   prebuiltDirectory: string
   namespaceDirectory: string
   substituteVariables: Map<string, string>
+  excludeServices: string[]
 }
 
 export type Service = {
@@ -56,18 +57,35 @@ const deleteOutdatedApplicationManifests = async (inputs: Inputs): Promise<void>
 const deleteOutdatedApplicationManifest = async (
   applicationManifestPath: string,
   currentHeadSha: string,
+  excludeServices: string[],
 ): Promise<void> => {
   const application = await parseApplicationManifest(applicationManifestPath)
   if (application instanceof Error) {
+    // TODO ignore namespace.yaml
+
     const error: Error = application
     core.info(`Deleting the invalid application manifest: ${applicationManifestPath}: ${String(error)}`)
     await io.rmRF(applicationManifestPath)
     return
   }
 
+  const service = path.basename(application.spec.source.path)
+
+  if (excludeServices.includes(service)) {
+    core.info(`Preserving the application manifest: ${applicationManifestPath} because the service is excluded`)
+    return
+  }
+
   // bootstrap-pull-request action needs to be run after git-push-service action.
   // See https://github.com/quipper/monorepo-deploy-actions/pull/1763 for the details.
   if (application.metadata.annotations['github.action'] === 'git-push-service') {
+    const service = path.basename(application.spec.source.path)
+
+    if (excludeServices.includes(service)) {
+      core.info(`Preserving the application manifest: ${applicationManifestPath} because the service is excluded`)
+      return
+    }
+
     if (application.metadata.annotations['github.head-sha'] === currentHeadSha) {
       core.info(`Preserving the application manifest: ${applicationManifestPath}`)
       return
@@ -110,6 +128,14 @@ const writeServices = async (inputs: Inputs): Promise<void> => {
     )
 
     const namespaceApplicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.namespace}--${service}.yaml`
+
+    if (inputs.excludeServices.includes(service)) {
+      core.info(
+        `Preserving the existing application manifest: ${namespaceApplicationManifestPath} because the service is excluded`,
+      )
+      continue
+    }
+
     if (existingApplicationManifestPaths.includes(namespaceApplicationManifestPath)) {
       core.info(`Preserving the existing application manifest: ${namespaceApplicationManifestPath}`)
       continue

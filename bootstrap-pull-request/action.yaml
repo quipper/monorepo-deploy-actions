@@ -31,6 +31,9 @@ inputs:
   current-head-sha:
     description: SHA of current head commit (For internal use)
     default: ${{ github.event.pull_request.head.sha || github.sha }}
+  exclude-services:
+    description: List of services to exclude from the overlay (multiline)
+    required: false
 
 outputs:
   services:
