@@ -12,6 +12,9 @@ inputs:
     description: Source repository
     required: true
     default: ${{ github.repository }}
+  prebuilt-branch:
+    description: Prebuilt branch. Default to `prebuilt/{source-repository-name}/{overlay}`
+    required: false
   destination-repository:
     description: Destination repository
     required: true

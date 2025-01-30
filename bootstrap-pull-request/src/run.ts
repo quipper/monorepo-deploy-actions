@@ -9,6 +9,7 @@ type Inputs = {
   overlay: string
   namespace: string
   sourceRepository: string
+  prebuiltBranch: string | undefined
   destinationRepository: string
   destinationRepositoryToken: string
   namespaceManifest: string | undefined
@@ -70,7 +71,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<prebuilt.Service[] | 
 
 const checkoutPrebuiltBranch = async (inputs: Inputs) => {
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
-  const branch = `prebuilt/${sourceRepositoryName}/${inputs.overlay}`
+  const branch = inputs.prebuiltBranch ?? `prebuilt/${sourceRepositoryName}/${inputs.overlay}`
   return await core.group(
     `Checking out the prebuilt branch: ${branch}`,
     async () =>

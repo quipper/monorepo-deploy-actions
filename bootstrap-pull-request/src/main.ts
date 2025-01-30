@@ -6,6 +6,7 @@ const main = async (): Promise<void> => {
     overlay: core.getInput('overlay', { required: true }),
     namespace: core.getInput('namespace', { required: true }),
     sourceRepository: core.getInput('source-repository', { required: true }),
+    prebuiltBranch: core.getInput('prebuilt-branch') || undefined,
     destinationRepository: core.getInput('destination-repository', { required: true }),
     destinationRepositoryToken: core.getInput('destination-repository-token', { required: true }),
     namespaceManifest: core.getInput('namespace-manifest') || undefined,

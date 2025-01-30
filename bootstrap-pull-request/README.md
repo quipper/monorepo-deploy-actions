@@ -57,7 +57,7 @@ jobs:
 This action creates a namespace branch into the destination repository.
 
 ```
-ns/${source-repository}/${overlay}/${namespace-prefix}${pull-request-number}
+ns/{source-repository-name}/{overlay}/{namespace-prefix}{pull-request-number}
 ```
 
 It creates the following directory structure.
@@ -66,16 +66,16 @@ It creates the following directory structure.
 .
 ├── applications
 |   ├── namespace.yaml
-|   └── ${namespace}--${service}.yaml
+|   └── {namespace}--{service}.yaml
 └── services
-    └── ${service}
+    └── {service}
         └── generated.yaml
 ```
 
 It assumes that the below name of prebuilt branch exists in the destination repository.
 
 ```
-prebuilt/${source-repository}/${overlay}
+`prebuilt/{source-repository-name}/{overlay}`
 ```
 
 It bootstraps the namespace branch by the following steps:
