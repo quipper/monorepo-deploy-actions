@@ -14,6 +14,7 @@ const main = async (): Promise<void> => {
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
       actor: github.context.actor,
+      eventName: github.context.eventName,
       now: () => new Date(),
       timeZone: core.getInput('time-zone') || undefined,
     },

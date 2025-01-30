@@ -15,6 +15,7 @@ type Inputs = {
   owner: string
   repo: string
   actor: string
+  eventName: string
   now: () => Date
   timeZone: string | undefined
 }
@@ -42,6 +43,12 @@ export const run = async (inputs: Inputs, octokit: Octokit): Promise<Outputs> =>
     return {}
   }
 
+  const reviewers = []
+  if (inputs.eventName === 'workflow_dispatch') {
+    core.info(`Requesting a review to @${inputs.actor} because the workflow was manually triggered`)
+    reviewers.push(inputs.actor)
+  }
+
   core.info(`Creating a pull request from ${inputs.head} to ${inputs.base}`)
   const timestamp = formatISO8601LocalTime(inputs.now(), inputs.timeZone)
   const pull = await createPull(octokit, {
@@ -53,8 +60,8 @@ export const run = async (inputs: Inputs, octokit: Octokit): Promise<Outputs> =>
     body: inputs.body,
     draft: inputs.draft,
     labels: inputs.labels,
-    reviewers: [inputs.actor],
-    assignees: [inputs.actor],
+    reviewers,
+    assignees: reviewers,
   })
   return {
     pullRequestUrl: pull.html_url,
