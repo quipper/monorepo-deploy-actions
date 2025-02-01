@@ -1,7 +1,7 @@
 import * as os from 'os'
 import * as path from 'path'
 import { promises as fs } from 'fs'
-import { syncServicesFromPrebuilt } from '../src/prebuilt.js'
+import { Service, syncServicesFromPrebuilt } from '../src/prebuilt.js'
 
 const readContent = async (filename: string) => await fs.readFile(filename, 'utf-8')
 
@@ -17,14 +17,31 @@ describe('syncServicesFromPrebuilt', () => {
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
       destinationRepository: 'octocat/destination-repository',
+      prebuiltBranch: 'prebuilt/source-repository/pr',
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(services).toStrictEqual([
-      { service: 'a', headRef: 'main', headSha: 'main-branch-sha' },
-      { service: 'b', headRef: 'main', headSha: 'main-branch-sha' },
+    expect(services).toStrictEqual<Service[]>([
+      {
+        service: 'a',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
+      {
+        service: 'b',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
     ])
     expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
@@ -46,14 +63,31 @@ describe('syncServicesFromPrebuilt', () => {
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
       destinationRepository: 'octocat/destination-repository',
+      prebuiltBranch: 'prebuilt/source-repository/pr',
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(services).toStrictEqual([
-      { service: 'a', headRef: 'main', headSha: 'main-branch-sha' },
-      { service: 'b', headRef: 'main', headSha: 'main-branch-sha' },
+    expect(services).toStrictEqual<Service[]>([
+      {
+        service: 'a',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
+      {
+        service: 'b',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
     ])
     expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
@@ -75,14 +109,23 @@ describe('syncServicesFromPrebuilt', () => {
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
       destinationRepository: 'octocat/destination-repository',
+      prebuiltBranch: 'prebuilt/source-repository/pr',
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(services).toStrictEqual([
-      { service: 'a', headRef: 'topic-branch', headSha: 'current-sha' },
-      { service: 'b', headRef: 'main', headSha: 'main-branch-sha' },
+    expect(services).toStrictEqual<Service[]>([
+      { service: 'a', builtFrom: { pullRequest: { headRef: 'topic-branch', headSha: 'current-sha' } } },
+      {
+        service: 'b',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
     ])
     expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(
@@ -104,14 +147,31 @@ describe('syncServicesFromPrebuilt', () => {
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
       destinationRepository: 'octocat/destination-repository',
+      prebuiltBranch: 'prebuilt/source-repository/pr',
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(services).toStrictEqual([
-      { service: 'a', headRef: 'main', headSha: 'main-branch-sha' },
-      { service: 'b', headRef: 'main', headSha: 'main-branch-sha' },
+    expect(services).toStrictEqual<Service[]>([
+      {
+        service: 'a',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
+      {
+        service: 'b',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
     ])
     expect(await fs.readdir(`${namespaceDirectory}/applications`, { recursive: true })).toStrictEqual([
       'pr-123--a.yaml',
@@ -135,14 +195,23 @@ describe('syncServicesFromPrebuilt', () => {
       namespace: 'pr-123',
       sourceRepositoryName: 'source-repository',
       destinationRepository: 'octocat/destination-repository',
+      prebuiltBranch: 'prebuilt/source-repository/pr',
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(services).toStrictEqual([
-      { service: 'a', headRef: undefined, headSha: undefined },
-      { service: 'b', headRef: 'main', headSha: 'main-branch-sha' },
+    expect(services).toStrictEqual<Service[]>([
+      { service: 'a', builtFrom: { pullRequest: { headRef: undefined, headSha: undefined } } },
+      {
+        service: 'b',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
     ])
     expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationPushedWithoutSha)
@@ -164,6 +233,7 @@ metadata:
     github.action: bootstrap-pull-request
     github.head-ref: main
     github.head-sha: main-branch-sha
+    built-from-prebuilt-branch: prebuilt/source-repository/pr
 spec:
   project: source-repository
   source:
@@ -268,6 +338,7 @@ metadata:
     github.action: bootstrap-pull-request
     github.head-ref: main
     github.head-sha: main-branch-sha
+    built-from-prebuilt-branch: prebuilt/source-repository/pr
 spec:
   project: source-repository
   source:

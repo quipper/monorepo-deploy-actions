@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import { run } from './run.js'
 
 const main = async (): Promise<void> => {
-  await run({
+  const outputs = await run({
     overlay: core.getInput('overlay', { required: true }),
     namespace: core.getInput('namespace', { required: true }),
     sourceRepository: core.getInput('source-repository', { required: true }),
@@ -12,6 +12,7 @@ const main = async (): Promise<void> => {
     substituteVariables: core.getMultilineInput('substitute-variables'),
     currentHeadSha: core.getInput('current-head-sha', { required: true }),
   })
+  core.setOutput('services', JSON.stringify(outputs.services))
 }
 
 main().catch((e: Error) => {

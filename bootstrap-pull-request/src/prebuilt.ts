@@ -12,6 +12,7 @@ type Inputs = {
   namespace: string
   sourceRepositoryName: string
   destinationRepository: string
+  prebuiltBranch: string
   prebuiltDirectory: string
   namespaceDirectory: string
   substituteVariables: Map<string, string>
@@ -19,35 +20,43 @@ type Inputs = {
 
 export type Service = {
   service: string
-  headRef: string | undefined
-  headSha: string | undefined
+  builtFrom: {
+    // Available if the service was built from the current pull request.
+    pullRequest?: {
+      headRef: string | undefined
+      headSha: string | undefined
+    }
+    // Available if the service was built from the prebuilt branch.
+    prebuilt?: {
+      prebuiltBranch: string | undefined
+      builtFrom: {
+        headRef: string | undefined
+        headSha: string | undefined
+      }
+    }
+  }
 }
 
 export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[]> => {
   core.info(`Syncing from the prebuilt branch to the namespace branch`)
-  const preservedServices = await deleteOutdatedApplicationManifests(inputs)
-  const wroteServices = await writeServices(inputs)
-  return [...preservedServices, ...wroteServices]
+  await deleteOutdatedApplicationManifests(inputs)
+  await writeServices(inputs)
+  return await listApplicationManifests(inputs.namespaceDirectory)
 }
 
-const deleteOutdatedApplicationManifests = async (inputs: Inputs): Promise<Service[]> => {
-  const preservedServices = []
+const deleteOutdatedApplicationManifests = async (inputs: Inputs): Promise<void> => {
   const applicationManifestGlob = await glob.create(`${inputs.namespaceDirectory}/applications/**`, {
     matchDirectories: false,
   })
   for await (const applicationManifestPath of applicationManifestGlob.globGenerator()) {
-    const preservedService = await deleteOutdatedApplicationManifest(applicationManifestPath, inputs.currentHeadSha)
-    if (preservedService !== undefined) {
-      preservedServices.push(preservedService)
-    }
+    await deleteOutdatedApplicationManifest(applicationManifestPath, inputs.currentHeadSha)
   }
-  return preservedServices
 }
 
 const deleteOutdatedApplicationManifest = async (
   applicationManifestPath: string,
   currentHeadSha: string,
-): Promise<Service | undefined> => {
+): Promise<void> => {
   const application = await parseApplicationManifest(applicationManifestPath)
   if (application instanceof Error) {
     const error: Error = application
@@ -59,25 +68,16 @@ const deleteOutdatedApplicationManifest = async (
   // bootstrap-pull-request action needs to be run after git-push-service action.
   // See https://github.com/quipper/monorepo-deploy-actions/pull/1763 for the details.
   if (application.metadata.annotations['github.action'] === 'git-push-service') {
-    const service = path.basename(application.spec.source.path)
     if (application.metadata.annotations['github.head-sha'] === currentHeadSha) {
       core.info(`Preserving the application manifest: ${applicationManifestPath}`)
-      return {
-        service,
-        headRef: application.metadata.annotations['github.head-ref'],
-        headSha: application.metadata.annotations['github.head-sha'],
-      }
+      return
     }
     // For the backward compatibility.
     // Before https://github.com/quipper/monorepo-deploy-actions/pull/1768, the head SHA was not recorded.
     // When this action is called for an old pull request, we assume that the application manifest was pushed on the current commit.
     if (application.metadata.annotations['github.head-sha'] === undefined) {
       core.info(`Preserving the application manifest: ${applicationManifestPath}`)
-      return {
-        service,
-        headRef: application.metadata.annotations['github.head-ref'],
-        headSha: application.metadata.annotations['github.head-sha'],
-      }
+      return
     }
   }
 
@@ -85,8 +85,7 @@ const deleteOutdatedApplicationManifest = async (
   await io.rmRF(applicationManifestPath)
 }
 
-const writeServices = async (inputs: Inputs): Promise<Service[]> => {
-  const wroteServices = []
+const writeServices = async (inputs: Inputs): Promise<void> => {
   const existingApplicationManifestPaths = await (
     await glob.create(`${inputs.namespaceDirectory}/applications/*.yaml`, { matchDirectories: false })
   ).glob()
@@ -116,13 +115,7 @@ const writeServices = async (inputs: Inputs): Promise<Service[]> => {
       continue
     }
     await writeService(inputs, service, prebuiltApplication)
-    wroteServices.push({
-      service,
-      headRef: prebuiltApplication.metadata.annotations['github.head-ref'],
-      headSha: prebuiltApplication.metadata.annotations['github.head-sha'],
-    })
   }
-  return wroteServices
 }
 
 const writeService = async (inputs: Inputs, service: string, prebuiltApplication: PartialApplication) => {
@@ -155,12 +148,55 @@ const writeServiceManifests = async (inputs: Inputs, service: string) => {
   }
 }
 
+const listApplicationManifests = async (namespaceDirectory: string): Promise<Service[]> => {
+  const services: Service[] = []
+  const applicationManifestGlob = await glob.create(`${namespaceDirectory}/applications/*.yaml`, {
+    matchDirectories: false,
+  })
+  for await (const applicationManifestPath of applicationManifestGlob.globGenerator()) {
+    const application = await parseApplicationManifest(applicationManifestPath)
+    if (application instanceof Error) {
+      continue
+    }
+    const service = path.basename(application.spec.source.path)
+    switch (application.metadata.annotations['github.action']) {
+      case 'git-push-service':
+        services.push({
+          service,
+          builtFrom: {
+            pullRequest: {
+              headRef: application.metadata.annotations['github.head-ref'],
+              headSha: application.metadata.annotations['github.head-sha'],
+            },
+          },
+        })
+        break
+      case 'bootstrap-pull-request':
+        services.push({
+          service,
+          builtFrom: {
+            prebuilt: {
+              prebuiltBranch: application.metadata.annotations['built-from-prebuilt-branch'],
+              builtFrom: {
+                headRef: application.metadata.annotations['github.head-ref'],
+                headSha: application.metadata.annotations['github.head-sha'],
+              },
+            },
+          },
+        })
+        break
+    }
+  }
+  return services
+}
+
 type PartialApplication = {
   metadata: {
     annotations: {
       'github.action': string
       'github.head-ref': string | undefined
       'github.head-sha': string | undefined
+      'built-from-prebuilt-branch': string | undefined
     }
   }
   spec: {
@@ -230,6 +266,7 @@ const buildApplicationManifest = (inputs: Inputs, service: string, prebuiltAppli
         'github.action': 'bootstrap-pull-request',
         'github.head-ref': prebuiltApplication.metadata.annotations['github.head-ref'],
         'github.head-sha': prebuiltApplication.metadata.annotations['github.head-sha'],
+        'built-from-prebuilt-branch': inputs.prebuiltBranch,
       },
     },
     spec: {
