@@ -90,19 +90,19 @@ To push a manifest as a prebuilt manifest:
     manifests: ${{ steps.kustomize.outputs.directory }}/**
     overlay: pr
     service: foo
-    destination-branch: prebuilt/REPOSITORY/pr
+    destination-branch: prebuilt/source-repository/pr
 ```
 
 It pushes the following file into a destination repository:
 
 ```
-destination-repository (branch: prebuilt/${project}/${overlay})
+destination-repository (branch: prebuilt/source-repository/pr)
 └── services
     └── ${service}
         └── generated.yaml
 ```
 
-You can build the prebuilt manifest using [git-push-services-from-prebuilt action](../git-push-services-from-prebuilt).
+You can build the prebuilt manifest using [bootstrap-pull-request action](../bootstrap-pull-request).
 
 ## Options
 

@@ -10,6 +10,7 @@ type Inputs = {
   namespace: string
   sourceRepository: string
   destinationRepository: string
+  prebuiltBranch: string | undefined
   destinationRepositoryToken: string
   namespaceManifest: string | undefined
   substituteVariables: string[]
@@ -32,7 +33,11 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
 
 const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
-  const prebuiltBranch = `prebuilt/${sourceRepositoryName}/${inputs.overlay}`
+  // TODO: prebuiltBranch input will be required in the future release.
+  if (inputs.prebuiltBranch === undefined) {
+    core.warning('prebuilt-branch input will be required in the future release.')
+  }
+  const prebuiltBranch = inputs.prebuiltBranch ?? `prebuilt/${sourceRepositoryName}/${inputs.overlay}`
 
   const prebuiltDirectory = await checkoutPrebuiltBranch(inputs, prebuiltBranch)
   const namespaceDirectory = await checkoutNamespaceBranch(inputs)
