@@ -13,6 +13,7 @@ const main = async (): Promise<void> => {
     substituteVariables: core.getMultilineInput('substitute-variables'),
     currentHeadSha: core.getInput('current-head-sha', { required: true }),
     excludeServices: core.getMultilineInput('exclude-services'),
+    invertExcludeServices: core.getBooleanInput('invert-exclude-services') || false,
   })
   core.setOutput('services', JSON.stringify(outputs.services))
 }
