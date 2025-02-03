@@ -6,11 +6,12 @@ When a pull request is created or updated, this action copies the service manife
 ```mermaid
 graph LR
   subgraph Source repository
-    SourceNamespaceManifest[Namespace manifest]
+    Source[Source]
   end
   subgraph Destination repository
     subgraph Prebuilt branch
-      PrebuiltServiceManifest[Service manifest]
+      PrebuiltApplicationManifest[Application manifest]
+      Source --Build--> PrebuiltServiceManifest[Service manifest]
     end
     subgraph Namespace branch
       ApplicationManifest[Application manifest]
@@ -18,8 +19,7 @@ graph LR
       NamespaceManifest[Namespace manifest]
     end
   end
-  PrebuiltServiceManifest --Copy--> ServiceManifest
-  SourceNamespaceManifest --Copy--> NamespaceManifest
+  PrebuiltServiceManifest --Build--> ServiceManifest
 ```
 
 ## Getting Started

@@ -16,23 +16,28 @@ type Inputs = {
   currentHeadSha: string
 }
 
-export const run = async (inputs: Inputs): Promise<void> => {
-  const services = await retryExponential(() => bootstrapNamespace(inputs), {
+type Outputs = {
+  services: prebuilt.Service[]
+}
+
+export const run = async (inputs: Inputs): Promise<Outputs> => {
+  const outputs = await retryExponential(() => bootstrapNamespace(inputs), {
     maxAttempts: 50,
     waitMs: 10000,
   })
-  if (services) {
-    writeSummary(inputs, services)
-  }
+  writeSummary(inputs, outputs.services)
   await core.summary.write()
+  return outputs
 }
 
-const bootstrapNamespace = async (inputs: Inputs): Promise<prebuilt.Service[] | void | Error> => {
-  const prebuiltDirectory = await checkoutPrebuiltBranch(inputs)
+const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
+  const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
+  const prebuiltBranch = `prebuilt/${sourceRepositoryName}/${inputs.overlay}`
+
+  const prebuiltDirectory = await checkoutPrebuiltBranch(inputs, prebuiltBranch)
   const namespaceDirectory = await checkoutNamespaceBranch(inputs)
 
   const substituteVariables = parseSubstituteVariables(inputs.substituteVariables)
-  const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
 
   const services = await prebuilt.syncServicesFromPrebuilt({
     currentHeadSha: inputs.currentHeadSha,
@@ -40,6 +45,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<prebuilt.Service[] | 
     namespace: inputs.namespace,
     sourceRepositoryName,
     destinationRepository: inputs.destinationRepository,
+    prebuiltBranch,
     prebuiltDirectory,
     namespaceDirectory,
     substituteVariables,
@@ -55,7 +61,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<prebuilt.Service[] | 
 
   if ((await git.status(namespaceDirectory)) === '') {
     core.info('Nothing to commit')
-    return
+    return { services }
   }
   return await core.group(`Pushing the namespace branch`, async () => {
     await git.commit(namespaceDirectory, commitMessage(inputs.namespace))
@@ -64,19 +70,17 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<prebuilt.Service[] | 
       // Retry from checkout if fast-forward was failed
       return new Error(`git-push returned code ${pushCode}`)
     }
-    return services
+    return { services }
   })
 }
 
-const checkoutPrebuiltBranch = async (inputs: Inputs) => {
-  const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
-  const branch = `prebuilt/${sourceRepositoryName}/${inputs.overlay}`
+const checkoutPrebuiltBranch = async (inputs: Inputs, prebuiltBranch: string) => {
   return await core.group(
-    `Checking out the prebuilt branch: ${branch}`,
+    `Checking out the prebuilt branch: ${prebuiltBranch}`,
     async () =>
       await git.checkout({
         repository: inputs.destinationRepository,
-        branch,
+        branch: prebuiltBranch,
         token: inputs.destinationRepositoryToken,
       }),
   )
@@ -118,16 +122,19 @@ const writeSummary = (inputs: Inputs, services: prebuilt.Service[]) => {
   core.summary.addTable([
     [
       { data: 'Service', header: true },
-      { data: 'Source branch', header: true },
-      { data: 'Source commit', header: true },
+      { data: 'Built from', header: true },
     ],
-    ...services.map((service) => [
-      service.service,
-      service.headRef ?? '(unknown)',
-      service.headSha
-        ? `<a href="${github.context.serverUrl}/${inputs.sourceRepository}/tree/${service.headSha}">${service.headSha}</a>`
-        : '(unknown)',
-    ]),
+    ...services.map((service) => {
+      if (service.builtFrom.pullRequest) {
+        const shaLink = `<a href="${github.context.serverUrl}/${inputs.sourceRepository}/tree/${service.builtFrom.pullRequest.headSha}">${service.builtFrom.pullRequest.headSha}</a>`
+        return [service.service, `Current pull request at ${shaLink}`]
+      }
+      if (service.builtFrom.prebuilt) {
+        const shaLink = `<a href="${github.context.serverUrl}/${inputs.sourceRepository}/tree/${service.builtFrom.prebuilt.builtFrom.headSha}">${service.builtFrom.prebuilt.builtFrom.headSha}</a>`
+        return [service.service, `${service.builtFrom.prebuilt.builtFrom.headRef}@${shaLink}`]
+      }
+      return [service.service, '(unknown)']
+    }),
   ])
 }
 

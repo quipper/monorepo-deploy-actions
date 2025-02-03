@@ -29,6 +29,10 @@ inputs:
     description: SHA of current head commit (For internal use)
     default: ${{ github.event.pull_request.head.sha || github.sha }}
 
+outputs:
+  services:
+    description: JSON string of services. See prebuilt.ts for the JSON schema
+
 runs:
   using: 'node20'
   main: 'dist/index.js'
