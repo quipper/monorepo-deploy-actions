@@ -17,6 +17,7 @@ type Inputs = {
   namespaceDirectory: string
   substituteVariables: Map<string, string>
   excludeServices: string[]
+  invertExcludeServices: boolean
 }
 
 export type Service = {
@@ -50,14 +51,27 @@ const deleteOutdatedApplicationManifests = async (inputs: Inputs): Promise<void>
     matchDirectories: false,
   })
   for await (const applicationManifestPath of applicationManifestGlob.globGenerator()) {
-    await deleteOutdatedApplicationManifest(applicationManifestPath, inputs.currentHeadSha)
+    await deleteOutdatedApplicationManifest(
+      applicationManifestPath,
+      inputs.currentHeadSha,
+      inputs.excludeServices,
+      inputs.invertExcludeServices,
+    )
   }
+}
+
+const shouldServiceExcluded = (service: string, excludeServices: string[], invertExcludeServices: boolean): boolean => {
+  if (invertExcludeServices) {
+    return !excludeServices.includes(service)
+  }
+  return excludeServices.includes(service)
 }
 
 const deleteOutdatedApplicationManifest = async (
   applicationManifestPath: string,
   currentHeadSha: string,
   excludeServices: string[],
+  invertExcludeServices: boolean,
 ): Promise<void> => {
   const application = await parseApplicationManifest(applicationManifestPath)
   if (application instanceof Error) {
@@ -69,7 +83,7 @@ const deleteOutdatedApplicationManifest = async (
 
   const service = path.basename(application.spec.source.path)
 
-  if (excludeServices.includes(service)) {
+  if (shouldServiceExcluded(service, excludeServices, invertExcludeServices)) {
     core.info(`Preserving the application manifest: ${applicationManifestPath} because the service is excluded`)
     return
   }
@@ -79,7 +93,7 @@ const deleteOutdatedApplicationManifest = async (
   if (application.metadata.annotations['github.action'] === 'git-push-service') {
     const service = path.basename(application.spec.source.path)
 
-    if (excludeServices.includes(service)) {
+    if (shouldServiceExcluded(service, excludeServices, invertExcludeServices)) {
       core.info(`Preserving the application manifest: ${applicationManifestPath} because the service is excluded`)
       return
     }
@@ -127,7 +141,7 @@ const writeServices = async (inputs: Inputs): Promise<void> => {
 
     const namespaceApplicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.namespace}--${service}.yaml`
 
-    if (inputs.excludeServices.includes(service)) {
+    if (shouldServiceExcluded(service, inputs.excludeServices, inputs.invertExcludeServices)) {
       core.info(
         `Preserving the existing application manifest: ${namespaceApplicationManifestPath} because the service is excluded`,
       )
