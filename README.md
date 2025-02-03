@@ -105,7 +105,7 @@ Node.js and pnpm is required.
 
 ```sh
 brew install node@20
-corepack enable pnpm
+npm install -g pnpm@latest-10
 ```
 
 ### Release workflow
