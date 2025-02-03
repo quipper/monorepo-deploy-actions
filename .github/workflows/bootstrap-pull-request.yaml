@@ -88,4 +88,4 @@ jobs:
         continue-on-error: true
         if: always()
         run: |
-          git push origin --delete "refs/heads/bootstrap-pull-request-e2e-prebuilt-${{ github.run_id }}""
+          git push origin --delete "refs/heads/bootstrap-pull-request-e2e-prebuilt-${{ github.run_id }}"
