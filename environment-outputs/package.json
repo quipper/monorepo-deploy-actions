@@ -1,0 +1,22 @@
+{
+  "name": "environment-outputs",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "ncc build --source-map --license licenses.txt src/main.ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@actions/core": "1.10.1",
+    "@actions/github": "6.0.0",
+    "@octokit/plugin-retry": "6.0.1",
+    "@octokit/request-error": "5.0.1",
+    "ajv": "8.12.0",
+    "js-yaml": "4.1.0",
+    "minimatch": "9.0.3"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "4.0.9",
+    "@types/minimatch": "5.1.2"
+  }
+}
