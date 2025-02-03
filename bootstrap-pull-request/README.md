@@ -48,6 +48,7 @@ jobs:
           overlay: pr
           namespace: pr-${{ github.event.number }}
           destination-repository: octocat/generated-manifests
+          prebuilt-branch: prebuilt/source-repository/pr
           destination-repository-token: ${{ steps.destination-repository-github-app.outputs.token }}
           namespace-manifest: deploy-config/overlays/pr/namespace.yaml
           substitute-variables: |
@@ -70,12 +71,6 @@ It creates the following directory structure.
 └── services
     └── ${service}
         └── generated.yaml
-```
-
-It assumes that the below name of prebuilt branch exists in the destination repository.
-
-```
-prebuilt/${source-repository}/${overlay}
 ```
 
 It bootstraps the namespace branch by the following steps:

@@ -59,13 +59,14 @@ jobs:
           cp -av "$GITHUB_WORKSPACE/bootstrap-pull-request/tests/fixtures/prebuilt/." .
           git add .
           git commit -m "Add prebuilt branch for e2e-test of ${GITHUB_REF}"
-          git push origin "HEAD:refs/heads/prebuilt/monorepo-deploy-actions/overlay-${{ github.run_id }}"
+          git push origin "HEAD:refs/heads/bootstrap-pull-request-e2e-prebuilt-${{ github.run_id }}"
 
       - uses: ./bootstrap-pull-request
         with:
           overlay: overlay-${{ github.run_id }}
           namespace: pr-${{ github.event.number }}
           destination-repository: ${{ github.repository }}
+          prebuilt-branch: bootstrap-pull-request-e2e-prebuilt-${{ github.run_id }}"
           namespace-manifest: bootstrap-pull-request/tests/fixtures/namespace.yaml
           substitute-variables: NAMESPACE=pr-${{ github.event.number }}
 
@@ -87,4 +88,4 @@ jobs:
         continue-on-error: true
         if: always()
         run: |
-          git push origin --delete "refs/heads/prebuilt/monorepo-deploy-actions/overlay-${{ github.run_id }}"
+          git push origin --delete "refs/heads/bootstrap-pull-request-e2e-prebuilt-${{ github.run_id }}""
