@@ -91,13 +91,6 @@ const deleteOutdatedApplicationManifest = async (
   // bootstrap-pull-request action needs to be run after git-push-service action.
   // See https://github.com/quipper/monorepo-deploy-actions/pull/1763 for the details.
   if (application.metadata.annotations['github.action'] === 'git-push-service') {
-    const service = path.basename(application.spec.source.path)
-
-    if (shouldServiceExcluded(service, excludeServices, invertExcludeServices)) {
-      core.info(`Preserving the application manifest: ${applicationManifestPath} because the service is excluded`)
-      return
-    }
-
     if (application.metadata.annotations['github.head-sha'] === currentHeadSha) {
       core.info(`Preserving the application manifest: ${applicationManifestPath}`)
       return
