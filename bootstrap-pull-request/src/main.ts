@@ -12,6 +12,7 @@ const main = async (): Promise<void> => {
     namespaceManifest: core.getInput('namespace-manifest') || undefined,
     substituteVariables: core.getMultilineInput('substitute-variables'),
     currentHeadSha: core.getInput('current-head-sha', { required: true }),
+    excludeServices: core.getMultilineInput('exclude-services'),
   })
   core.setOutput('services', JSON.stringify(outputs.services))
 }

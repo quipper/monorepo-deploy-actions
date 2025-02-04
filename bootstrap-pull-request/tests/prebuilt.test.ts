@@ -21,6 +21,7 @@ describe('syncServicesFromPrebuilt', () => {
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
+      excludeServices: [],
     })
 
     expect(services).toStrictEqual<Service[]>([
@@ -67,6 +68,7 @@ describe('syncServicesFromPrebuilt', () => {
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
+      excludeServices: [],
     })
 
     expect(services).toStrictEqual<Service[]>([
@@ -113,6 +115,7 @@ describe('syncServicesFromPrebuilt', () => {
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
+      excludeServices: [],
     })
 
     expect(services).toStrictEqual<Service[]>([
@@ -136,6 +139,33 @@ describe('syncServicesFromPrebuilt', () => {
     expect(await readContent(`${namespaceDirectory}/services/b/generated.yaml`)).toBe(serviceB)
   })
 
+  it('does not write service manifest if it was exluded', async () => {
+    const namespaceDirectory = await createEmptyDirectory()
+    await fs.mkdir(`${namespaceDirectory}/applications`)
+    await fs.mkdir(`${namespaceDirectory}/services/a`, { recursive: true })
+    await fs.writeFile(`${namespaceDirectory}/applications/pr-123--a.yaml`, applicationPushedOnOutdatedCommit)
+    await fs.writeFile(`${namespaceDirectory}/services/a/generated.yaml`, 'this-should-be-kept')
+
+    await syncServicesFromPrebuilt({
+      currentHeadSha: 'current-sha',
+      overlay: 'pr',
+      namespace: 'pr-123',
+      sourceRepositoryName: 'source-repository',
+      destinationRepository: 'octocat/destination-repository',
+      prebuiltBranch: 'prebuilt/source-repository/pr',
+      prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
+      namespaceDirectory,
+      substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
+      excludeServices: ['a'],
+    })
+
+    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
+    expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(
+      applicationPushedOnOutdatedCommit,
+    )
+    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe('this-should-be-kept')
+  })
+
   it('deletes a service which does not exist in the prebuilt branch', async () => {
     const namespaceDirectory = await createEmptyDirectory()
     await fs.mkdir(`${namespaceDirectory}/applications`)
@@ -151,6 +181,7 @@ describe('syncServicesFromPrebuilt', () => {
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
+      excludeServices: [],
     })
 
     expect(services).toStrictEqual<Service[]>([
@@ -199,6 +230,7 @@ describe('syncServicesFromPrebuilt', () => {
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
+      excludeServices: [],
     })
 
     expect(services).toStrictEqual<Service[]>([
