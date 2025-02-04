@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
 import * as git from './git.js'
-import { retryExponential } from './retry.js'
 import { listApplicationFiles, readApplication, ApplicationVersion } from './application.js'
 
 type Inputs = {
@@ -14,17 +13,14 @@ type Inputs = {
 type Outputs = ApplicationVersion[]
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  const result = await retryExponential(() => getServiceVersions(inputs), {
-    maxAttempts: 50,
-    waitMs: 10000,
-  })
+  const result = await getServiceVersions(inputs)
 
   if (result) {
     core.setOutput('application-versions', JSON.stringify(result))
   }
 }
 
-const getServiceVersions = async (inputs: Inputs): Promise<Outputs | Error> => {
+const getServiceVersions = async (inputs: Inputs): Promise<Outputs> => {
   core.info(`Checking out the namespace branch`)
   const namespaceDirectory = await checkoutNamespaceBranch(inputs)
   core.debug(`Namespace directory: ${namespaceDirectory}`)
