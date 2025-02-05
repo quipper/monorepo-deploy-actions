@@ -15,6 +15,10 @@ inputs:
   destination-repository:
     description: Destination repository
     required: true
+  error-if-namespace-branch-not-exists:
+    description: Throw an error if the namespace branch does not exist
+    required: false
+    default: "false"
   prebuilt-branch:
     description: Name of prebuilt branch in the destination repository. This input will be required in the future release.
     required: false
