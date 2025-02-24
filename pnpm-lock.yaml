@@ -89,8 +89,8 @@ importers:
         version: 5.0.1
     devDependencies:
       msw:
-        specifier: 2.7.1
-        version: 2.7.1(@types/node@20.17.19)(typescript@5.7.3)
+        specifier: 2.7.3
+        version: 2.7.3(@types/node@20.17.19)(typescript@5.7.3)
 
   environment-matrix:
     dependencies:
@@ -1945,8 +1945,8 @@ packages:
   ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
 
-  msw@2.7.1:
-    resolution: {integrity: sha512-TVT65uoWt9LE4lMTLBdClHBQVwvZv5ofac1YyE119nCrNyXf4ktdeVnWH9Fyt94Ifmiedhw6Npp4DSuVRSuRpw==}
+  msw@2.7.3:
+    resolution: {integrity: sha512-+mycXv8l2fEAjFZ5sjrtjJDmm2ceKGjrNbBr1durRg6VkU9fNUE/gsmQ51hWbHqs+l35W1iM+ZsmOD9Fd6lspw==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -4826,7 +4826,7 @@ snapshots:
 
   ms@2.1.2: {}
 
-  msw@2.7.1(@types/node@20.17.19)(typescript@5.7.3):
+  msw@2.7.3(@types/node@20.17.19)(typescript@5.7.3):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
