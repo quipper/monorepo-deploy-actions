@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import { Environment } from './rule.js'
-import { RequestError } from '@octokit/request-error'
 import { Octokit, assertPullRequestPayload } from './github.js'
 import assert from 'assert'
 
@@ -58,7 +57,7 @@ const createDeployment = async (
         deployment_id: deployment.id,
       })
     } catch (error) {
-      if (error instanceof RequestError) {
+      if (isRequestError(error)) {
         core.warning(`Could not delete the old deployment ${deployment.url}: ${error.status} ${error.message}`)
         continue
       }
@@ -107,3 +106,8 @@ const getDeploymentRef = (context: Context): string => {
   }
   return context.ref
 }
+
+type RequestError = Error & { status: number }
+
+const isRequestError = (error: unknown): error is RequestError =>
+  error instanceof Error && 'status' in error && typeof error.status === 'number'

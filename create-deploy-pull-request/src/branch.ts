@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
 import { GitHub } from '@actions/github/lib/utils'
-import { RequestError } from '@octokit/request-error'
 
 type Octokit = InstanceType<typeof GitHub>
 
@@ -15,7 +14,7 @@ export const checkIfBranchExists = async (octokit: Octokit, options: CheckIfBran
     await octokit.rest.repos.getBranch(options)
     return true
   } catch (error) {
-    if (error instanceof RequestError && error.status === 404) {
+    if (isRequestError(error) && error.status === 404) {
       return false
     }
     throw error
@@ -46,3 +45,8 @@ export const createBranch = async (octokit: Octokit, options: CreateUpdateBranch
     sha: fromBranch.commit.sha,
   })
 }
+
+type RequestError = Error & { status: number }
+
+const isRequestError = (error: unknown): error is RequestError =>
+  error instanceof Error && 'status' in error && typeof error.status === 'number'
