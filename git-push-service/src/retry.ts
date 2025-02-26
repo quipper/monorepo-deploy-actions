@@ -1,5 +1,4 @@
 import * as core from '@actions/core'
-import { RequestError } from '@octokit/request-error'
 
 type RetrySpec = {
   maxAttempts: number
@@ -28,9 +27,14 @@ export const catchHttpStatus = async <T>(status: number, f: () => Promise<T>): P
   try {
     return await f()
   } catch (e) {
-    if (e instanceof RequestError && e.status === status) {
+    if (isRequestError(e) && e.status === status) {
       return e // retry
     }
     throw e
   }
 }
+
+type RequestError = Error & { status: number }
+
+const isRequestError = (error: unknown): error is RequestError =>
+  error instanceof Error && 'status' in error && typeof error.status === 'number'
