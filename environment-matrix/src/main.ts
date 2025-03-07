@@ -6,7 +6,7 @@ const main = async (): Promise<void> => {
     rules: core.getInput('rules', { required: true }),
     token: core.getInput('token'),
   })
-  core.setOutput('json', outputs.environments)
+  core.setOutput('json', outputs.json)
 }
 
 main().catch((e: Error) => {

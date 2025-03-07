@@ -11,7 +11,7 @@ type Inputs = {
 }
 
 type Outputs = {
-  environments: Environment[]
+  json: rule.Outputs[]
 }
 
 type Environment = rule.Environment & {
@@ -41,5 +41,7 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
   core.startGroup('Environments')
   core.info(JSON.stringify(environments, undefined, 2))
   core.endGroup()
-  return { environments }
+  return {
+    json: environments.map((environment) => environment.outputs),
+  }
 }
