@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as rule from './rule.js'
-import * as matcher from './matcher.js'
+import { parseRulesYAML } from './rule.js'
+import { find } from './matcher.js'
 import { createDeployment } from './deployment.js'
 import { getOctokit } from './github.js'
 
@@ -11,16 +11,16 @@ type Inputs = {
 }
 
 type Outputs = {
-  json: rule.Outputs[]
+  json: Record<string, string>[]
 }
 
 export const run = async (inputs: Inputs): Promise<Outputs> => {
-  const rules = rule.parseRulesYAML(inputs.rules)
+  const rules = parseRulesYAML(inputs.rules)
   core.startGroup('Rules')
   core.info(JSON.stringify(rules, undefined, 2))
   core.endGroup()
 
-  const environments = matcher.find(github.context, rules)
+  const environments = find(github.context, rules)
   if (environments === undefined) {
     throw new Error(`no environment to deploy`)
   }
