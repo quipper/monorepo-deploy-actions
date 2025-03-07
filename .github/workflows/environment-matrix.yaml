@@ -55,13 +55,15 @@ jobs:
                 base: '**'
                 head: '**'
               environments:
-                - overlay: pr
-                  namespace: pr-${{ github.event.pull_request.number }}
+                - outputs:
+                    overlay: pr
+                    namespace: pr-${{ github.event.pull_request.number }}
             - push:
                 ref: refs/heads/main
               environments:
-                - overlay: development
-                  namespace: development
+                - outputs:
+                    overlay: development
+                    namespace: development
 
   e2e-test-matrix:
     needs: e2e-test
