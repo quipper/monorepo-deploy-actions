@@ -6,13 +6,17 @@ test('parse a valid YAML', () => {
     base: '**'
     head: '**'
   environments:
-    - overlay: pr
-      namespace: pr-1
+    - github-deployment:
+        environment: pr/pr-1/backend
+      outputs:
+        overlay: pr
+        namespace: pr-1
 - push:
     ref: refs/heads/main
   environments:
-    - overlay: development
-      namespace: development
+    - outputs:
+        overlay: development
+        namespace: development
 `
   expect(parseRulesYAML(yaml)).toStrictEqual<Rules>([
     {
@@ -22,8 +26,13 @@ test('parse a valid YAML', () => {
       },
       environments: [
         {
-          overlay: 'pr',
-          namespace: 'pr-1',
+          outputs: {
+            overlay: 'pr',
+            namespace: 'pr-1',
+          },
+          'github-deployment': {
+            environment: 'pr/pr-1/backend',
+          },
         },
       ],
     },
@@ -33,8 +42,10 @@ test('parse a valid YAML', () => {
       },
       environments: [
         {
-          overlay: 'development',
-          namespace: 'development',
+          outputs: {
+            overlay: 'development',
+            namespace: 'development',
+          },
         },
       ],
     },
@@ -45,13 +56,28 @@ test('parse an empty string', () => {
   expect(() => parseRulesYAML('')).toThrow(`invalid rules YAML:  must be array`)
 })
 
-test('parse an invalid string', () => {
-  const yaml = `
+describe('parse an invalid object', () => {
+  test('missing field in pull_request', () => {
+    const yaml = `
 - pull_request:
     base: '**'
+  environments:
+    - outputs:
+        overlay: pr
+        namespace: pr-1
+`
+    expect(() => parseRulesYAML(yaml)).toThrow(`invalid rules YAML: /0/pull_request must have property 'head'`)
+  })
+
+  test('missing field in environment', () => {
+    const yaml = `
+- pull_request:
+    base: '**'
+    head: '**'
   environments:
     - overlay: pr
       namespace: pr-1
 `
-  expect(() => parseRulesYAML(yaml)).toThrow(`invalid rules YAML: /0/pull_request must have property 'head'`)
+    expect(() => parseRulesYAML(yaml)).toThrow(`invalid rules YAML: /0/environments/0 must have property 'outputs'`)
+  })
 })

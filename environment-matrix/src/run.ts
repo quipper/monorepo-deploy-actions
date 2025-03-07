@@ -1,43 +1,45 @@
-import assert from 'assert'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { Environment, parseRulesYAML } from './rule.js'
-import { find } from './matcher.js'
-import { EnvironmentWithDeployment, createGitHubDeploymentForEnvironments } from './deployment.js'
+import * as rule from './rule.js'
+import * as matcher from './matcher.js'
+import { createDeployment } from './deployment.js'
 import { getOctokit } from './github.js'
 
 type Inputs = {
   rules: string
-  service: string
   token: string
 }
 
 type Outputs = {
-  environments: Environment[] | EnvironmentWithDeployment[]
+  environments: Environment[]
+}
+
+type Environment = rule.Environment & {
+  'github-deployment-url'?: string
 }
 
 export const run = async (inputs: Inputs): Promise<Outputs> => {
-  const rules = parseRulesYAML(inputs.rules)
-  core.info(`rules: ${JSON.stringify(rules, undefined, 2)}`)
-  const environments = find(github.context, rules)
+  const rules = rule.parseRulesYAML(inputs.rules)
+  core.startGroup('Rules')
+  core.info(JSON.stringify(rules, undefined, 2))
+  core.endGroup()
+
+  const environments: Environment[] | undefined = matcher.find(github.context, rules)
   if (environments === undefined) {
     throw new Error(`no environment to deploy`)
   }
 
-  core.info(`environments = ${JSON.stringify(environments, undefined, 2)}`)
-  if (!inputs.service) {
-    return { environments }
+  core.info(`Creating GitHub Deployments for environments`)
+  const octokit = getOctokit(inputs.token)
+  for (const environment of environments) {
+    if (environment['github-deployment']) {
+      const deployment = await createDeployment(octokit, github.context, environment['github-deployment'])
+      environment['github-deployment-url'] = deployment.url
+    }
   }
 
-  core.info(`Creating GitHub Deployments for environments`)
-  assert(inputs.token, `inputs.token is required`)
-  const octokit = getOctokit(inputs.token)
-  const environmentsWithDeployments = await createGitHubDeploymentForEnvironments(
-    octokit,
-    github.context,
-    environments,
-    inputs.service,
-  )
-  core.info(`environmentsWithDeployments = ${JSON.stringify(environmentsWithDeployments, undefined, 2)}`)
-  return { environments: environmentsWithDeployments }
+  core.startGroup('Environments')
+  core.info(JSON.stringify(environments, undefined, 2))
+  core.endGroup()
+  return { environments }
 }

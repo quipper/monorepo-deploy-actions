@@ -16,17 +16,19 @@ It can be descibed as the following rules:
     base: '**'
     head: '**'
   environments:
-    - overlay: pr
-      namespace: pr-${{ github.event.pull_request.number }}
+    - outputs:
+        overlay: pr
+        namespace: pr-${{ github.event.pull_request.number }}
 - push:
     ref: refs/heads/main
   environments:
-    - overlay: development
-      namespace: development
+    - outputs:
+        overlay: development
+        namespace: development
 ```
 
 This action finds a rule matched to the current context.
-If any rule is matched, this action returns a JSON string of `environments` field of the rule.
+If any rule is matched, this action returns a JSON string of `outputs` field of the rule.
 For example, when `main` branch is pushed, this action returns the following JSON:
 
 ```json
@@ -40,12 +42,7 @@ If no rule is matched, this action fails.
 
 This action supports [GitHub Deployment](https://docs.github.com/en/rest/deployments/deployments) to receive the deployment status from an external system, such as Argo CD.
 
-It creates a GitHub Deployment for each environment in the form of `{overlay}/{namespace}/{service}`,
-if the following fields are given:
-
-- `overlay` (in `environments`)
-- `namespace` (in `environments`)
-- `service` (in the inputs)
+If a rule has `github-deployment` field, this action creates a GitHub Deployment for the environment.
 
 If an old deployment exists, this action deletes it and recreates new one.
 
@@ -55,17 +52,19 @@ For example, the below inputs are given,
 ```yaml
 - uses: quipper/monorepo-deploy-actions/environment-matrix@v1
   with:
-    service: backend
     rules: |
       - pull_request:
           base: '**'
           head: '**'
         environments:
-          - overlay: pr
-            namespace: pr-${{ github.event.pull_request.number }}
+          - outputs:
+              overlay: pr
+              namespace: pr-${{ github.event.pull_request.number }}
+            github-deployment:
+              environment: pr/pr-${{ github.event.pull_request.number }}/backend
 ```
 
-this action creates a GitHub Deployment of `pr/pr-1/backend` and returns the following JSON:
+This action creates a GitHub Deployment of `pr/pr-1/backend` and returns the following JSON:
 
 ```json
 [
@@ -97,13 +96,15 @@ jobs:
                 base: '**'
                 head: '**'
               environments:
-                - overlay: pr
-                  namespace: pr-${{ github.event.pull_request.number }}
+                - outputs:
+                    overlay: pr
+                    namespace: pr-${{ github.event.pull_request.number }}
             - push:
                 ref: refs/heads/main
               environments:
-                - overlay: development
-                  namespace: development
+                - outputs:
+                    overlay: development
+                    namespace: development
 
   deploy:
     needs:
@@ -129,11 +130,10 @@ jobs:
 
 ### Inputs
 
-| Name      | Default        | Description                                                 |
-| --------- | -------------- | ----------------------------------------------------------- |
-| `rules`   | (required)     | YAML string of rules                                        |
-| `service` | (optional)     | Name of service to deploy. If set, create GitHub Deployment |
-| `token`   | `github.token` | GitHub token, required if `service` is set                  |
+| Name    | Default        | Description                                            |
+| ------- | -------------- | ------------------------------------------------------ |
+| `rules` | (required)     | YAML string of rules                                   |
+| `token` | `github.token` | GitHub token, required if creating a GitHub deployment |
 
 The following fields are available in the rules YAML.
 
@@ -141,10 +141,14 @@ The following fields are available in the rules YAML.
 - pull_request: # on pull_request event
     base: # base branch name (wildcard available)
     head: # head branch name (wildcard available)
-  environments: # array of map<string, string>
+  environments:
+    - outputs:
+        key: value # map<string, string>
+      github-deployment: # optional
+        environment: pr-1 # environment name
 - push: # on push event
     ref: refs/heads/main # ref name (wildcard available)
-  environments: # array of map<string, string>
+  environments: [] # same as above
 ```
 
 It supports the wildcard pattern.

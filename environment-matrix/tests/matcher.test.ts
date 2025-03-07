@@ -9,8 +9,10 @@ const rules: Rules = [
     },
     environments: [
       {
-        overlay: 'pr',
-        namespace: 'pr-2',
+        outputs: {
+          overlay: 'pr',
+          namespace: 'pr-2',
+        },
       },
     ],
   },
@@ -21,8 +23,10 @@ const rules: Rules = [
     },
     environments: [
       {
-        overlay: 'pr',
-        namespace: 'pr-1',
+        outputs: {
+          overlay: 'pr',
+          namespace: 'pr-1',
+        },
       },
     ],
   },
@@ -32,8 +36,10 @@ const rules: Rules = [
     },
     environments: [
       {
-        overlay: 'development',
-        namespace: 'development',
+        outputs: {
+          overlay: 'development',
+          namespace: 'development',
+        },
       },
     ],
   },
@@ -53,8 +59,10 @@ test('pull_request with any branches', () => {
   }
   expect(find(context, rules)).toStrictEqual([
     {
-      overlay: 'pr',
-      namespace: 'pr-1',
+      outputs: {
+        overlay: 'pr',
+        namespace: 'pr-1',
+      },
     },
   ])
 })
@@ -73,8 +81,10 @@ test('pull_request with patterns', () => {
   }
   expect(find(context, rules)).toStrictEqual([
     {
-      overlay: 'pr',
-      namespace: 'pr-2',
+      outputs: {
+        overlay: 'pr',
+        namespace: 'pr-2',
+      },
     },
   ])
 })
@@ -87,8 +97,10 @@ test('push', () => {
   }
   expect(find(context, rules)).toStrictEqual([
     {
-      overlay: 'development',
-      namespace: 'development',
+      outputs: {
+        overlay: 'development',
+        namespace: 'development',
+      },
     },
   ])
 })
