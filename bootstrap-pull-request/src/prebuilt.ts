@@ -90,18 +90,12 @@ const deleteOutdatedApplicationManifest = async (
 
   // bootstrap-pull-request action needs to be run after git-push-service action.
   // See https://github.com/quipper/monorepo-deploy-actions/pull/1763 for the details.
-  if (application.metadata.annotations['github.action'] === 'git-push-service') {
-    if (application.metadata.annotations['github.head-sha'] === currentHeadSha) {
-      core.info(`Preserving the application manifest: ${applicationManifestPath}`)
-      return
-    }
-    // For the backward compatibility.
-    // Before https://github.com/quipper/monorepo-deploy-actions/pull/1768, the head SHA was not recorded.
-    // When this action is called for an old pull request, we assume that the application manifest was pushed on the current commit.
-    if (application.metadata.annotations['github.head-sha'] === undefined) {
-      core.info(`Preserving the application manifest: ${applicationManifestPath}`)
-      return
-    }
+  if (
+    application.metadata.annotations['github.action'] === 'git-push-service' &&
+    application.metadata.annotations['github.head-sha'] === currentHeadSha
+  ) {
+    core.info(`Preserving the application manifest: ${applicationManifestPath}`)
+    return
   }
 
   core.info(`Deleting the outdated application manifest: ${applicationManifestPath}`)
