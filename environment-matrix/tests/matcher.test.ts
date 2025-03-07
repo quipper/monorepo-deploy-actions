@@ -1,4 +1,4 @@
-import { find } from '../src/matcher.js'
+import { findEnvironmentsFromRules, matchEnvironment } from '../src/matcher.js'
 import { Rules } from '../src/rule.js'
 
 const rules: Rules = [
@@ -45,7 +45,7 @@ const rules: Rules = [
   },
 ]
 
-test('pull_request with any branches', () => {
+test('pull_request with any branches', async () => {
   const context = {
     eventName: 'pull_request',
     payload: {
@@ -57,7 +57,7 @@ test('pull_request with any branches', () => {
     },
     ref: 'refs/pull/1/merge',
   }
-  expect(find(context, rules)).toStrictEqual([
+  expect(await findEnvironmentsFromRules(rules, context)).toStrictEqual([
     {
       outputs: {
         overlay: 'pr',
@@ -67,7 +67,7 @@ test('pull_request with any branches', () => {
   ])
 })
 
-test('pull_request with patterns', () => {
+test('pull_request with patterns', async () => {
   const context = {
     eventName: 'pull_request',
     payload: {
@@ -79,7 +79,7 @@ test('pull_request with patterns', () => {
     },
     ref: 'refs/pull/2/merge',
   }
-  expect(find(context, rules)).toStrictEqual([
+  expect(await findEnvironmentsFromRules(rules, context)).toStrictEqual([
     {
       outputs: {
         overlay: 'pr',
@@ -89,13 +89,13 @@ test('pull_request with patterns', () => {
   ])
 })
 
-test('push', () => {
+test('push', async () => {
   const context = {
     eventName: 'push',
     payload: {},
     ref: 'refs/heads/main',
   }
-  expect(find(context, rules)).toStrictEqual([
+  expect(await findEnvironmentsFromRules(rules, context)).toStrictEqual([
     {
       outputs: {
         overlay: 'development',
@@ -105,11 +105,34 @@ test('push', () => {
   ])
 })
 
-test('push with no match', () => {
+test('push with no match', async () => {
   const context = {
     eventName: 'push',
     payload: {},
     ref: 'refs/tags/v1.0.0',
   }
-  expect(find(context, rules)).toBeUndefined()
+  expect(await findEnvironmentsFromRules(rules, context)).toBeNull()
+})
+
+describe('matchEnvironment', () => {
+  describe('if-file-exists', () => {
+    it('returns true if the file exists', async () => {
+      const environment = {
+        outputs: {
+          namespace: 'pr-2',
+        },
+        'if-file-exists': 'tests/fixtures/*',
+      }
+      expect(await matchEnvironment(environment)).toBeTruthy()
+    })
+    it('returns false if the file does not exist', async () => {
+      const environment = {
+        outputs: {
+          namespace: 'pr-2',
+        },
+        'if-file-exists': 'tests/fixtures/not-found',
+      }
+      expect(await matchEnvironment(environment)).toBeFalsy()
+    })
+  })
 })
