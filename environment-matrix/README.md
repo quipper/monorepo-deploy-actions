@@ -79,6 +79,7 @@ This action creates a GitHub Deployment of `pr/pr-1/backend` and returns the fol
 ### Conditional deployment
 
 If an environment has `if-file-exists` field, this action checks if the glob pattern matches any files in the working directory.
+For example, the below inputs are given,
 
 ```yaml
 - uses: quipper/monorepo-deploy-actions/environment-matrix@v1
@@ -94,6 +95,14 @@ If an environment has `if-file-exists` field, this action checks if the glob pat
               overlay: pr
               namespace: pr-${{ github.event.pull_request.number }}
 ```
+
+This action returns the following JSON if `backend/kubernetes/overlays/pr/kustomization.yaml` exists:
+
+```json
+[{ "overlay": "pr", "namespace": "pr-1" }]
+```
+
+It returns an empty array if the file does not exist.
 
 ## Example
 

@@ -6,7 +6,7 @@ import { assertPullRequestPayload } from './github.js'
 
 type Context = Pick<typeof github.context, 'eventName' | 'ref' | 'payload'>
 
-export const findEnvironmentsFromRules = async (rules: Rules, context: Context): Promise<Environment[] | null> => {
+export const findEnvironmentsFromRules = async (rules: Rules, context: Context): Promise<Environment[] | undefined> => {
   for (const rule of rules) {
     if (matchRule(rule, context)) {
       const environments = []
@@ -18,7 +18,6 @@ export const findEnvironmentsFromRules = async (rules: Rules, context: Context):
       return environments
     }
   }
-  return null
 }
 
 const matchRule = (rule: Rule, context: Context): boolean => {

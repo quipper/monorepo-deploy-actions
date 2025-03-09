@@ -111,7 +111,7 @@ test('push with no match', async () => {
     payload: {},
     ref: 'refs/tags/v1.0.0',
   }
-  expect(await findEnvironmentsFromRules(rules, context)).toBeNull()
+  expect(await findEnvironmentsFromRules(rules, context)).toBeUndefined()
 })
 
 describe('matchEnvironment', () => {

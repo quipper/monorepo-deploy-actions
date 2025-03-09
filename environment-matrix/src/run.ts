@@ -21,7 +21,7 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
   core.endGroup()
 
   const environments = await findEnvironmentsFromRules(rules, github.context)
-  if (environments === null) {
+  if (environments === undefined) {
     throw new Error(`no environment to deploy`)
   }
 
