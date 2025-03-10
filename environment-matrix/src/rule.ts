@@ -1,11 +1,37 @@
 import * as yaml from 'js-yaml'
 import Ajv, { JTDSchemaType } from 'ajv/dist/jtd'
 
-export type Environment = Record<string, string>
+export type Outputs = Record<string, string>
 
-const EnvironmentSchema: JTDSchemaType<Environment> = {
+const OutputsSchema: JTDSchemaType<Outputs> = {
   values: {
     type: 'string',
+  },
+}
+
+export type GitHubDeployment = {
+  environment: string
+}
+
+const GitHubDeploymentSchema: JTDSchemaType<GitHubDeployment> = {
+  properties: {
+    environment: {
+      type: 'string',
+    },
+  },
+}
+
+export type Environment = {
+  outputs: Outputs
+  'github-deployment'?: GitHubDeployment
+}
+
+const EnvironmentSchema: JTDSchemaType<Environment> = {
+  properties: {
+    outputs: OutputsSchema,
+  },
+  optionalProperties: {
+    'github-deployment': GitHubDeploymentSchema,
   },
 }
 

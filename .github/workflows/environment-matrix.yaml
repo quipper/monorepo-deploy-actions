@@ -49,19 +49,22 @@ jobs:
       - uses: ./environment-matrix
         id: environment-matrix
         with:
-          service: example
           rules: |
             - pull_request:
                 base: '**'
                 head: '**'
               environments:
-                - overlay: pr
-                  namespace: pr-${{ github.event.pull_request.number }}
+                - github-deployment:
+                    environment: pr-${{ github.event.pull_request.number }}/example
+                  outputs:
+                    overlay: pr
+                    namespace: pr-${{ github.event.pull_request.number }}
             - push:
                 ref: refs/heads/main
               environments:
-                - overlay: development
-                  namespace: development
+                - outputs:
+                    overlay: development
+                    namespace: development
 
   e2e-test-matrix:
     needs: e2e-test

@@ -1,51 +1,17 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { Environment } from './rule.js'
 import { Octokit, assertPullRequestPayload } from './github.js'
 import assert from 'assert'
+import { GitHubDeployment } from './rule.js'
 
 type Context = Pick<typeof github.context, 'eventName' | 'repo' | 'ref' | 'payload'>
 
-export type EnvironmentWithDeployment = Environment & {
-  // URL of the GitHub Deployment
-  // e.g. https://api.github.com/repos/octocat/example/deployments/1
-  'github-deployment-url': string
-}
-
-export const createGitHubDeploymentForEnvironments = async (
-  octokit: Octokit,
-  context: Context,
-  environments: Environment[],
-  service: string,
-): Promise<EnvironmentWithDeployment[]> => {
-  const environmentsWithDeployments = []
-  for (const environment of environments) {
-    const { overlay, namespace } = environment
-    if (overlay && namespace && service) {
-      const deployment = await createDeployment(octokit, context, overlay, namespace, service)
-      environmentsWithDeployments.push({
-        ...environment,
-        'github-deployment-url': deployment.url,
-      })
-    }
-  }
-  return environmentsWithDeployments
-}
-
-const createDeployment = async (
-  octokit: Octokit,
-  context: Context,
-  overlay: string,
-  namespace: string,
-  service: string,
-) => {
-  const environment = `${overlay}/${namespace}/${service}`
-
-  core.info(`Finding the old deployments for environment ${environment}`)
+export const createDeployment = async (octokit: Octokit, context: Context, deployment: GitHubDeployment) => {
+  core.info(`Finding the old deployments for environment ${deployment.environment}`)
   const oldDeployments = await octokit.rest.repos.listDeployments({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    environment,
+    environment: deployment.environment,
   })
 
   core.info(`Deleting ${oldDeployments.data.length} deployment(s)`)
@@ -68,16 +34,15 @@ const createDeployment = async (
   core.info(`Deleted ${oldDeployments.data.length} deployment(s)`)
 
   const ref = getDeploymentRef(context)
-  core.info(`Creating a deployment for environment=${environment}, ref=${ref}`)
+  core.info(`Creating a deployment for environment=${deployment.environment}, ref=${ref}`)
   const created = await octokit.rest.repos.createDeployment({
     owner: context.repo.owner,
     repo: context.repo.repo,
     ref,
-    environment,
+    environment: deployment.environment,
     auto_merge: false,
     required_contexts: [],
     transient_environment: context.eventName === 'pull_request',
-    payload: { overlay, namespace, service },
   })
   assert.strictEqual(created.status, 201)
   core.info(`Created a deployment ${created.data.url}`)
