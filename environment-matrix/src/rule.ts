@@ -23,6 +23,7 @@ const GitHubDeploymentSchema: JTDSchemaType<GitHubDeployment> = {
 
 export type Environment = {
   outputs: Outputs
+  'if-file-exists'?: string
   'github-deployment'?: GitHubDeployment
 }
 
@@ -31,6 +32,9 @@ const EnvironmentSchema: JTDSchemaType<Environment> = {
     outputs: OutputsSchema,
   },
   optionalProperties: {
+    'if-file-exists': {
+      type: 'string',
+    },
     'github-deployment': GitHubDeploymentSchema,
   },
 }

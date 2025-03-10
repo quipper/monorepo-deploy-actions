@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import { parseRulesYAML } from './rule.js'
-import { find } from './matcher.js'
+import { findEnvironmentsFromRules } from './matcher.js'
 import { createDeployment } from './deployment.js'
 import { getOctokit } from './github.js'
 
@@ -20,7 +20,7 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
   core.info(JSON.stringify(rules, undefined, 2))
   core.endGroup()
 
-  const environments = find(github.context, rules)
+  const environments = await findEnvironmentsFromRules(rules, github.context)
   if (environments === undefined) {
     throw new Error(`no environment to deploy`)
   }

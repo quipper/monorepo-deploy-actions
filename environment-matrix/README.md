@@ -38,7 +38,7 @@ For example, when `main` branch is pushed, this action returns the following JSO
 This action finds a rule in order.
 If no rule is matched, this action fails.
 
-## GitHub Deployment
+### GitHub Deployment
 
 This action supports [GitHub Deployment](https://docs.github.com/en/rest/deployments/deployments) to receive the deployment status from an external system, such as Argo CD.
 
@@ -75,6 +75,34 @@ This action creates a GitHub Deployment of `pr/pr-1/backend` and returns the fol
   }
 ]
 ```
+
+### Conditional deployment
+
+If an environment has `if-file-exists` field, this action checks if the glob pattern matches any files in the working directory.
+For example, the below inputs are given,
+
+```yaml
+- uses: quipper/monorepo-deploy-actions/environment-matrix@v1
+  with:
+    rules: |
+      - pull_request:
+          base: '**'
+          head: '**'
+        environments:
+          - if-file-exists: |
+              backend/kubernetes/overlays/pr/kustomization.yaml
+            outputs:
+              overlay: pr
+              namespace: pr-${{ github.event.pull_request.number }}
+```
+
+This action returns the following JSON if `backend/kubernetes/overlays/pr/kustomization.yaml` exists:
+
+```json
+[{ "overlay": "pr", "namespace": "pr-1" }]
+```
+
+It returns an empty array if the file does not exist.
 
 ## Example
 
