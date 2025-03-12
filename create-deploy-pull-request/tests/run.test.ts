@@ -67,14 +67,15 @@ it('should create pull request if base branch exists', async () => {
     http.post('https://api.github.com/repos/test-owner/test-repo-2/pulls', () =>
       HttpResponse.json({
         html_url: 'https://github.com/test-owner/test-repo-2/pulls/100',
+        number: 100,
       }),
     ),
-    http.post('https://api.github.com/repos/test-owner/test-repo-2/pulls//requested_reviewers', () =>
+    http.post('https://api.github.com/repos/test-owner/test-repo-2/pulls/100/requested_reviewers', () =>
       HttpResponse.json({
         // Omit an example response
       }),
     ),
-    http.post('https://api.github.com/repos/test-owner/test-repo-2/issues//assignees', () =>
+    http.post('https://api.github.com/repos/test-owner/test-repo-2/issues/100/assignees', () =>
       HttpResponse.json({
         // Omit an example response
       }),
@@ -97,5 +98,8 @@ it('should create pull request if base branch exists', async () => {
     },
     getOctokit(),
   )
-  expect(outputs.pullRequestUrl).toBe('https://github.com/test-owner/test-repo-2/pulls/100')
+  expect(outputs).toStrictEqual({
+    pullRequestUrl: 'https://github.com/test-owner/test-repo-2/pulls/100',
+    pullRequestNumber: 100,
+  })
 })
