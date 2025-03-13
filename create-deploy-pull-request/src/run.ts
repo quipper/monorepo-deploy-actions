@@ -22,6 +22,7 @@ type Inputs = {
 
 type Outputs = {
   pullRequestUrl?: string
+  pullRequestNumber?: number
 }
 
 export const run = async (inputs: Inputs, octokit: Octokit): Promise<Outputs> => {
@@ -65,6 +66,7 @@ export const run = async (inputs: Inputs, octokit: Octokit): Promise<Outputs> =>
   })
   return {
     pullRequestUrl: pull.html_url,
+    pullRequestNumber: pull.number,
   }
 }
 

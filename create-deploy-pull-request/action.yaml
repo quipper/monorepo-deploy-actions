@@ -32,6 +32,8 @@ inputs:
 outputs:
   pull-request-url:
     description: URL of the pull request if created
+  pull-request-number:
+    description: Number of the pull request if created
 
 runs:
   using: 'node20'

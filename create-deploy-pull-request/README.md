@@ -56,21 +56,4 @@ jobs:
 
 ## Specification
 
-### Inputs
-
-| Name          | Default        | Description                       |
-| ------------- | -------------- | --------------------------------- |
-| `head-branch` | (required)     | Name of head branch               |
-| `base-branch` | (required)     | Name of base branch               |
-| `title`       | (required)     | Title of pull request             |
-| `body`        | (required)     | Body of pull request              |
-| `labels`      | -              | Label of pull request (multiline) |
-| `draft`       | `true`         | Set the pull request to draft     |
-| `time-zone`   | -              | Time-zone for timestamp in title  |
-| `token`       | `github.token` | GitHub token                      |
-
-### Outputs
-
-| Name               | Description                        |
-| ------------------ | ---------------------------------- |
-| `pull-request-url` | URL of the pull request if created |
+See [action.yaml](action.yaml).

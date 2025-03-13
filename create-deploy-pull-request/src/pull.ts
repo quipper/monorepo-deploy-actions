@@ -18,6 +18,7 @@ type CreatePullOptions = {
 
 type Pull = {
   html_url: string
+  number: number
 }
 
 export const createPull = async (octokit: Octokit, options: CreatePullOptions): Promise<Pull> => {
