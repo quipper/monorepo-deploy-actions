@@ -12,6 +12,6 @@
     "@actions/github": "6.0.0"
   },
   "devDependencies": {
-    "msw": "2.7.4"
+    "msw": "2.7.5"
   }
 }
