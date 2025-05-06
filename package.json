@@ -7,7 +7,7 @@
     "@eslint/js": "9.26.0",
     "@tsconfig/recommended": "1.0.8",
     "@types/jest": "29.5.14",
-    "@types/node": "20.17.40",
+    "@types/node": "20.17.41",
     "@typescript-eslint/parser": "8.32.0",
     "@vercel/ncc": "0.38.3",
     "eslint": "9.26.0",
