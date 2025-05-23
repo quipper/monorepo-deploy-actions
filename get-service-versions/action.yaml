@@ -19,6 +19,10 @@ inputs:
     description: GitHub token for destination repository
     required: true
     default: ${{ github.token }}
+  success-if-not-found:
+    description: If true, the action will not fail if the namespace is not found
+    required: false
+    default: 'true'
 
 outputs:
   application-versions:
