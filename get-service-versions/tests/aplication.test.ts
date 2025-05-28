@@ -1,9 +1,25 @@
 import * as os from 'os'
 import * as path from 'path'
 import { promises as fs } from 'fs'
+import { getServiceVersions } from '../src/run.js'
 import { listApplicationFiles, readApplication } from '../src/application.js'
 
 const createEmptyDirectory = async () => await fs.mkdtemp(path.join(os.tmpdir(), 'bootstrap-pull-request-'))
+
+describe('getServiceVersions', () => {
+  it('returnes empty list if successIfNotFound', async () => {
+    const result = await getServiceVersions({
+      overlay: 'overlay',
+      namespace: 'namespace',
+      sourceRepository: 'sourceRepository',
+      destinationRepository: 'destinationRepository',
+      destinationRepositoryToken: 'destinationRepositoryToken',
+      successIfNotFound: true,
+    })
+
+    expect(result).toStrictEqual([])
+  })
+})
 
 describe('listApplicationFiles', () => {
   it('lists up the application files, not other files', async () => {
