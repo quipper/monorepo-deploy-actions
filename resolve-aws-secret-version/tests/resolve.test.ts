@@ -1,9 +1,11 @@
 import { promises as fs } from 'fs'
 import * as os from 'os'
 import { replaceSecretVersionIds, updateManifest } from '../src/resolve.js'
+import { vi, it, expect } from 'vitest'
+
 
 it('replaces the placeholder of AWSSecret with the current version id', async () => {
-  const manager = { getCurrentVersionId: jest.fn() }
+  const manager = { getCurrentVersionId: vi.fn() }
   manager.getCurrentVersionId.mockResolvedValue('c7ea50c5-b2be-4970-bf90-2237bef3b4cf')
 
   const tempdir = await fs.mkdtemp(`${os.tmpdir()}/resolve-aws-secret-version-action-`)
@@ -17,7 +19,7 @@ it('replaces the placeholder of AWSSecret with the current version id', async ()
 })
 
 it('replaces the placeholder of ExternalSecret with the current version id', async () => {
-  const manager = { getCurrentVersionId: jest.fn() }
+  const manager = { getCurrentVersionId: vi.fn() }
   manager.getCurrentVersionId.mockResolvedValue('c7ea50c5-b2be-4970-bf90-2237bef3b4cf')
 
   const tempdir = await fs.mkdtemp(`${os.tmpdir()}/resolve-aws-secret-version-action-`)
@@ -31,13 +33,13 @@ it('replaces the placeholder of ExternalSecret with the current version id', asy
 })
 
 it('does nothing for an empty string', async () => {
-  const manager = { getCurrentVersionId: jest.fn() }
+  const manager = { getCurrentVersionId: vi.fn() }
   const output = await replaceSecretVersionIds('', manager)
   expect(output).toBe('')
 })
 
 it('does nothing for an AWSSecret without a placeholder', async () => {
-  const manager = { getCurrentVersionId: jest.fn() }
+  const manager = { getCurrentVersionId: vi.fn() }
   const manifest = `---
 apiVersion: mumoshu.github.io/v1alpha1
 kind: AWSSecret
@@ -56,7 +58,7 @@ spec:
 })
 
 it('throws an error if invalid AWSSecret', async () => {
-  const manager = { getCurrentVersionId: jest.fn() }
+  const manager = { getCurrentVersionId: vi.fn() }
   const manifest = `---
 apiVersion: mumoshu.github.io/v1alpha1
 kind: AWSSecret

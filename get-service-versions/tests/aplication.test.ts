@@ -2,6 +2,7 @@ import * as os from 'os'
 import * as path from 'path'
 import { promises as fs } from 'fs'
 import { listApplicationFiles, readApplication } from '../src/application.js'
+import { describe, it, expect } from 'vitest'
 
 const createEmptyDirectory = async () => await fs.mkdtemp(path.join(os.tmpdir(), 'bootstrap-pull-request-'))
 
@@ -24,7 +25,7 @@ describe('listApplicationFiles', () => {
 })
 
 describe('readApplication', () => {
-  it('', async () => {
+  it('returns the application object', async () => {
     const namespaceDirectory = await createEmptyDirectory()
     await fs.mkdir(`${namespaceDirectory}/applications`)
     await fs.writeFile(`${namespaceDirectory}/applications/pr-123--a.yaml`, applicationA)

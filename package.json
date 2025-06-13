@@ -19,7 +19,8 @@
   },
   "scripts": {
     "format": "prettier --write **/*.ts",
-    "lint": "eslint --fix **/*.ts"
+    "lint": "eslint --fix **/*.ts",
+    "test": "vitest"
   },
   "engines": {
     "node": "20.x"
