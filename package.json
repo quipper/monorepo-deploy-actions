@@ -4,7 +4,7 @@
   "license": "MIT",
   "type": "module",
   "devDependencies": {
-    "@eslint/js": "9.28.0",
+    "@eslint/js": "9.29.0",
     "@tsconfig/node20": "20.1.5",
     "@types/node": "20.19.0",
     "@typescript-eslint/parser": "8.34.0",
