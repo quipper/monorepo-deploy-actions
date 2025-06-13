@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "ncc build --source-map --license licenses.txt src/main.ts",
-    "test": "jest"
+    "test": "vitest"
   },
   "dependencies": {
     "@actions/core": "1.11.1",
