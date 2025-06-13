@@ -11,7 +11,7 @@
     "@typescript-eslint/parser": "8.34.0",
     "@vercel/ncc": "0.38.3",
     "eslint": "9.28.0",
-    "eslint-plugin-jest": "28.13.4",
+    "eslint-plugin-jest": "28.13.5",
     "jest": "30.0.0",
     "pnpm": "10.12.1",
     "prettier": "3.5.3",
