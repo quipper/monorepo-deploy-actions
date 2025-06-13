@@ -9,7 +9,7 @@
     "@types/node": "20.19.0",
     "@typescript-eslint/parser": "8.34.0",
     "@vercel/ncc": "0.38.3",
-    "@vitest/eslint-plugin": "1.2.4",
+    "@vitest/eslint-plugin": "1.2.5",
     "eslint": "9.28.0",
     "pnpm": "10.12.1",
     "prettier": "3.5.3",
