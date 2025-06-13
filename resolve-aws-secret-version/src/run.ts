@@ -1,5 +1,5 @@
 import * as glob from '@actions/glob'
-import * as awsSecretsManager from './awsSecretsManager'
+import * as awsSecretsManager from './awsSecretsManager.js'
 import { updateManifest } from './resolve.js'
 
 type Inputs = {
