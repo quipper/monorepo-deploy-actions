@@ -1,6 +1,3 @@
 {
-  "extends": "@tsconfig/recommended/tsconfig.json",
-  "compilerOptions": {
-    "target": "ES2023"
-  }
+  "extends": "@tsconfig/node20/tsconfig.json"
 }
