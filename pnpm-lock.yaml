@@ -24,7 +24,7 @@ importers:
         specifier: 0.38.3
         version: 0.38.3
       '@vitest/eslint-plugin':
-        specifier: ^1.2.4
+        specifier: 1.2.4
         version: 1.2.4(eslint@9.28.0)(typescript@5.8.3)(vitest@3.2.3(@types/node@20.19.0)(msw@2.10.2(@types/node@20.19.0)(typescript@5.8.3)))
       eslint:
         specifier: 9.28.0
@@ -42,7 +42,7 @@ importers:
         specifier: 8.34.0
         version: 8.34.0(eslint@9.28.0)(typescript@5.8.3)
       vitest:
-        specifier: ^3.2.3
+        specifier: 3.2.3
         version: 3.2.3(@types/node@20.19.0)(msw@2.10.2(@types/node@20.19.0)(typescript@5.8.3))
 
   bootstrap-pull-request:
@@ -3029,7 +3029,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.34.0(typescript@5.8.3)
       '@typescript-eslint/types': 8.34.0
-      debug: 4.4.0
+      debug: 4.4.1
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
@@ -3047,7 +3047,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 8.34.0(typescript@5.8.3)
       '@typescript-eslint/utils': 8.34.0(eslint@9.28.0)(typescript@5.8.3)
-      debug: 4.4.0
+      debug: 4.4.1
       eslint: 9.28.0
       ts-api-utils: 2.1.0(typescript@5.8.3)
       typescript: 5.8.3
@@ -3062,7 +3062,7 @@ snapshots:
       '@typescript-eslint/tsconfig-utils': 8.34.0(typescript@5.8.3)
       '@typescript-eslint/types': 8.34.0
       '@typescript-eslint/visitor-keys': 8.34.0
-      debug: 4.4.0
+      debug: 4.4.1
       fast-glob: 3.3.2
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -3366,7 +3366,7 @@ snapshots:
 
   estree-walker@3.0.3:
     dependencies:
-      '@types/estree': 1.0.6
+      '@types/estree': 1.0.7
 
   esutils@2.0.3: {}
 
