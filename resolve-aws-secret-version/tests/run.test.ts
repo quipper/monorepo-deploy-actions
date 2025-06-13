@@ -1,5 +1,5 @@
 import { promises as fs } from 'fs'
-import * as awsSecretsManager from '../src/awsSecretsManager'
+import * as awsSecretsManager from '../src/awsSecretsManager.js'
 import * as os from 'os'
 import { run } from '../src/run.js'
 
