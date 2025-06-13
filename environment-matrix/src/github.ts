@@ -1,12 +1,11 @@
 import assert from 'assert'
 import * as pluginRetry from '@octokit/plugin-retry'
-import { GitHub, getOctokitOptions } from '@actions/github/lib/utils'
+import * as github from '@actions/github'
 
-export type Octokit = InstanceType<typeof GitHub>
+export type Octokit = ReturnType<typeof github.getOctokit>
 
 export const getOctokit = (token: string): Octokit => {
-  const MyOctokit = GitHub.plugin(pluginRetry.retry)
-  return new MyOctokit(getOctokitOptions(token, { previews: ['ant-man', 'flash'] }))
+  return github.getOctokit(token, { previews: ['ant-man', 'flash'] }, pluginRetry.retry)
 }
 
 // picked from https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request
