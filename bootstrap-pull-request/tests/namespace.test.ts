@@ -2,6 +2,7 @@ import * as os from 'os'
 import * as path from 'path'
 import { promises as fs } from 'fs'
 import { writeNamespaceManifest } from '../src/namespace.js'
+import { describe, it, expect } from 'vitest'
 
 const readContent = async (filename: string) => (await fs.readFile(filename)).toString()
 

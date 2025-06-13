@@ -1,13 +1,13 @@
 import { promises as fs } from 'fs'
-import * as awsSecretsManager from '../src/awsSecretsManager.js'
 import * as os from 'os'
 import { run } from '../src/run.js'
+import { vi, it, expect } from 'vitest'
+import * as awsSecretsManager from '../src/awsSecretsManager.js'
 
-jest.mock('../src/awsSecretsManager')
-const getCurrentVersionId = awsSecretsManager.getCurrentVersionId as jest.Mock
+vi.mock('../src/awsSecretsManager.js')
 
 it('replaces the placeholders of secrets', async () => {
-  getCurrentVersionId.mockResolvedValue('c7ea50c5-b2be-4970-bf90-2237bef3b4cf')
+  vi.mocked(awsSecretsManager.getCurrentVersionId).mockResolvedValue('c7ea50c5-b2be-4970-bf90-2237bef3b4cf')
 
   const tempdir = await fs.mkdtemp(`${os.tmpdir()}/resolve-aws-secret-version-action-`)
   await fs.copyFile(

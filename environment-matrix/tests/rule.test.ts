@@ -1,4 +1,5 @@
 import { Rules, parseRulesYAML } from '../src/rule.js'
+import { test, describe, expect } from 'vitest'
 
 test('parse a valid YAML', () => {
   const yaml = `

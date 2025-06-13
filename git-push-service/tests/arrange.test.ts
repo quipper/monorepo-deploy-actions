@@ -2,6 +2,7 @@ import * as os from 'os'
 import * as fs from 'fs/promises'
 import * as path from 'path'
 import { writeManifests } from '../src/arrange.js'
+import { it, expect } from 'vitest'
 
 const readContent = async (f: string) => await fs.readFile(f, 'utf-8')
 
