@@ -1,24 +1,27 @@
 name: git-push-services-patch
-description: action to push a patch to all services in a namespace
+description: Push a patch to all services in a namespace
 
 inputs:
   patch:
-    description: path to a patch
+    description: Path to a patch
     required: true
   operation:
-    description: add or delete
+    description: A choice of "add" or "delete"
     required: true
   overlay:
-    description: overlay name
+    description: Overlay name
     required: true
   namespace:
-    description: namespace name
+    description: Namespace name
     required: true
+  services:
+    description: Services to include (optional)
+    required: false
   exclude-services:
-    description: services to exclude (optional)
+    description: Services to exclude (optional)
     required: false
   destination-repository:
-    description: destination repository
+    description: Destination repository
     required: true
   token:
     description: GitHub token
