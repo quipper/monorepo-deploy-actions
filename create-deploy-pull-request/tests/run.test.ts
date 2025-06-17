@@ -31,16 +31,20 @@ it('should create base branch if not exist', async () => {
       base: 'production',
       title: 'Deploy service to production',
       body: 'Hello',
-      actor: 'octocat',
-      eventName: 'workflow_dispatch',
       labels: [],
       draft: true,
-      owner: 'test-owner',
-      repo: 'test-repo-1',
       now: () => new Date(Date.UTC(2023, 8, 7, 6, 1, 2, 0)),
       timeZone: 'Asia/Tokyo',
     },
     getOctokit(),
+    {
+      repo: {
+        owner: 'test-owner',
+        repo: 'test-repo-1',
+      },
+      actor: 'octocat',
+      eventName: 'workflow_dispatch',
+    },
   )
   expect(outputs.pullRequestUrl).toBeUndefined()
 })
@@ -88,16 +92,20 @@ it('should create pull request if base branch exists', async () => {
       base: 'production',
       title: 'Deploy service to production',
       body: 'Hello',
-      actor: 'octocat',
-      eventName: 'workflow_dispatch',
       labels: [],
       draft: true,
-      owner: 'test-owner',
-      repo: 'test-repo-2',
       now: () => new Date(Date.UTC(2023, 8, 7, 6, 1, 2, 0)),
       timeZone: 'Asia/Tokyo', // UTC+9
     },
     getOctokit(),
+    {
+      repo: {
+        owner: 'test-owner',
+        repo: 'test-repo-2',
+      },
+      actor: 'octocat',
+      eventName: 'workflow_dispatch',
+    },
   )
   expect(outputs).toStrictEqual({
     pullRequestUrl: 'https://github.com/test-owner/test-repo-2/pulls/100',

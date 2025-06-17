@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import * as github from '@actions/github'
+import * as github from './github.js'
 import { run } from './run.js'
 
 const main = async (): Promise<void> => {
@@ -11,14 +11,11 @@ const main = async (): Promise<void> => {
       body: core.getInput('body', { required: true }),
       labels: core.getMultilineInput('labels'),
       draft: core.getBooleanInput('draft', { required: true }),
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      actor: github.context.actor,
-      eventName: github.context.eventName,
       now: () => new Date(),
       timeZone: core.getInput('time-zone') || undefined,
     },
-    github.getOctokit(core.getInput('token', { required: true })),
+    github.getOctokit(),
+    github.getContext(),
   )
   await core.summary.write()
   if (outputs.pullRequestUrl) {

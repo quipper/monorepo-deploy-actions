@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "@actions/core": "1.11.1",
-    "@actions/github": "6.0.1"
+    "@octokit/action": "^8.0.2",
+    "@octokit/plugin-retry": "6.0.1"
   },
   "devDependencies": {
     "msw": "2.10.2"
