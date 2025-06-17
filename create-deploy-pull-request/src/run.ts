@@ -1,9 +1,8 @@
 import * as core from '@actions/core'
-import * as github from '@actions/github'
 import { createPull } from './pull.js'
 import { checkIfBranchExists, createBranch } from './branch.js'
-
-type Octokit = ReturnType<typeof github.getOctokit>
+import { Octokit } from '@octokit/action'
+import { Context } from './github.js'
 
 type Inputs = {
   head: string
@@ -12,10 +11,6 @@ type Inputs = {
   body: string
   draft: boolean
   labels: string[]
-  owner: string
-  repo: string
-  actor: string
-  eventName: string
   now: () => Date
   timeZone: string | undefined
 }
@@ -25,18 +20,18 @@ type Outputs = {
   pullRequestNumber?: number
 }
 
-export const run = async (inputs: Inputs, octokit: Octokit): Promise<Outputs> => {
+export const run = async (inputs: Inputs, octokit: Octokit, context: Context): Promise<Outputs> => {
   core.info(`Checking if ${inputs.base} branch exists`)
   const baseBranchExists = await checkIfBranchExists(octokit, {
-    owner: inputs.owner,
-    repo: inputs.repo,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
     branch: inputs.base,
   })
   if (!baseBranchExists) {
     core.info(`Creating ${inputs.base} branch because it does not exist`)
     await createBranch(octokit, {
-      owner: inputs.owner,
-      repo: inputs.repo,
+      owner: context.repo.owner,
+      repo: context.repo.repo,
       fromBranch: inputs.head,
       toBranch: inputs.base,
     })
@@ -45,16 +40,16 @@ export const run = async (inputs: Inputs, octokit: Octokit): Promise<Outputs> =>
   }
 
   const reviewers = []
-  if (inputs.eventName === 'workflow_dispatch') {
-    core.info(`Requesting a review to @${inputs.actor} because the workflow was manually triggered`)
-    reviewers.push(inputs.actor)
+  if (context.eventName === 'workflow_dispatch') {
+    core.info(`Requesting a review to @${context.actor} because the workflow was manually triggered`)
+    reviewers.push(context.actor)
   }
 
   core.info(`Creating a pull request from ${inputs.head} to ${inputs.base}`)
   const timestamp = formatISO8601LocalTime(inputs.now(), inputs.timeZone)
   const pull = await createPull(octokit, {
-    owner: inputs.owner,
-    repo: inputs.repo,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
     head: inputs.head,
     base: inputs.base,
     title: `${inputs.title} at ${timestamp}`,
