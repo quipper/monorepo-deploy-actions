@@ -21,6 +21,11 @@ defaults:
     working-directory: open-backport-pull-request
   
 jobs:
+  autofix:
+    uses: ./.github/workflows/autofix.yaml
+    with:
+      working-directory: open-backport-pull-request
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10

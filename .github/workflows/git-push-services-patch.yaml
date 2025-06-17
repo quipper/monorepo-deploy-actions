@@ -21,6 +21,11 @@ defaults:
     working-directory: git-push-services-patch
 
 jobs:
+  autofix:
+    uses: ./.github/workflows/autofix.yaml
+    with:
+      working-directory: git-push-services-patch
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10

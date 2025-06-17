@@ -3,7 +3,6 @@ import * as os from 'os'
 import { replaceSecretVersionIds, updateManifest } from '../src/resolve.js'
 import { vi, it, expect } from 'vitest'
 
-
 it('replaces the placeholder of AWSSecret with the current version id', async () => {
   const manager = { getCurrentVersionId: vi.fn() }
   manager.getCurrentVersionId.mockResolvedValue('c7ea50c5-b2be-4970-bf90-2237bef3b4cf')
