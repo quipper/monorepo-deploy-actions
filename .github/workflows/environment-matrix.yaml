@@ -21,6 +21,11 @@ defaults:
     working-directory: environment-matrix
   
 jobs:
+  autofix:
+    uses: ./.github/workflows/autofix.yaml
+    with:
+      working-directory: environment-matrix
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10

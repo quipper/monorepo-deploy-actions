@@ -21,6 +21,11 @@ defaults:
     working-directory: template
 
 jobs:
+  autofix:
+    uses: ./.github/workflows/autofix.yaml
+    with:
+      working-directory: template
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10

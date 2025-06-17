@@ -5,6 +5,8 @@
   "description": "Open Backport Pull Request action",
   "type": "module",
   "scripts": {
+    "format": "prettier --write **/*.ts",
+    "lint": "eslint --fix **/*.ts",
     "build": "ncc build --source-map --license licenses.txt src/main.ts",
     "test": "vitest"
   },
@@ -12,5 +14,6 @@
     "@actions/core": "1.11.1",
     "@actions/github": "6.0.1",
     "@octokit/plugin-retry": "6.0.1"
-  }
+  },
+  "packageManager": "pnpm@10.12.1"
 }
