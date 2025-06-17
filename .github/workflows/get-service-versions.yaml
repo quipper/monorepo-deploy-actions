@@ -21,6 +21,11 @@ defaults:
     working-directory: get-service-versions
 
 jobs:
+  autofix:
+    uses: ./.github/workflows/autofix.yaml
+    with:
+      working-directory: get-service-versions
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10

@@ -19,6 +19,11 @@ jobs:
         with:
           node-version: 20
       - run: npm install -g pnpm@latest-10
-      - run: pnpm i
-      - run: pnpm run --recursive build
+      - run: |
+          find */package.json | xargs -n1 dirname | while read -r dir; do
+            pushd "$dir"
+            pnpm i
+            pnpm run build
+            popd
+          done
       - uses: int128/release-typescript-action@4b93cf2f4b55fbce962db4c9acb89760c4a699d9 # v1.36.0

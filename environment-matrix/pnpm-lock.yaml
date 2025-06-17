@@ -7,6 +7,28 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@actions/core':
+        specifier: 1.11.1
+        version: 1.11.1
+      '@actions/github':
+        specifier: 6.0.1
+        version: 6.0.1
+      '@actions/glob':
+        specifier: 0.5.0
+        version: 0.5.0
+      '@octokit/plugin-retry':
+        specifier: 6.0.1
+        version: 6.0.1(@octokit/core@5.2.0)
+      ajv:
+        specifier: 8.17.1
+        version: 8.17.1
+      js-yaml:
+        specifier: 4.1.0
+        version: 4.1.0
+      minimatch:
+        specifier: 10.0.3
+        version: 10.0.3
     devDependencies:
       '@eslint/js':
         specifier: 9.29.0
@@ -14,6 +36,12 @@ importers:
       '@tsconfig/node20':
         specifier: 20.1.6
         version: 20.1.6
+      '@types/js-yaml':
+        specifier: 4.0.9
+        version: 4.0.9
+      '@types/minimatch':
+        specifier: 5.1.2
+        version: 5.1.2
       '@types/node':
         specifier: 20.19.1
         version: 20.19.1

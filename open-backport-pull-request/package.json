@@ -5,6 +5,8 @@
   "description": "Open Backport Pull Request action",
   "type": "module",
   "scripts": {
+    "format": "prettier --write **/*.ts",
+    "lint": "eslint --fix **/*.ts",
     "build": "ncc build --source-map --license licenses.txt src/main.ts",
     "test": "vitest"
   },
@@ -12,5 +14,20 @@
     "@actions/core": "1.11.1",
     "@actions/github": "6.0.1",
     "@octokit/plugin-retry": "6.0.1"
-  }
+  },
+  "devDependencies": {
+    "@eslint/js": "9.29.0",
+    "@tsconfig/node20": "20.1.6",
+    "@types/node": "20.19.1",
+    "@typescript-eslint/parser": "8.34.1",
+    "@vercel/ncc": "0.38.3",
+    "@vitest/eslint-plugin": "1.2.7",
+    "eslint": "9.29.0",
+    "pnpm": "10.12.1",
+    "prettier": "3.5.3",
+    "typescript": "5.8.3",
+    "typescript-eslint": "8.34.1",
+    "vitest": "3.2.3"
+  },
+  "packageManager": "pnpm@10.12.1"
 }

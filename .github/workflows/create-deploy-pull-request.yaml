@@ -21,6 +21,11 @@ defaults:
     working-directory: create-deploy-pull-request
 
 jobs:
+  autofix:
+    uses: ./.github/workflows/autofix.yaml
+    with:
+      working-directory: create-deploy-pull-request
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10

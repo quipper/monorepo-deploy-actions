@@ -21,6 +21,11 @@ defaults:
     working-directory: update-outdated-pull-request-branch
 
 jobs:
+  autofix:
+    uses: ./.github/workflows/autofix.yaml
+    with:
+      working-directory: update-outdated-pull-request-branch
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
