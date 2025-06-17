@@ -1,7 +1,5 @@
 import * as core from '@actions/core'
-import * as github from '@actions/github'
-
-type Octokit = ReturnType<typeof github.getOctokit>
+import { Octokit } from '@octokit/action'
 
 type CheckIfBranchExistsOptions = {
   owner: string
