@@ -6,7 +6,7 @@ inputs:
     description: Path to a patch
     required: true
   operation:
-    description: Add or delete
+    description: A choice of "add" or "delete"
     required: true
   overlay:
     description: Overlay name
