@@ -10,6 +10,7 @@ type Inputs = {
   namespace: string
   sourceRepository: string
   destinationRepository: string
+  errorIfNamespaceBranchNotExists: boolean
   prebuiltBranch: string | undefined
   destinationRepositoryToken: string
   namespaceManifest: string | undefined
@@ -97,8 +98,19 @@ const checkoutPrebuiltBranch = async (inputs: Inputs, prebuiltBranch: string) =>
 
 const checkoutNamespaceBranch = async (inputs: Inputs) => {
   const namespaceBranch = getNamespaceBranch(inputs)
+  if (inputs.errorIfNamespaceBranchNotExists) {
+    return await core.group(
+      `Checking out the namespace branch: ${namespaceBranch}`,
+      async () =>
+        await git.checkout({
+          repository: inputs.destinationRepository,
+          branch: namespaceBranch,
+          token: inputs.destinationRepositoryToken,
+        }),
+    )
+  }
   return await core.group(
-    `Checking out the namespace branch: ${namespaceBranch}`,
+    `Checking out or init the namespace branch: ${namespaceBranch}`,
     async () =>
       await git.checkoutOrInitRepository({
         repository: inputs.destinationRepository,

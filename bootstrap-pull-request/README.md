@@ -148,6 +148,19 @@ All placeholders will be replaced during copying the namespace manifest.
 For example, if `NAMESPACE=pr-123` is given by `substitute-variables` input,
 this action will replace `${NAMESPACE}` with `pr-123`.
 
+## Consistency considerations
+
+### Namespace branch lost
+
+1. When a pull request is created, git-push-service action writes the service manifests to the namespace branch.
+1. The namespace branch is deleted accidentally.
+1. When the label is added to the pull request, this action creates the namespace branch with all services from the prebuilt branch.
+   It confuses the user because the namespace branch does not contain the change of the pull request.
+
+```yaml
+error-if-namespace-branch-not-exists: ${{ github.event.action == 'labeled' }}
+```
+
 ## Specification
 
 See [action.yaml](action.yaml).

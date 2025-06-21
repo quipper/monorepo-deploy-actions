@@ -54,6 +54,20 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           git config --global user.name 'github-actions'
 
+      - uses: ./bootstrap-pull-request
+        id: when-namespace-branch-not-exists
+        continue-on-error: true
+        with:
+          overlay: overlay-${{ github.run_id }}
+          namespace: pr-${{ github.event.number }}
+          destination-repository: ${{ github.repository }}
+          error-if-namespace-branch-not-exists: true
+          prebuilt-branch: bootstrap-pull-request-e2e-prebuilt-${{ github.run_id }}
+          namespace-manifest: bootstrap-pull-request/tests/fixtures/namespace.yaml
+          substitute-variables: NAMESPACE=pr-${{ github.event.number }}
+      - if: steps.when-namespace-branch-not-exists.outcome != 'failure'
+        run: exit 1
+
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ github.head_ref }} # avoid "shallow update not allowed" error
