@@ -53,7 +53,9 @@ const cleanupManifests = async (inputs: Inputs): Promise<void> => {
     `${inputs.namespaceDirectory}/**`,
     ...inputs.preserveServices.map((service) => `!${inputs.namespaceDirectory}/applications/*--${service}.yaml`),
     ...inputs.preserveServices.map((service) => `!${inputs.namespaceDirectory}/services/${service}/*.yaml`),
+    `!${inputs.namespaceDirectory}/.git/**`,
   ]
+  core.info(`Cleaning up the manifests with patterns:\n${patterns.join('\n')}`)
   const globber = await glob.create(patterns.join('\n'), { matchDirectories: false })
   for await (const manifestPath of globber.globGenerator()) {
     core.info(`Deleting ${manifestPath}`)
