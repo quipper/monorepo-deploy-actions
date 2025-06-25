@@ -7,17 +7,16 @@ import * as path from 'path'
 import * as yaml from 'js-yaml'
 
 type Inputs = {
-  currentHeadSha: string
   overlay: string
   namespace: string
   sourceRepositoryName: string
   destinationRepository: string
+  preserveServices: string[]
+  overrideDirectory: string | undefined
   prebuiltBranch: string
   prebuiltDirectory: string
   namespaceDirectory: string
   substituteVariables: Map<string, string>
-  excludeServices: string[]
-  invertExcludeServices: boolean
 }
 
 export type Service = {
@@ -41,116 +40,93 @@ export type Service = {
 
 export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[]> => {
   core.info(`Syncing from the prebuilt branch to the namespace branch`)
-  await deleteOutdatedApplicationManifests(inputs)
-  await writeServices(inputs)
+  await cleanupManifests(inputs)
+  await copyServicesFromPrebuilt(inputs)
+  if (inputs.overrideDirectory) {
+    await copyServicesFromOverride(inputs)
+  }
   return await listApplicationManifests(inputs.namespaceDirectory)
 }
 
-const deleteOutdatedApplicationManifests = async (inputs: Inputs): Promise<void> => {
-  const applicationManifestGlob = await glob.create(`${inputs.namespaceDirectory}/applications/**`, {
+const cleanupManifests = async (inputs: Inputs): Promise<void> => {
+  const patterns = [
+    `${inputs.namespaceDirectory}/**`,
+    ...inputs.preserveServices.map((service) => `!${inputs.namespaceDirectory}/applications/*--${service}.yaml`),
+    ...inputs.preserveServices.map((service) => `!${inputs.namespaceDirectory}/services/${service}/*.yaml`),
+  ]
+  const globber = await glob.create(patterns.join('\n'), { matchDirectories: false })
+  for await (const manifestPath of globber.globGenerator()) {
+    core.info(`Deleting ${manifestPath}`)
+    await io.rmRF(manifestPath)
+  }
+}
+
+const copyServicesFromPrebuilt = async (inputs: Inputs): Promise<void> => {
+  const prebuiltGlobber = await glob.create(`${inputs.prebuiltDirectory}/applications/*.yaml`, {
     matchDirectories: false,
   })
-  for await (const applicationManifestPath of applicationManifestGlob.globGenerator()) {
-    await deleteOutdatedApplicationManifest(
-      applicationManifestPath,
-      inputs.currentHeadSha,
-      inputs.excludeServices,
-      inputs.invertExcludeServices,
-    )
-  }
-}
-
-const shouldServiceExcluded = (service: string, excludeServices: string[], invertExcludeServices: boolean): boolean => {
-  if (invertExcludeServices) {
-    return !excludeServices.includes(service)
-  }
-  return excludeServices.includes(service)
-}
-
-const deleteOutdatedApplicationManifest = async (
-  applicationManifestPath: string,
-  currentHeadSha: string,
-  excludeServices: string[],
-  invertExcludeServices: boolean,
-): Promise<void> => {
-  const application = await parseApplicationManifest(applicationManifestPath)
-  if (application instanceof Error) {
-    const error: Error = application
-    core.info(`Deleting the invalid application manifest: ${applicationManifestPath}: ${String(error)}`)
-    await io.rmRF(applicationManifestPath)
-    return
-  }
-
-  const service = path.basename(application.spec.source.path)
-
-  if (shouldServiceExcluded(service, excludeServices, invertExcludeServices)) {
-    core.info(`Preserving the application manifest: ${applicationManifestPath} because the service is excluded`)
-    return
-  }
-
-  // bootstrap-pull-request action needs to be run after git-push-service action.
-  // See https://github.com/quipper/monorepo-deploy-actions/pull/1763 for the details.
-  if (
-    application.metadata.annotations['github.action'] === 'git-push-service' &&
-    application.metadata.annotations['github.head-sha'] === currentHeadSha
-  ) {
-    core.info(`Preserving the application manifest: ${applicationManifestPath}`)
-    return
-  }
-
-  core.info(`Deleting the outdated application manifest: ${applicationManifestPath}`)
-  await io.rmRF(applicationManifestPath)
-}
-
-const writeServices = async (inputs: Inputs): Promise<void> => {
-  const existingApplicationManifestPaths = await (
-    await glob.create(`${inputs.namespaceDirectory}/applications/*.yaml`, { matchDirectories: false })
-  ).glob()
-  const prebuiltApplicationManifestPaths = await (
-    await glob.create(`${inputs.prebuiltDirectory}/applications/*.yaml`, { matchDirectories: false })
-  ).glob()
-  for (const prebuiltApplicationManifestPath of prebuiltApplicationManifestPaths) {
+  for await (const prebuiltApplicationManifestPath of prebuiltGlobber.globGenerator()) {
     const prebuiltApplication = await parseApplicationManifest(prebuiltApplicationManifestPath)
     if (prebuiltApplication instanceof Error) {
       const error: Error = prebuiltApplication
       core.info(`Ignored an invalid application manifest: ${prebuiltApplicationManifestPath}: ${String(error)}`)
       continue
     }
-
     if (!prebuiltApplication.spec.source.path.startsWith('services/')) {
       core.info(`Ignored a non-service application manifest: ${prebuiltApplicationManifestPath}`)
       continue
     }
     const service = path.basename(prebuiltApplication.spec.source.path)
-    core.info(
-      `Found the service ${service} prebuilt from ${prebuiltApplication.metadata.annotations['github.head-sha']}`,
-    )
-
-    const namespaceApplicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.namespace}--${service}.yaml`
-
-    if (shouldServiceExcluded(service, inputs.excludeServices, inputs.invertExcludeServices)) {
-      core.info(
-        `Preserving the existing application manifest: ${namespaceApplicationManifestPath} because the service is excluded`,
-      )
+    if (inputs.preserveServices.includes(service)) {
+      core.info(`Preserving the service ${service}`)
       continue
     }
-
-    if (existingApplicationManifestPaths.includes(namespaceApplicationManifestPath)) {
-      core.info(`Preserving the existing application manifest: ${namespaceApplicationManifestPath}`)
-      continue
-    }
-    await writeService(inputs, service, prebuiltApplication)
+    core.info(`Copying the service ${service} from the prebuilt branch`)
+    await writeApplicationManifest(inputs, service, prebuiltApplication)
+    await writeServiceManifests(inputs, service)
   }
 }
 
-const writeService = async (inputs: Inputs, service: string, prebuiltApplication: PartialApplication) => {
+const copyServicesFromOverride = async (inputs: Inputs): Promise<void> => {
+  const overrideGlobber = await glob.create(`${inputs.overrideDirectory}/*/*.yaml`, {
+    matchDirectories: false,
+  })
+  for await (const overrideManifestPath of overrideGlobber.globGenerator()) {
+    const service = path.basename(path.dirname(overrideManifestPath))
+    if (inputs.preserveServices.includes(service)) {
+      core.info(`Preserving the service ${service} from override directory`)
+      continue
+    }
+
+    const namespacePath = `${inputs.namespaceDirectory}/services/${service}/${path.basename(overrideManifestPath)}`
+    core.info(`Copying ${overrideManifestPath} -> ${namespacePath}`)
+    await io.mkdirP(`${inputs.namespaceDirectory}/services/${service}`)
+    await io.cp(overrideManifestPath, namespacePath)
+
+    await writeApplicationManifest(inputs, service, {
+      metadata: {
+        annotations: {
+          'github.action': 'bootstrap-pull-request',
+          'github.head-ref': undefined,
+          'github.head-sha': undefined,
+          'built-from-prebuilt-branch': undefined,
+        },
+      },
+      spec: {
+        source: {
+          path: `services/${service}`,
+        },
+      },
+    })
+  }
+}
+
+const writeApplicationManifest = async (inputs: Inputs, service: string, prebuiltApplication: PartialApplication) => {
   const applicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.namespace}--${service}.yaml`
   core.info(`Writing the application manifest: ${applicationManifestPath}`)
   await io.mkdirP(`${inputs.namespaceDirectory}/applications`)
   const application = buildApplicationManifest(inputs, service, prebuiltApplication)
   await fs.writeFile(applicationManifestPath, yaml.dump(application))
-
-  await writeServiceManifests(inputs, service)
 }
 
 const writeServiceManifests = async (inputs: Inputs, service: string) => {

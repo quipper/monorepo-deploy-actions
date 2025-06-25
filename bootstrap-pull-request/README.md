@@ -3,25 +3,6 @@
 This is an action to bootstrap the pull request namespace.
 When a pull request is created or updated, this action copies the service manifests from the prebuilt branch.
 
-```mermaid
-graph LR
-  subgraph Source repository
-    Source[Source]
-  end
-  subgraph Destination repository
-    subgraph Prebuilt branch
-      PrebuiltApplicationManifest[Application manifest]
-      Source --Build--> PrebuiltServiceManifest[Service manifest]
-    end
-    subgraph Namespace branch
-      ApplicationManifest[Application manifest]
-      ServiceManifest[Service manifest]
-      NamespaceManifest[Namespace manifest]
-    end
-  end
-  PrebuiltServiceManifest --Build--> ServiceManifest
-```
-
 ## Getting Started
 
 To bootstrap the pull request namespace,
@@ -38,19 +19,30 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      # This action needs to be run after all services are pushed.
-      - uses: int128/wait-for-workflows-action@v1
+      - uses: int128/list-matched-workflows-action@v0
+        id: list-matched-workflows
         with:
-          filter-workflow-names: |
-            * / deploy
+          workflows: |
+            .github/workflows/*--deploy.yaml
+      - uses: actions/github-script@v7
+        id: preserve-services
+        env:
+          matched_workflows_json: ${{ steps.list-matched-workflows.outputs.matched-workflows-json }}
+        with:
+          result-encoding: string
+          script: |
+            // It assumes that the workflow files are named like service--deploy.yaml
+            return JSON.parse(process.env.matched_workflows_json)
+              .map((workflow) => workflow.filename.replace(/--.+$/, ''))
+              .join('\n')
       - uses: quipper/monorepo-deploy-actions/bootstrap-pull-request@v1
         with:
           overlay: pr
           namespace: pr-${{ github.event.number }}
           destination-repository: octocat/generated-manifests
+          preserve-services: ${{ steps.preserve-services.outputs.result }}
           prebuilt-branch: prebuilt/source-repository/pr
           destination-repository-token: ${{ steps.destination-repository-github-app.outputs.token }}
-          namespace-manifest: deploy-config/overlays/pr/namespace.yaml
           substitute-variables: |
             NAMESPACE=pr-${{ github.event.number }}
 ```
@@ -75,66 +67,39 @@ It creates the following directory structure.
 
 It bootstraps the namespace branch by the following steps:
 
-1. Delete the outdated application manifests
+1. Clean up the existing manifests
 2. Copy the services from prebuilt branch
-3. Write the namespace manifest
+3. Copy the services from override directory (if specified)
+4. Write the namespace manifest
 
-### 1. Delete the outdated application manifests
+### 1. Clean up the existing manifests
 
-This action deletes the outdated application manifests in the namespace branch.
-If an application manifest is pushed by `git-push-service` action on the current commit, this action preserves the application manifest.
-Otherwise, this action deletes the application manifest.
-
-For example, if the namespace branch has the below application manifests,
-this action deletes `applications/pr-123--backend.yaml`.
-
-```yaml
-# applications/pr-123--backend.yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  annotations:
-    github.action: bootstrap-pull-request
-```
-
-```yaml
-# applications/pr-123--frontend.yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  annotations:
-    github.action: git-push-service
-    github.head-sha: 0123456789abcdef0123456789abcdef01234567 # The current commit
-```
-
-Note that this action needs to be run after all of `git-push-service` actions.
+This action deletes the existing manifests in the namespace branch before copying.
+It excepts the services given by `preserve-services` input.
 
 ### 2. Copy the services from prebuilt branch
 
 This action copies the services from prebuilt branch to the namespace branch.
-
-For example, if the prebuilt branch has 2 services `backend` and `frontend`,
-the namespace branch will be the below structure.
-
-```
-.
-├── applications
-|   ├── pr-123--backend.yaml
-|   └── pr-123--frontend.yaml
-└── services
-    ├── backend
-    |   └── generated.yaml
-    └── frontend
-        └── generated.yaml
-```
-
-If the namespace branch contains any application manifests, this action will not overwrite them.
+It excepts the services given by `preserve-services` input.
 
 All placeholders will be replaced during copying the service manifests.
 For example, if `NAMESPACE=pr-123` is given by `substitute-variables` input,
 this action will replace `${NAMESPACE}` with `pr-123`.
 
-### 3. Write the namespace manifest
+### 3. Copy the services from override directory
+
+When `override-directory` input is specified, this action copies the services from the override directory to the namespace branch.
+It excepts the services given by `preserve-services` input.
+
+It assumes that the override directory contains the following directory structure.
+
+```
+.
+└── ${service}
+    └── generated.yaml
+```
+
+### 4. Write the namespace manifest
 
 This action copies the namespace manifest to path `/applications/namespace.yaml` in the namespace branch.
 
