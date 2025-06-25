@@ -25,12 +25,12 @@
     "@vercel/ncc": "0.38.3",
     "@vitest/eslint-plugin": "1.2.7",
     "eslint": "9.29.0",
-    "pnpm": "10.12.2",
+    "pnpm": "10.12.3",
     "prettier": "3.5.3",
     "typescript": "5.8.3",
     "typescript-eslint": "8.34.1",
     "vitest": "3.2.4",
     "@types/js-yaml": "4.0.9"
   },
-  "packageManager": "pnpm@10.12.2"
+  "packageManager": "pnpm@10.12.3"
 }
