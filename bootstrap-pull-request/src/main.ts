@@ -8,8 +8,9 @@ const main = async (): Promise<void> => {
     sourceRepository: core.getInput('source-repository', { required: true }),
     destinationRepository: core.getInput('destination-repository', { required: true }),
     preserveServices: core.getMultilineInput('preserve-services'),
-    overrideDirectory: core.getInput('override-directory') || undefined,
-    prebuiltBranch: core.getInput('prebuilt-branch', { required: true }),
+    sourceBranch: core.getInput('source-branch', { required: true }),
+    overrideSourceBranch: core.getInput('override-source-branch') || undefined,
+    overrideServices: core.getMultilineInput('override-services'),
     destinationRepositoryToken: core.getInput('destination-repository-token', { required: true }),
     substituteVariables: core.getMultilineInput('substitute-variables'),
   })

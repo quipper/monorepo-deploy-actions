@@ -18,12 +18,15 @@ inputs:
   preserve-services:
     description: List of services to preserve in the namespace branch
     required: false
-  override-directory:
-    description: If set, copy the manifests from this directory after copying from prebuilt
-    required: false
-  prebuilt-branch:
-    description: Name of prebuilt branch in the destination repository
+  source-branch:
+    description: Name of source branch in the destination repository
     required: true
+  override-source-branch:
+    description: If set, copy override-services from this branch instead of the source branch
+    required: false
+  override-services:
+    description: If set, copy these services from override-source-branch
+    required: false
   destination-repository-token:
     description: GitHub token for destination repository
     required: true

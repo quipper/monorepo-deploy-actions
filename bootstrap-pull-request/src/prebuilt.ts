@@ -12,9 +12,9 @@ type Inputs = {
   sourceRepositoryName: string
   destinationRepository: string
   preserveServices: string[]
-  overrideDirectory: string | undefined
-  prebuiltBranch: string
-  prebuiltDirectory: string
+  sourceBranchDirectory: string
+  overrideSourceBranchDirectory: string | undefined
+  overrideServices: string[]
   namespaceDirectory: string
   substituteVariables: Map<string, string>
 }
@@ -41,8 +41,8 @@ export type Service = {
 export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[]> => {
   core.info(`Syncing from the prebuilt branch to the namespace branch`)
   await cleanupManifests(inputs)
-  await copyServicesFromPrebuilt(inputs)
-  if (inputs.overrideDirectory) {
+  await copyServices(inputs)
+  if (inputs.overrideSourceBranchDirectory) {
     await copyServicesFromOverride(inputs)
   }
   return await listApplicationManifests(inputs.namespaceDirectory)
@@ -63,63 +63,64 @@ const cleanupManifests = async (inputs: Inputs): Promise<void> => {
   }
 }
 
-const copyServicesFromPrebuilt = async (inputs: Inputs): Promise<void> => {
-  const prebuiltGlobber = await glob.create(`${inputs.prebuiltDirectory}/applications/*.yaml`, {
+const copyServices = async (inputs: Inputs): Promise<void> => {
+  const globber = await glob.create(`${inputs.sourceBranchDirectory}/applications/*.yaml`, {
     matchDirectories: false,
   })
-  for await (const prebuiltApplicationManifestPath of prebuiltGlobber.globGenerator()) {
+  for await (const prebuiltApplicationManifestPath of globber.globGenerator()) {
     const prebuiltApplication = await parseApplicationManifest(prebuiltApplicationManifestPath)
     if (prebuiltApplication instanceof Error) {
       const error: Error = prebuiltApplication
       core.info(`Ignored an invalid application manifest: ${prebuiltApplicationManifestPath}: ${String(error)}`)
       continue
     }
-    if (!prebuiltApplication.spec.source.path.startsWith('services/')) {
+    const service = getServiceNameFromApplicationManifest(prebuiltApplication)
+    if (!service) {
       core.info(`Ignored a non-service application manifest: ${prebuiltApplicationManifestPath}`)
       continue
     }
-    const service = path.basename(prebuiltApplication.spec.source.path)
     if (inputs.preserveServices.includes(service)) {
       core.info(`Preserving the service ${service}`)
       continue
     }
-    core.info(`Copying the service ${service} from the prebuilt branch`)
+    core.info(`Copying the service ${service} from the source branch`)
     await writeApplicationManifest(inputs, service, prebuiltApplication)
     await writeServiceManifests(inputs, service)
   }
 }
 
 const copyServicesFromOverride = async (inputs: Inputs): Promise<void> => {
-  const overrideGlobber = await glob.create(`${inputs.overrideDirectory}/*/*.yaml`, {
+  const globber = await glob.create(`${inputs.overrideSourceBranchDirectory}/applications/*.yaml`, {
     matchDirectories: false,
   })
-  for await (const overrideManifestPath of overrideGlobber.globGenerator()) {
-    const service = path.basename(path.dirname(overrideManifestPath))
-    if (inputs.preserveServices.includes(service)) {
-      core.info(`Preserving the service ${service} from override directory`)
+  for await (const prebuiltApplicationManifestPath of globber.globGenerator()) {
+    const prebuiltApplication = await parseApplicationManifest(prebuiltApplicationManifestPath)
+    if (prebuiltApplication instanceof Error) {
+      const error: Error = prebuiltApplication
+      core.info(`Ignored an invalid application manifest: ${prebuiltApplicationManifestPath}: ${String(error)}`)
       continue
     }
+    const service = getServiceNameFromApplicationManifest(prebuiltApplication)
+    if (!service) {
+      core.info(`Ignored a non-service application manifest: ${prebuiltApplicationManifestPath}`)
+      continue
+    }
+    if (inputs.preserveServices.includes(service)) {
+      core.info(`Preserving the service ${service}`)
+      continue
+    }
+    if (!inputs.overrideServices.includes(service)) {
+      continue
+    }
+    core.info(`Copying the service ${service} from the override branch`)
+    await writeApplicationManifest(inputs, service, prebuiltApplication)
+    await writeServiceManifests(inputs, service)
+  }
+}
 
-    const namespacePath = `${inputs.namespaceDirectory}/services/${service}/${path.basename(overrideManifestPath)}`
-    core.info(`Copying ${overrideManifestPath} -> ${namespacePath}`)
-    await io.mkdirP(`${inputs.namespaceDirectory}/services/${service}`)
-    await io.cp(overrideManifestPath, namespacePath)
-
-    await writeApplicationManifest(inputs, service, {
-      metadata: {
-        annotations: {
-          'github.action': 'bootstrap-pull-request',
-          'github.head-ref': undefined,
-          'github.head-sha': undefined,
-          'built-from-prebuilt-branch': undefined,
-        },
-      },
-      spec: {
-        source: {
-          path: `services/${service}`,
-        },
-      },
-    })
+const getServiceNameFromApplicationManifest = (application: PartialApplication): string | undefined => {
+  if (application.spec.source.path.startsWith('services/')) {
+    return path.basename(application.spec.source.path)
   }
 }
 
@@ -132,22 +133,21 @@ const writeApplicationManifest = async (inputs: Inputs, service: string, prebuil
 }
 
 const writeServiceManifests = async (inputs: Inputs, service: string) => {
-  const filenames = (await fs.readdir(`${inputs.prebuiltDirectory}/services/${service}`, { withFileTypes: true }))
-    .filter((e) => e.isFile())
-    .map((e) => e.name)
-
-  for (const filename of filenames) {
-    const prebuiltPath = `${inputs.prebuiltDirectory}/services/${service}/${filename}`
+  const globber = await glob.create(`${inputs.sourceDirectory}/services/${service}/*.yaml`, {
+    matchDirectories: false,
+  })
+  for await (const filename of globber.globGenerator()) {
+    const prebuiltPath = `${inputs.sourceDirectory}/services/${service}/${filename}`
     core.info(`Reading the prebuilt manifest: ${prebuiltPath}`)
     let content = await fs.readFile(prebuiltPath, 'utf-8')
     for (const [k, v] of inputs.substituteVariables) {
       const placeholder = '${' + k + '}'
       content = content.replaceAll(placeholder, v)
     }
-    const namespacePath = `${inputs.namespaceDirectory}/services/${service}/${filename}`
-    core.info(`Writing the service manifest: ${namespacePath}`)
-    await io.mkdirP(`${inputs.namespaceDirectory}/services/${service}`)
-    await fs.writeFile(namespacePath, content)
+    const destinationPath = `${inputs.destinationDirectory}/services/${service}/${filename}`
+    core.info(`Writing the service manifest: ${destinationPath}`)
+    await io.mkdirP(`${inputs.destinationDirectory}/services/${service}`)
+    await fs.writeFile(destinationPath, content)
   }
 }
 

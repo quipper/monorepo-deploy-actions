@@ -41,7 +41,7 @@ jobs:
           namespace: pr-${{ github.event.number }}
           destination-repository: octocat/generated-manifests
           preserve-services: ${{ steps.preserve-services.outputs.result }}
-          prebuilt-branch: prebuilt/source-repository/pr
+          source-branch: prebuilt/source-repository/pr
           destination-repository-token: ${{ steps.destination-repository-github-app.outputs.token }}
           substitute-variables: |
             NAMESPACE=pr-${{ github.event.number }}
