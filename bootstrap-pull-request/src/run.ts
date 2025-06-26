@@ -3,7 +3,7 @@ import * as github from '@actions/github'
 import * as git from './git.js'
 import * as prebuilt from './prebuilt.js'
 import { retryExponential } from './retry.js'
-import { getNamespaceBranch, writeNamespaceManifest } from './namespace.js'
+import { getNamespaceBranch } from './namespace.js'
 
 type Inputs = {
   overlay: string
@@ -12,7 +12,6 @@ type Inputs = {
   destinationRepository: string
   prebuiltBranch: string | undefined
   destinationRepositoryToken: string
-  namespaceManifest: string | undefined
   substituteVariables: string[]
   currentHeadSha: string
   excludeServices: string[]
@@ -59,14 +58,6 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
     excludeServices: inputs.excludeServices,
     invertExcludeServices: inputs.invertExcludeServices,
   })
-
-  if (inputs.namespaceManifest) {
-    await writeNamespaceManifest({
-      namespaceManifest: inputs.namespaceManifest,
-      namespaceDirectory,
-      substituteVariables,
-    })
-  }
 
   if ((await git.status(namespaceDirectory)) === '') {
     core.info('Nothing to commit')

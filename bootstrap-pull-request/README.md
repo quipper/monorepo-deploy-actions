@@ -16,7 +16,6 @@ graph LR
     subgraph Namespace branch
       ApplicationManifest[Application manifest]
       ServiceManifest[Service manifest]
-      NamespaceManifest[Namespace manifest]
     end
   end
   PrebuiltServiceManifest --Build--> ServiceManifest
@@ -50,7 +49,6 @@ jobs:
           destination-repository: octocat/generated-manifests
           prebuilt-branch: prebuilt/source-repository/pr
           destination-repository-token: ${{ steps.destination-repository-github-app.outputs.token }}
-          namespace-manifest: deploy-config/overlays/pr/namespace.yaml
           substitute-variables: |
             NAMESPACE=pr-${{ github.event.number }}
 ```
@@ -66,7 +64,6 @@ It creates the following directory structure.
 ```
 .
 ├── applications
-|   ├── namespace.yaml
 |   └── ${namespace}--${service}.yaml
 └── services
     └── ${service}
@@ -77,7 +74,6 @@ It bootstraps the namespace branch by the following steps:
 
 1. Delete the outdated application manifests
 2. Copy the services from prebuilt branch
-3. Write the namespace manifest
 
 ### 1. Delete the outdated application manifests
 
@@ -131,20 +127,6 @@ the namespace branch will be the below structure.
 If the namespace branch contains any application manifests, this action will not overwrite them.
 
 All placeholders will be replaced during copying the service manifests.
-For example, if `NAMESPACE=pr-123` is given by `substitute-variables` input,
-this action will replace `${NAMESPACE}` with `pr-123`.
-
-### 3. Write the namespace manifest
-
-This action copies the namespace manifest to path `/applications/namespace.yaml` in the namespace branch.
-
-```
-.
-└── applications
-    └── namespace.yaml
-```
-
-All placeholders will be replaced during copying the namespace manifest.
 For example, if `NAMESPACE=pr-123` is given by `substitute-variables` input,
 this action will replace `${NAMESPACE}` with `pr-123`.
 

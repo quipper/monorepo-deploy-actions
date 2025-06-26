@@ -72,7 +72,6 @@ jobs:
           namespace: pr-${{ github.event.number }}
           destination-repository: ${{ github.repository }}
           prebuilt-branch: bootstrap-pull-request-e2e-prebuilt-${{ github.run_id }}
-          namespace-manifest: bootstrap-pull-request/tests/fixtures/namespace.yaml
           substitute-variables: NAMESPACE=pr-${{ github.event.number }}
 
       # the action should be idempotent
@@ -82,7 +81,6 @@ jobs:
           namespace: pr-${{ github.event.number }}
           destination-repository: ${{ github.repository }}
           prebuilt-branch: bootstrap-pull-request-e2e-prebuilt-${{ github.run_id }}
-          namespace-manifest: bootstrap-pull-request/tests/fixtures/namespace.yaml
           substitute-variables: NAMESPACE=pr-${{ github.event.number }}
 
       - name: Clean up the namespace branch
