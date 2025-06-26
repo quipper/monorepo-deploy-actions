@@ -9,7 +9,6 @@ const main = async (): Promise<void> => {
     destinationRepository: core.getInput('destination-repository', { required: true }),
     prebuiltBranch: core.getInput('prebuilt-branch', { required: false }) || undefined,
     destinationRepositoryToken: core.getInput('destination-repository-token', { required: true }),
-    namespaceManifest: core.getInput('namespace-manifest') || undefined,
     substituteVariables: core.getMultilineInput('substitute-variables'),
     currentHeadSha: core.getInput('current-head-sha', { required: true }),
     excludeServices: core.getMultilineInput('exclude-services'),
