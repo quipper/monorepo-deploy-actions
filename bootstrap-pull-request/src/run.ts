@@ -108,10 +108,11 @@ const parseSubstituteVariables = (substituteVariables: string[]): Map<string, st
 const writeSummary = (inputs: Inputs, commitSha: string, services: prebuilt.Service[]) => {
   core.summary.addHeading('bootstrap-pull-request summary', 2)
 
-  core.summary.addRaw('<p>')
-  core.summary.addRaw('Pushed to the namespace branch: ')
   const commitUrl = `${github.context.serverUrl}/${inputs.destinationRepository}/commit/${commitSha}`
+  core.summary.addRaw('<p>')
+  core.summary.addRaw('Pushed ')
   core.summary.addLink(commitSha, commitUrl)
+  core.summary.addRaw(' to the namespace branch.')
   core.summary.addRaw('</p>')
 
   core.summary.addTable([
