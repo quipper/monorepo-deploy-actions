@@ -16,8 +16,8 @@ inputs:
     description: Destination repository
     required: true
   prebuilt-branch:
-    description: Name of prebuilt branch in the destination repository. This input will be required in the future release.
-    required: false
+    description: Name of prebuilt branch in the destination repository.
+    required: true
   destination-repository-token:
     description: GitHub token for destination repository
     required: true
