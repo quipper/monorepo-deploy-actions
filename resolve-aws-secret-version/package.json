@@ -12,7 +12,7 @@
   "dependencies": {
     "@actions/core": "1.11.1",
     "@actions/glob": "0.5.0",
-    "@aws-sdk/client-secrets-manager": "3.830.0",
+    "@aws-sdk/client-secrets-manager": "3.835.0",
     "js-yaml": "4.1.0"
   },
   "devDependencies": {
@@ -23,13 +23,13 @@
     "@vercel/ncc": "0.38.3",
     "@vitest/eslint-plugin": "1.2.7",
     "eslint": "9.29.0",
-    "pnpm": "10.12.1",
+    "pnpm": "10.12.3",
     "prettier": "3.5.3",
     "typescript": "5.8.3",
     "typescript-eslint": "8.34.1",
-    "vitest": "3.2.3",
+    "vitest": "3.2.4",
     "@types/js-yaml": "4.0.9",
     "aws-sdk-client-mock": "4.1.0"
   },
-  "packageManager": "pnpm@10.12.1"
+  "packageManager": "pnpm@10.12.3"
 }

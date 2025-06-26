@@ -11,7 +11,6 @@ const main = async (): Promise<void> => {
     overrideDirectory: core.getInput('override-directory') || undefined,
     prebuiltBranch: core.getInput('prebuilt-branch', { required: true }),
     destinationRepositoryToken: core.getInput('destination-repository-token', { required: true }),
-    namespaceManifest: core.getInput('namespace-manifest') || undefined,
     substituteVariables: core.getMultilineInput('substitute-variables'),
   })
   core.setOutput('services', JSON.stringify(outputs.services))
