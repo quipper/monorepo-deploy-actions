@@ -67,12 +67,13 @@ export const status = async (cwd: string): Promise<string> => {
   return output.stdout.trim()
 }
 
-export const commit = async (cwd: string, message: string): Promise<void> => {
+export const commit = async (cwd: string, message: string): Promise<string> => {
   await exec.exec('git', ['add', '.'], { cwd })
   await exec.exec('git', ['config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com'], { cwd })
   await exec.exec('git', ['config', 'user.name', 'github-actions[bot]'], { cwd })
   await exec.exec('git', ['commit', '-m', message], { cwd })
-  await exec.exec('git', ['rev-parse', 'HEAD'], { cwd })
+  const { stdout } = await exec.getExecOutput('git', ['rev-parse', 'HEAD'], { cwd })
+  return stdout.trim()
 }
 
 export const pushByFastForward = async (cwd: string): Promise<number> => {

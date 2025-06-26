@@ -3,7 +3,6 @@ import * as github from '@actions/github'
 import * as git from './git.js'
 import * as prebuilt from './prebuilt.js'
 import { retryExponential } from './retry.js'
-import { getNamespaceBranch } from './namespace.js'
 
 type Inputs = {
   overlay: string
@@ -27,16 +26,15 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
     maxAttempts: 50,
     waitMs: 10000,
   })
-  writeSummary(inputs, outputs.services)
-  await core.summary.write()
   return outputs
 }
 
 const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
+  const namespaceBranch = `ns/${sourceRepositoryName}/${inputs.overlay}/${inputs.namespace}`
 
   const prebuiltDirectory = await checkoutPrebuiltBranch(inputs, inputs.prebuiltBranch)
-  const namespaceDirectory = await checkoutNamespaceBranch(inputs)
+  const namespaceDirectory = await checkoutNamespaceBranch(inputs, namespaceBranch)
 
   const substituteVariables = parseSubstituteVariables(inputs.substituteVariables)
 
@@ -58,15 +56,19 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
     core.info('Nothing to commit')
     return { services }
   }
-  return await core.group(`Pushing the namespace branch`, async () => {
-    await git.commit(namespaceDirectory, commitMessage(inputs.namespace))
-    const pushCode = await git.pushByFastForward(namespaceDirectory)
-    if (pushCode > 0) {
-      // Retry from checkout if fast-forward was failed
-      return new Error(`git-push returned code ${pushCode}`)
-    }
-    return { services }
-  })
+
+  core.startGroup(`Pushing the namespace branch`)
+  const commitSha = await git.commit(namespaceDirectory, commitMessage(inputs.namespace))
+  const pushCode = await git.pushByFastForward(namespaceDirectory)
+  if (pushCode > 0) {
+    // Retry from checkout if fast-forward was failed
+    return new Error(`git-push returned code ${pushCode}`)
+  }
+  core.endGroup()
+
+  writeSummary(inputs, commitSha, services)
+  await core.summary.write()
+  return { services }
 }
 
 const checkoutPrebuiltBranch = async (inputs: Inputs, prebuiltBranch: string) => {
@@ -81,8 +83,7 @@ const checkoutPrebuiltBranch = async (inputs: Inputs, prebuiltBranch: string) =>
   )
 }
 
-const checkoutNamespaceBranch = async (inputs: Inputs) => {
-  const namespaceBranch = getNamespaceBranch(inputs)
+const checkoutNamespaceBranch = async (inputs: Inputs, namespaceBranch: string) => {
   return await core.group(
     `Checking out the namespace branch: ${namespaceBranch}`,
     async () =>
@@ -104,14 +105,14 @@ const parseSubstituteVariables = (substituteVariables: string[]): Map<string, st
   return m
 }
 
-const writeSummary = (inputs: Inputs, services: prebuilt.Service[]) => {
+const writeSummary = (inputs: Inputs, commitSha: string, services: prebuilt.Service[]) => {
   core.summary.addHeading('bootstrap-pull-request summary', 2)
 
+  const commitUrl = `${github.context.serverUrl}/${inputs.destinationRepository}/commit/${commitSha}`
   core.summary.addRaw('<p>')
-  core.summary.addRaw('Pushed to the namespace branch: ')
-  const namespaceBranch = getNamespaceBranch(inputs)
-  const namespaceBranchUrl = `${github.context.serverUrl}/${inputs.destinationRepository}/tree/${namespaceBranch}`
-  core.summary.addLink(namespaceBranchUrl, namespaceBranchUrl)
+  core.summary.addRaw('Pushed ')
+  core.summary.addLink(commitSha, commitUrl)
+  core.summary.addRaw(' to the namespace branch.')
   core.summary.addRaw('</p>')
 
   core.summary.addTable([
