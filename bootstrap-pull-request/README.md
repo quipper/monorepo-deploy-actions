@@ -73,29 +73,21 @@ It bootstraps the namespace branch by the following steps:
 ### 1. Clean up the existing manifests
 
 This action deletes the existing manifests in the namespace branch before copying.
-It excepts the services given by `preserve-services` input.
+It does not delete the services of `preserve-services` input.
 
 ### 2. Copy the services from prebuilt branch
 
 This action copies the services from prebuilt branch to the namespace branch.
-It excepts the services given by `preserve-services` input.
+It does not copy the services of `preserve-services` input.
 
 All placeholders will be replaced during copying the service manifests.
 For example, if `NAMESPACE=pr-123` is given by `substitute-variables` input,
 this action will replace `${NAMESPACE}` with `pr-123`.
 
-### 3. Copy the services from override directory
+### 3. Copy the services from override prebuilt directory
 
-When `override-directory` input is specified, this action copies the services from the override directory to the namespace branch.
-It excepts the services given by `preserve-services` input.
-
-It assumes that the override directory contains the following directory structure.
-
-```
-.
-└── ${service}
-    └── generated.yaml
-```
+When `override-services` input is specified, this action copies the services from another prebuilt directory to the namespace branch.
+It does not copy the services of `preserve-services` input.
 
 ## Specification
 

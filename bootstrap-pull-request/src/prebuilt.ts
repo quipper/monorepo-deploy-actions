@@ -34,7 +34,9 @@ export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[
 
   await copyServices({
     applicationContext: inputs.applicationContext,
-    filterService: (service) => !inputs.preserveServices.includes(service),
+    filterService: (service) => {
+      return !inputs.preserveServices.includes(service)
+    },
     prebuiltBranch: inputs.prebuiltBranch.name,
     prebuiltDirectory: inputs.prebuiltBranch.directory,
     namespaceDirectory: inputs.namespaceDirectory,
@@ -44,8 +46,9 @@ export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[
   if (inputs.overridePrebuiltBranch) {
     await copyServices({
       applicationContext: inputs.applicationContext,
-      filterService: (service) =>
-        !inputs.preserveServices.includes(service) && inputs.overrideServices.includes(service),
+      filterService: (service) => {
+        return !inputs.preserveServices.includes(service) && inputs.overrideServices.includes(service)
+      },
       prebuiltBranch: inputs.overridePrebuiltBranch.name,
       prebuiltDirectory: inputs.overridePrebuiltBranch.directory,
       namespaceDirectory: inputs.namespaceDirectory,
