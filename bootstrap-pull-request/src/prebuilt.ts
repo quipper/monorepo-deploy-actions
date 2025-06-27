@@ -1,10 +1,10 @@
-import assert from 'assert'
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 import * as fs from 'fs/promises'
 import * as io from '@actions/io'
 import * as path from 'path'
 import * as yaml from 'js-yaml'
+import { parseApplicationManifest } from './application.js'
 
 type ApplicationContext = {
   overlay: string
@@ -97,27 +97,28 @@ type CopyServicesInputs = {
 const copyServices = async (inputs: CopyServicesInputs): Promise<void> => {
   const prebuiltServices = await findPrebuiltServices(inputs.prebuiltDirectory)
   const filteredPrebuiltServices = prebuiltServices.filter((s) => inputs.filterService(s.service))
-  for (const { service, application } of filteredPrebuiltServices) {
-    core.info(`Service ${service}: copying from the branch ${inputs.prebuiltBranch}`)
+  for (const prebuiltService of filteredPrebuiltServices) {
+    core.info(`Service ${prebuiltService.service}: copying from the branch ${inputs.prebuiltBranch}`)
     await copyManifests({
-      fromDirectory: `${inputs.prebuiltDirectory}/services/${service}`,
-      toDirectory: `${inputs.namespaceDirectory}/services/${service}`,
+      fromDirectory: `${inputs.prebuiltDirectory}/services/${prebuiltService.service}`,
+      toDirectory: `${inputs.namespaceDirectory}/services/${prebuiltService.service}`,
       substituteVariables: inputs.substituteVariables,
     })
     await writeApplicationManifest({
       context: inputs.context,
-      service,
+      service: prebuiltService.service,
       namespaceDirectory: inputs.namespaceDirectory,
       prebuiltBranch: inputs.prebuiltBranch,
-      prebuiltApplicationHeadRef: application.metadata.annotations['github.head-ref'],
-      prebuiltApplicationHeadSha: application.metadata.annotations['github.head-sha'],
+      prebuiltApplicationHeadRef: prebuiltService.applicationHeadRef,
+      prebuiltApplicationHeadSha: prebuiltService.applicationHeadSha,
     })
   }
 }
 
 type PrebuiltService = {
   service: string
-  application: PartialApplication
+  applicationHeadRef: string | undefined
+  applicationHeadSha: string | undefined
 }
 
 const findPrebuiltServices = async (prebuiltDirectory: string): Promise<PrebuiltService[]> => {
@@ -140,7 +141,8 @@ const findPrebuiltServices = async (prebuiltDirectory: string): Promise<Prebuilt
     const service = path.basename(application.spec.source.path)
     services.push({
       service,
-      application,
+      applicationHeadRef: application.metadata.annotations['github.head-ref'],
+      applicationHeadSha: application.metadata.annotations['github.head-sha'],
     })
   }
   return services
@@ -259,68 +261,4 @@ const listApplicationManifests = async (namespaceDirectory: string): Promise<Ser
     }
   }
   return services
-}
-
-type PartialApplication = {
-  metadata: {
-    annotations: {
-      'github.action': string
-      'github.head-ref': string | undefined
-      'github.head-sha': string | undefined
-      'built-from-prebuilt-branch': string | undefined
-    }
-  }
-  spec: {
-    source: {
-      path: string
-    }
-  }
-}
-
-function assertIsPartialApplication(o: unknown): asserts o is PartialApplication {
-  assert(typeof o === 'object', 'must be an object')
-  assert(o !== null, 'must not be null')
-  assert('metadata' in o, 'must have metadata property')
-  assert(typeof o.metadata === 'object', 'metadata must be an object')
-  assert(o.metadata !== null, 'metadata must not be null')
-  assert('annotations' in o.metadata, 'metadata must have annotations property')
-  assert(typeof o.metadata.annotations === 'object', 'annotations must be an object')
-  assert(o.metadata.annotations !== null, 'annotations must not be null')
-  assert('github.action' in o.metadata.annotations, 'annotations must have github.action property')
-  assert(typeof o.metadata.annotations['github.action'] === 'string', 'github.action must be a string')
-  if ('github.head-ref' in o.metadata.annotations) {
-    assert(typeof o.metadata.annotations['github.head-ref'] === 'string', 'github.head-ref must be a string')
-  }
-  if ('github.head-sha' in o.metadata.annotations) {
-    assert(typeof o.metadata.annotations['github.head-sha'] === 'string', 'github.head-sha must be a string')
-  }
-  assert('spec' in o, 'must have spec property')
-  assert(typeof o.spec === 'object', 'spec must be an object')
-  assert(o.spec !== null, 'spec must not be null')
-  assert('source' in o.spec, 'spec must have source property')
-  assert(typeof o.spec.source === 'object', 'source must be an object')
-  assert(o.spec.source !== null, 'source must not be null')
-  assert('path' in o.spec.source, 'source must have path property')
-  assert(typeof o.spec.source.path === 'string', 'path must be a string')
-}
-
-const parseApplicationManifest = async (applicationManifestPath: string): Promise<PartialApplication | Error> => {
-  let application
-  try {
-    application = yaml.load(await fs.readFile(applicationManifestPath, 'utf-8'))
-  } catch (error) {
-    if (error instanceof yaml.YAMLException) {
-      return error
-    }
-    throw error
-  }
-  try {
-    assertIsPartialApplication(application)
-  } catch (error) {
-    if (error instanceof assert.AssertionError) {
-      return error
-    }
-    throw error
-  }
-  return application
 }
