@@ -33,8 +33,21 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
   const namespaceBranch = `ns/${sourceRepositoryName}/${inputs.overlay}/${inputs.namespace}`
 
-  const prebuiltDirectory = await checkoutPrebuiltBranch(inputs, inputs.prebuiltBranch)
-  const namespaceDirectory = await checkoutNamespaceBranch(inputs, namespaceBranch)
+  core.startGroup(`Checking out the prebuilt branch: ${inputs.prebuiltBranch}`)
+  const prebuiltDirectory = await git.checkout({
+    repository: inputs.destinationRepository,
+    branch: inputs.prebuiltBranch,
+    token: inputs.destinationRepositoryToken,
+  })
+  core.endGroup()
+
+  core.startGroup(`Checking out the namespace branch: ${namespaceBranch}`)
+  const namespaceDirectory = await git.checkoutOrInitRepository({
+    repository: inputs.destinationRepository,
+    branch: namespaceBranch,
+    token: inputs.destinationRepositoryToken,
+  })
+  core.endGroup()
 
   const substituteVariables = parseSubstituteVariables(inputs.substituteVariables)
 
@@ -69,30 +82,6 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   writeSummary(inputs, commitSha, services)
   await core.summary.write()
   return { services }
-}
-
-const checkoutPrebuiltBranch = async (inputs: Inputs, prebuiltBranch: string) => {
-  return await core.group(
-    `Checking out the prebuilt branch: ${prebuiltBranch}`,
-    async () =>
-      await git.checkout({
-        repository: inputs.destinationRepository,
-        branch: prebuiltBranch,
-        token: inputs.destinationRepositoryToken,
-      }),
-  )
-}
-
-const checkoutNamespaceBranch = async (inputs: Inputs, namespaceBranch: string) => {
-  return await core.group(
-    `Checking out the namespace branch: ${namespaceBranch}`,
-    async () =>
-      await git.checkoutOrInitRepository({
-        repository: inputs.destinationRepository,
-        branch: namespaceBranch,
-        token: inputs.destinationRepositoryToken,
-      }),
-  )
 }
 
 const parseSubstituteVariables = (substituteVariables: string[]): Map<string, string> => {
