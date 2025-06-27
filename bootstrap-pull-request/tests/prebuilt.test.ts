@@ -13,12 +13,15 @@ describe('syncServicesFromPrebuilt', () => {
     const namespaceDirectory = await createEmptyDirectory()
 
     const services = await syncServicesFromPrebuilt({
-      overlay: 'pr',
-      namespace: 'pr-123',
-      sourceRepositoryName: 'source-repository',
-      destinationRepository: 'octocat/destination-repository',
+      context: {
+        overlay: 'pr',
+        namespace: 'pr-123',
+        project: 'source-repository',
+        destinationRepository: 'octocat/destination-repository',
+      },
       preserveServices: [],
-      overrideDirectory: undefined,
+      overridePrebuiltBranchDirectory: undefined,
+      overrideServices: [],
       prebuiltBranch: 'prebuilt/source-repository/pr',
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,
@@ -60,12 +63,15 @@ describe('syncServicesFromPrebuilt', () => {
     await fs.writeFile(`${namespaceDirectory}/services/a/generated.yaml`, 'this-should-be-kept')
 
     await syncServicesFromPrebuilt({
-      overlay: 'pr',
-      namespace: 'pr-123',
-      sourceRepositoryName: 'source-repository',
-      destinationRepository: 'octocat/destination-repository',
+      context: {
+        overlay: 'pr',
+        namespace: 'pr-123',
+        project: 'source-repository',
+        destinationRepository: 'octocat/destination-repository',
+      },
       preserveServices: ['a'],
-      overrideDirectory: undefined,
+      overridePrebuiltBranchDirectory: undefined,
+      overrideServices: [],
       prebuiltBranch: 'prebuilt/source-repository/pr',
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,
@@ -85,12 +91,15 @@ describe('syncServicesFromPrebuilt', () => {
     await fs.writeFile(`${namespaceDirectory}/applications/pr-123--outdated.yaml`, applicationPushedOnOutdatedCommit)
 
     const services = await syncServicesFromPrebuilt({
-      overlay: 'pr',
-      namespace: 'pr-123',
-      sourceRepositoryName: 'source-repository',
-      destinationRepository: 'octocat/destination-repository',
+      context: {
+        overlay: 'pr',
+        namespace: 'pr-123',
+        project: 'source-repository',
+        destinationRepository: 'octocat/destination-repository',
+      },
       preserveServices: [],
-      overrideDirectory: undefined,
+      overridePrebuiltBranchDirectory: undefined,
+      overrideServices: [],
       prebuiltBranch: 'prebuilt/source-repository/pr',
       prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
       namespaceDirectory,

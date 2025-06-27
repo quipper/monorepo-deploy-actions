@@ -42,13 +42,16 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   const substituteVariables = parseSubstituteVariables(inputs.substituteVariables)
 
   const services = await prebuilt.syncServicesFromPrebuilt({
-    overlay: inputs.overlay,
-    namespace: inputs.namespace,
-    sourceRepositoryName,
-    destinationRepository: inputs.destinationRepository,
+    context: {
+      overlay: inputs.overlay,
+      namespace: inputs.namespace,
+      project: inputs.sourceRepository,
+      destinationRepository: inputs.destinationRepository,
+    },
     preserveServices: inputs.preserveServices,
-    sourceBranchDirectory,
-    overrideSourceBranchDirectory,
+    prebuiltBranch: inputs.sourceBranch,
+    prebuiltDirectory: sourceBranchDirectory,
+    overridePrebuiltBranchDirectory: overrideSourceBranchDirectory,
     overrideServices: inputs.overrideServices,
     namespaceDirectory,
     substituteVariables,
