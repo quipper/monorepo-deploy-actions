@@ -18,6 +18,7 @@ type Inputs = {
   preserveServices: string[]
   prebuiltBranch: string
   prebuiltDirectory: string
+  overridePrebuiltBranch: string | undefined
   overridePrebuiltBranchDirectory: string | undefined
   overrideServices: string[]
   namespaceDirectory: string
@@ -55,12 +56,12 @@ export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[
     substituteVariables: inputs.substituteVariables,
   })
 
-  if (inputs.overridePrebuiltBranchDirectory) {
+  if (inputs.overridePrebuiltBranch && inputs.overridePrebuiltBranchDirectory) {
     await copyServices({
       context: inputs.context,
       filterService: (service) =>
         !inputs.preserveServices.includes(service) && inputs.overrideServices.includes(service),
-      prebuiltBranch: inputs.prebuiltBranch,
+      prebuiltBranch: inputs.overridePrebuiltBranch,
       prebuiltDirectory: inputs.overridePrebuiltBranchDirectory,
       namespaceDirectory: inputs.namespaceDirectory,
       substituteVariables: inputs.substituteVariables,

@@ -10,8 +10,8 @@ type Inputs = {
   sourceRepository: string
   destinationRepository: string
   preserveServices: string[]
-  sourceBranch: string
-  overrideSourceBranch: string | undefined
+  prebuiltBranch: string
+  overridePrebuiltBranch: string | undefined
   overrideServices: string[]
   destinationRepositoryToken: string
   substituteVariables: string[]
@@ -33,9 +33,9 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
   const namespaceBranch = `ns/${sourceRepositoryName}/${inputs.overlay}/${inputs.namespace}`
 
-  const sourceBranchDirectory = await checkoutPrebuiltBranch(inputs, inputs.sourceBranch)
-  const overrideSourceBranchDirectory = inputs.overrideSourceBranch
-    ? await checkoutPrebuiltBranch(inputs, inputs.overrideSourceBranch)
+  const prebuiltBranchDirectory = await checkoutPrebuiltBranch(inputs, inputs.prebuiltBranch)
+  const overridePrebuiltBranchDirectory = inputs.overridePrebuiltBranch
+    ? await checkoutPrebuiltBranch(inputs, inputs.overridePrebuiltBranch)
     : undefined
   const namespaceDirectory = await checkoutNamespaceBranch(inputs, namespaceBranch)
 
@@ -49,9 +49,10 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
       destinationRepository: inputs.destinationRepository,
     },
     preserveServices: inputs.preserveServices,
-    prebuiltBranch: inputs.sourceBranch,
-    prebuiltDirectory: sourceBranchDirectory,
-    overridePrebuiltBranchDirectory: overrideSourceBranchDirectory,
+    prebuiltBranch: inputs.prebuiltBranch,
+    prebuiltDirectory: prebuiltBranchDirectory,
+    overridePrebuiltBranch: inputs.overridePrebuiltBranch,
+    overridePrebuiltBranchDirectory: overridePrebuiltBranchDirectory,
     overrideServices: inputs.overrideServices,
     namespaceDirectory,
     substituteVariables,
