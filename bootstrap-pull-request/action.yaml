@@ -19,13 +19,13 @@ inputs:
     description: List of services to preserve in the namespace branch
     required: false
   prebuilt-branch:
-    description: Prebuilt branch name in the destination repository
+    description: Name of prebuilt branch in the destination repository
     required: true
-  override-prebuilt-branch:
-    description: If set, copy override-services from this branch instead of prebuilt-branch
-    required: false
   override-services:
     description: If set, copy these services from override-prebuilt-branch
+    required: false
+  override-prebuilt-branch:
+    description: If set, copy override-services from this branch instead of prebuilt-branch
     required: false
   destination-repository-token:
     description: GitHub token for destination repository

@@ -13,17 +13,18 @@ describe('syncServicesFromPrebuilt', () => {
     const namespaceDirectory = await createEmptyDirectory()
 
     const services = await syncServicesFromPrebuilt({
-      context: {
+      applicationContext: {
         overlay: 'pr',
         namespace: 'pr-123',
         project: 'source-repository',
         destinationRepository: 'octocat/destination-repository',
       },
       preserveServices: [],
-      prebuiltBranch: 'prebuilt/source-repository/pr',
-      prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
+      prebuiltBranch: {
+        name: 'prebuilt/source-repository/pr',
+        directory: `${__dirname}/fixtures/prebuilt`,
+      },
       overridePrebuiltBranch: undefined,
-      overridePrebuiltBranchDirectory: undefined,
       overrideServices: [],
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
@@ -64,17 +65,18 @@ describe('syncServicesFromPrebuilt', () => {
     await fs.writeFile(`${namespaceDirectory}/services/a/generated.yaml`, 'this-should-be-kept')
 
     await syncServicesFromPrebuilt({
-      context: {
+      applicationContext: {
         overlay: 'pr',
         namespace: 'pr-123',
         project: 'source-repository',
         destinationRepository: 'octocat/destination-repository',
       },
       preserveServices: ['a'],
-      prebuiltBranch: 'prebuilt/source-repository/pr',
-      prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
+      prebuiltBranch: {
+        name: 'prebuilt/source-repository/pr',
+        directory: `${__dirname}/fixtures/prebuilt`,
+      },
       overridePrebuiltBranch: undefined,
-      overridePrebuiltBranchDirectory: undefined,
       overrideServices: [],
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
@@ -93,17 +95,18 @@ describe('syncServicesFromPrebuilt', () => {
     await fs.writeFile(`${namespaceDirectory}/applications/pr-123--outdated.yaml`, applicationPushedOnOutdatedCommit)
 
     const services = await syncServicesFromPrebuilt({
-      context: {
+      applicationContext: {
         overlay: 'pr',
         namespace: 'pr-123',
         project: 'source-repository',
         destinationRepository: 'octocat/destination-repository',
       },
       preserveServices: [],
-      prebuiltBranch: 'prebuilt/source-repository/pr',
-      prebuiltDirectory: `${__dirname}/fixtures/prebuilt`,
+      prebuiltBranch: {
+        name: 'prebuilt/source-repository/pr',
+        directory: `${__dirname}/fixtures/prebuilt`,
+      },
       overridePrebuiltBranch: undefined,
-      overridePrebuiltBranchDirectory: undefined,
       overrideServices: [],
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),

@@ -41,14 +41,17 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   })
   core.endGroup()
 
-  let overridePrebuiltBranchDirectory
+  let overridePrebuiltBranch
   if (inputs.overridePrebuiltBranch) {
     core.startGroup(`Checking out the override prebuilt branch: ${inputs.overridePrebuiltBranch}`)
-    overridePrebuiltBranchDirectory = await git.checkout({
-      repository: inputs.destinationRepository,
-      branch: inputs.overridePrebuiltBranch,
-      token: inputs.destinationRepositoryToken,
-    })
+    overridePrebuiltBranch = {
+      name: inputs.overridePrebuiltBranch,
+      directory: await git.checkout({
+        repository: inputs.destinationRepository,
+        branch: inputs.overridePrebuiltBranch,
+        token: inputs.destinationRepositoryToken,
+      }),
+    }
     core.endGroup()
   }
 
@@ -60,23 +63,22 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   })
   core.endGroup()
 
-  const substituteVariables = parseSubstituteVariables(inputs.substituteVariables)
-
   const services = await prebuilt.syncServicesFromPrebuilt({
-    context: {
+    applicationContext: {
       overlay: inputs.overlay,
       namespace: inputs.namespace,
       project: inputs.sourceRepository,
       destinationRepository: inputs.destinationRepository,
     },
     preserveServices: inputs.preserveServices,
-    prebuiltBranch: inputs.prebuiltBranch,
-    prebuiltDirectory: prebuiltDirectory,
-    overridePrebuiltBranch: inputs.overridePrebuiltBranch,
-    overridePrebuiltBranchDirectory: overridePrebuiltBranchDirectory,
+    prebuiltBranch: {
+      name: inputs.prebuiltBranch,
+      directory: prebuiltDirectory,
+    },
     overrideServices: inputs.overrideServices,
+    overridePrebuiltBranch,
     namespaceDirectory,
-    substituteVariables,
+    substituteVariables: parseSubstituteVariables(inputs.substituteVariables),
   })
 
   if ((await git.status(namespaceDirectory)) === '') {
