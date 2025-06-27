@@ -25,25 +25,6 @@ type Inputs = {
   substituteVariables: Map<string, string>
 }
 
-export type Service = {
-  service: string
-  builtFrom: {
-    // Available if the service was built from the current pull request.
-    pullRequest?: {
-      headRef: string | undefined
-      headSha: string | undefined
-    }
-    // Available if the service was built from the prebuilt branch.
-    prebuilt?: {
-      prebuiltBranch: string | undefined
-      builtFrom: {
-        headRef: string | undefined
-        headSha: string | undefined
-      }
-    }
-  }
-}
-
 export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[]> => {
   await cleanupManifests(inputs)
 
@@ -219,6 +200,25 @@ const copyManifests = async (inputs: CopyManifestsInputs) => {
     core.info(`Writing ${toPath}`)
     await io.mkdirP(inputs.toDirectory)
     await fs.writeFile(toPath, content)
+  }
+}
+
+export type Service = {
+  service: string
+  builtFrom: {
+    // Available if the service was built from the current pull request.
+    pullRequest?: {
+      headRef: string | undefined
+      headSha: string | undefined
+    }
+    // Available if the service was built from the prebuilt branch.
+    prebuilt?: {
+      prebuiltBranch: string | undefined
+      builtFrom: {
+        headRef: string | undefined
+        headSha: string | undefined
+      }
+    }
   }
 }
 

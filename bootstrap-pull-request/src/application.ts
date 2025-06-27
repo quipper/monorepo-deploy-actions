@@ -2,7 +2,7 @@ import assert from 'assert'
 import fs from 'fs/promises'
 import * as yaml from 'js-yaml'
 
-type PartialApplication = {
+export type PartialApplication = {
   metadata: {
     annotations: {
       'github.action': string
