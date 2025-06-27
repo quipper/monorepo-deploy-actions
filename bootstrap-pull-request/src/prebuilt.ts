@@ -15,6 +15,7 @@ type ApplicationContext = {
 
 type Inputs = {
   applicationContext: ApplicationContext
+  namespaceDirectory: string
   preserveServices: string[]
   prebuiltBranch: {
     name: string
@@ -25,7 +26,6 @@ type Inputs = {
     name: string
     directory: string
   }
-  namespaceDirectory: string
   substituteVariables: Map<string, string>
 }
 
@@ -34,24 +34,24 @@ export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[
 
   await copyServices({
     applicationContext: inputs.applicationContext,
+    namespaceDirectory: inputs.namespaceDirectory,
     filterService: (service) => {
       return !inputs.preserveServices.includes(service)
     },
     prebuiltBranch: inputs.prebuiltBranch.name,
     prebuiltDirectory: inputs.prebuiltBranch.directory,
-    namespaceDirectory: inputs.namespaceDirectory,
     substituteVariables: inputs.substituteVariables,
   })
 
   if (inputs.overridePrebuiltBranch) {
     await copyServices({
       applicationContext: inputs.applicationContext,
+      namespaceDirectory: inputs.namespaceDirectory,
       filterService: (service) => {
         return !inputs.preserveServices.includes(service) && inputs.overrideServices.includes(service)
       },
       prebuiltBranch: inputs.overridePrebuiltBranch.name,
       prebuiltDirectory: inputs.overridePrebuiltBranch.directory,
-      namespaceDirectory: inputs.namespaceDirectory,
       substituteVariables: inputs.substituteVariables,
     })
   }
@@ -76,10 +76,10 @@ const cleanupManifests = async (inputs: Inputs): Promise<void> => {
 
 type CopyServicesInputs = {
   applicationContext: ApplicationContext
+  namespaceDirectory: string
   filterService: (service: string) => boolean
   prebuiltBranch: string
   prebuiltDirectory: string
-  namespaceDirectory: string
   substituteVariables: Map<string, string>
 }
 
