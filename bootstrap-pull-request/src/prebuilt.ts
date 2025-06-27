@@ -1,10 +1,10 @@
-import assert from 'assert'
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 import * as fs from 'fs/promises'
 import * as io from '@actions/io'
 import * as path from 'path'
 import * as yaml from 'js-yaml'
+import { parseApplicationManifest, PartialApplication } from './application.js'
 
 type Inputs = {
   currentHeadSha: string
@@ -18,25 +18,6 @@ type Inputs = {
   substituteVariables: Map<string, string>
   excludeServices: string[]
   invertExcludeServices: boolean
-}
-
-export type Service = {
-  service: string
-  builtFrom: {
-    // Available if the service was built from the current pull request.
-    pullRequest?: {
-      headRef: string | undefined
-      headSha: string | undefined
-    }
-    // Available if the service was built from the prebuilt branch.
-    prebuilt?: {
-      prebuiltBranch: string | undefined
-      builtFrom: {
-        headRef: string | undefined
-        headSha: string | undefined
-      }
-    }
-  }
 }
 
 export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[]> => {
@@ -144,13 +125,47 @@ const writeServices = async (inputs: Inputs): Promise<void> => {
 }
 
 const writeService = async (inputs: Inputs, service: string, prebuiltApplication: PartialApplication) => {
+  await writeApplicationManifest(inputs, service, prebuiltApplication)
+  await writeServiceManifests(inputs, service)
+}
+
+const writeApplicationManifest = async (inputs: Inputs, service: string, prebuiltApplication: PartialApplication) => {
   const applicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.namespace}--${service}.yaml`
   core.info(`Writing the application manifest: ${applicationManifestPath}`)
   await io.mkdirP(`${inputs.namespaceDirectory}/applications`)
-  const application = buildApplicationManifest(inputs, service, prebuiltApplication)
+  const application = {
+    apiVersion: 'argoproj.io/v1alpha1',
+    kind: 'Application',
+    metadata: {
+      name: `${inputs.namespace}--${service}`,
+      namespace: 'argocd',
+      finalizers: ['resources-finalizer.argocd.argoproj.io'],
+      annotations: {
+        'github.action': 'bootstrap-pull-request',
+        'github.head-ref': prebuiltApplication.metadata.annotations['github.head-ref'],
+        'github.head-sha': prebuiltApplication.metadata.annotations['github.head-sha'],
+        'built-from-prebuilt-branch': inputs.prebuiltBranch,
+      },
+    },
+    spec: {
+      project: inputs.sourceRepositoryName,
+      source: {
+        repoURL: `https://github.com/${inputs.destinationRepository}.git`,
+        targetRevision: `ns/${inputs.sourceRepositoryName}/${inputs.overlay}/${inputs.namespace}`,
+        path: `services/${service}`,
+      },
+      destination: {
+        server: `https://kubernetes.default.svc`,
+        namespace: inputs.namespace,
+      },
+      syncPolicy: {
+        automated: {
+          prune: true,
+        },
+      },
+    },
+  }
   await fs.writeFile(applicationManifestPath, yaml.dump(application))
-
-  await writeServiceManifests(inputs, service)
 }
 
 const writeServiceManifests = async (inputs: Inputs, service: string) => {
@@ -170,6 +185,25 @@ const writeServiceManifests = async (inputs: Inputs, service: string) => {
     core.info(`Writing the service manifest: ${namespacePath}`)
     await io.mkdirP(`${inputs.namespaceDirectory}/services/${service}`)
     await fs.writeFile(namespacePath, content)
+  }
+}
+
+export type Service = {
+  service: string
+  builtFrom: {
+    // Available if the service was built from the current pull request.
+    pullRequest?: {
+      headRef: string | undefined
+      headSha: string | undefined
+    }
+    // Available if the service was built from the prebuilt branch.
+    prebuilt?: {
+      prebuiltBranch: string | undefined
+      builtFrom: {
+        headRef: string | undefined
+        headSha: string | undefined
+      }
+    }
   }
 }
 
@@ -213,103 +247,4 @@ const listApplicationManifests = async (namespaceDirectory: string): Promise<Ser
     }
   }
   return services
-}
-
-type PartialApplication = {
-  metadata: {
-    annotations: {
-      'github.action': string
-      'github.head-ref': string | undefined
-      'github.head-sha': string | undefined
-      'built-from-prebuilt-branch': string | undefined
-    }
-  }
-  spec: {
-    source: {
-      path: string
-    }
-  }
-}
-
-function assertIsPartialApplication(o: unknown): asserts o is PartialApplication {
-  assert(typeof o === 'object', 'must be an object')
-  assert(o !== null, 'must not be null')
-  assert('metadata' in o, 'must have metadata property')
-  assert(typeof o.metadata === 'object', 'metadata must be an object')
-  assert(o.metadata !== null, 'metadata must not be null')
-  assert('annotations' in o.metadata, 'metadata must have annotations property')
-  assert(typeof o.metadata.annotations === 'object', 'annotations must be an object')
-  assert(o.metadata.annotations !== null, 'annotations must not be null')
-  assert('github.action' in o.metadata.annotations, 'annotations must have github.action property')
-  assert(typeof o.metadata.annotations['github.action'] === 'string', 'github.action must be a string')
-  if ('github.head-ref' in o.metadata.annotations) {
-    assert(typeof o.metadata.annotations['github.head-ref'] === 'string', 'github.head-ref must be a string')
-  }
-  if ('github.head-sha' in o.metadata.annotations) {
-    assert(typeof o.metadata.annotations['github.head-sha'] === 'string', 'github.head-sha must be a string')
-  }
-  assert('spec' in o, 'must have spec property')
-  assert(typeof o.spec === 'object', 'spec must be an object')
-  assert(o.spec !== null, 'spec must not be null')
-  assert('source' in o.spec, 'spec must have source property')
-  assert(typeof o.spec.source === 'object', 'source must be an object')
-  assert(o.spec.source !== null, 'source must not be null')
-  assert('path' in o.spec.source, 'source must have path property')
-  assert(typeof o.spec.source.path === 'string', 'path must be a string')
-}
-
-const parseApplicationManifest = async (applicationManifestPath: string): Promise<PartialApplication | Error> => {
-  let application
-  try {
-    application = yaml.load(await fs.readFile(applicationManifestPath, 'utf-8'))
-  } catch (error) {
-    if (error instanceof yaml.YAMLException) {
-      return error
-    }
-    throw error
-  }
-  try {
-    assertIsPartialApplication(application)
-  } catch (error) {
-    if (error instanceof assert.AssertionError) {
-      return error
-    }
-    throw error
-  }
-  return application
-}
-
-const buildApplicationManifest = (inputs: Inputs, service: string, prebuiltApplication: PartialApplication) => {
-  return {
-    apiVersion: 'argoproj.io/v1alpha1',
-    kind: 'Application',
-    metadata: {
-      name: `${inputs.namespace}--${service}`,
-      namespace: 'argocd',
-      finalizers: ['resources-finalizer.argocd.argoproj.io'],
-      annotations: {
-        'github.action': 'bootstrap-pull-request',
-        'github.head-ref': prebuiltApplication.metadata.annotations['github.head-ref'],
-        'github.head-sha': prebuiltApplication.metadata.annotations['github.head-sha'],
-        'built-from-prebuilt-branch': inputs.prebuiltBranch,
-      },
-    },
-    spec: {
-      project: inputs.sourceRepositoryName,
-      source: {
-        repoURL: `https://github.com/${inputs.destinationRepository}.git`,
-        targetRevision: `ns/${inputs.sourceRepositoryName}/${inputs.overlay}/${inputs.namespace}`,
-        path: `services/${service}`,
-      },
-      destination: {
-        server: `https://kubernetes.default.svc`,
-        namespace: inputs.namespace,
-      },
-      syncPolicy: {
-        automated: {
-          prune: true,
-        },
-      },
-    },
-  }
 }
