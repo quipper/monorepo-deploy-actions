@@ -140,7 +140,10 @@ type WriteApplicationManifestInputs = {
 }
 
 const writeApplicationManifest = async (inputs: WriteApplicationManifestInputs) => {
-  const destinationApplication = {
+  const applicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.context.namespace}--${inputs.service}.yaml`
+  core.info(`Writing the application manifest: ${applicationManifestPath}`)
+  await io.mkdirP(`${inputs.namespaceDirectory}/applications`)
+  const application = {
     apiVersion: 'argoproj.io/v1alpha1',
     kind: 'Application',
     metadata: {
@@ -172,11 +175,7 @@ const writeApplicationManifest = async (inputs: WriteApplicationManifestInputs) 
       },
     },
   }
-
-  const applicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.context.namespace}--${inputs.service}.yaml`
-  core.info(`Writing the application manifest: ${applicationManifestPath}`)
-  await io.mkdirP(`${inputs.namespaceDirectory}/applications`)
-  await fs.writeFile(applicationManifestPath, yaml.dump(destinationApplication))
+  await fs.writeFile(applicationManifestPath, yaml.dump(application))
 }
 
 type CopyManifestsInputs = {
