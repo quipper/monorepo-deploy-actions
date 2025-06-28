@@ -23,7 +23,7 @@
     "@vercel/ncc": "0.38.3",
     "@vitest/eslint-plugin": "1.2.7",
     "eslint": "9.29.0",
-    "pnpm": "10.12.3",
+    "pnpm": "10.12.4",
     "prettier": "3.5.3",
     "typescript": "5.8.3",
     "typescript-eslint": "8.34.1",
@@ -31,5 +31,5 @@
     "@types/js-yaml": "4.0.9",
     "aws-sdk-client-mock": "4.1.0"
   },
-  "packageManager": "pnpm@10.12.3"
+  "packageManager": "pnpm@10.12.4"
 }
