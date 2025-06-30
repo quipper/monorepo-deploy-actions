@@ -22,10 +22,12 @@ type Inputs = {
     name: string
     directory: string
   }
-  overrideServices: string[]
-  overridePrebuiltBranch?: {
-    name: string
-    directory: string
+  override?: {
+    services: string[]
+    prebuiltBranch: {
+      name: string
+      directory: string
+    }
   }
   substituteVariables: Map<string, string>
 }
@@ -36,7 +38,7 @@ export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[
   await copyServiceManifestsFromPrebuiltBranch(inputs)
   await copyApplicationManifestsFromPrebuiltBranch(inputs)
 
-  if (inputs.overridePrebuiltBranch) {
+  if (inputs.override) {
     await copyServiceManifestsFromOverridePrebuiltBranch(inputs)
     await copyApplicationManifestsFromOverridePrebuiltBranch(inputs)
   }
@@ -80,12 +82,12 @@ const copyServiceManifestsFromPrebuiltBranch = async (inputs: Inputs) => {
 }
 
 const copyServiceManifestsFromOverridePrebuiltBranch = async (inputs: Inputs) => {
-  const prebuiltBranch = inputs.overridePrebuiltBranch
-  assert(prebuiltBranch)
+  const { override } = inputs
+  assert(override)
   const patterns = [
-    ...inputs.overrideServices.map((service) => `${prebuiltBranch.directory}/services/${service}/*.yaml`),
+    ...override.services.map((service) => `${override.prebuiltBranch.directory}/services/${service}/*.yaml`),
     // Do not overwrite the changed services.
-    ...inputs.changedServices.map((service) => `!${prebuiltBranch.directory}/services/${service}/*.yaml`),
+    ...inputs.changedServices.map((service) => `!${override.prebuiltBranch.directory}/services/${service}/*.yaml`),
   ]
   core.info(`Copying the service manifests with patterns:\n${patterns.join('\n')}`)
   const globber = await glob.create(patterns.join('\n'), { matchDirectories: false })
@@ -136,12 +138,12 @@ const copyApplicationManifestsFromPrebuiltBranch = async (inputs: Inputs) => {
 }
 
 const copyApplicationManifestsFromOverridePrebuiltBranch = async (inputs: Inputs) => {
-  const prebuiltBranch = inputs.overridePrebuiltBranch
-  assert(prebuiltBranch)
+  const { override } = inputs
+  assert(override)
   const patterns = [
-    ...inputs.overrideServices.map((service) => `${prebuiltBranch.directory}/applications/*--${service}.yaml`),
+    ...override.services.map((service) => `${override.prebuiltBranch.directory}/applications/*--${service}.yaml`),
     // Do not overwrite the changed services.
-    ...inputs.changedServices.map((service) => `!${prebuiltBranch.directory}/applications/*--${service}.yaml`),
+    ...inputs.changedServices.map((service) => `!${override.prebuiltBranch.directory}/applications/*--${service}.yaml`),
   ]
   core.info(`Copying the application manifests with patterns:\n${patterns.join('\n')}`)
   const globber = await glob.create(patterns.join('\n'), { matchDirectories: false })

@@ -41,16 +41,19 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   })
   core.endGroup()
 
-  let overridePrebuiltBranch
+  let override
   if (inputs.overridePrebuiltBranch) {
     core.startGroup(`Checking out the override prebuilt branch: ${inputs.overridePrebuiltBranch}`)
-    overridePrebuiltBranch = {
-      name: inputs.overridePrebuiltBranch,
-      directory: await git.checkout({
-        repository: inputs.destinationRepository,
-        branch: inputs.overridePrebuiltBranch,
-        token: inputs.destinationRepositoryToken,
-      }),
+    override = {
+      services: inputs.overrideServices,
+      prebuiltBranch: {
+        name: inputs.overridePrebuiltBranch,
+        directory: await git.checkout({
+          repository: inputs.destinationRepository,
+          branch: inputs.overridePrebuiltBranch,
+          token: inputs.destinationRepositoryToken,
+        }),
+      },
     }
     core.endGroup()
   }
@@ -75,8 +78,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
       name: inputs.prebuiltBranch,
       directory: prebuiltDirectory,
     },
-    overrideServices: inputs.overrideServices,
-    overridePrebuiltBranch,
+    override,
     namespaceDirectory,
     substituteVariables: parseSubstituteVariables(inputs.substituteVariables),
   })

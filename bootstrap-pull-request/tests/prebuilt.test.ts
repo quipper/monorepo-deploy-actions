@@ -24,8 +24,6 @@ describe('syncServicesFromPrebuilt', () => {
         name: 'prebuilt/source-repository/pr',
         directory: `${__dirname}/fixtures/prebuilt`,
       },
-      overridePrebuiltBranch: undefined,
-      overrideServices: [],
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
@@ -76,8 +74,6 @@ describe('syncServicesFromPrebuilt', () => {
         name: 'prebuilt/source-repository/pr',
         directory: `${__dirname}/fixtures/prebuilt`,
       },
-      overridePrebuiltBranch: undefined,
-      overrideServices: [],
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
@@ -106,8 +102,6 @@ describe('syncServicesFromPrebuilt', () => {
         name: 'prebuilt/source-repository/pr',
         directory: `${__dirname}/fixtures/prebuilt`,
       },
-      overridePrebuiltBranch: undefined,
-      overrideServices: [],
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
