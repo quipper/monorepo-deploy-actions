@@ -7,12 +7,12 @@ const main = async (): Promise<void> => {
     namespace: core.getInput('namespace', { required: true }),
     sourceRepository: core.getInput('source-repository', { required: true }),
     destinationRepository: core.getInput('destination-repository', { required: true }),
+    changedServices: core.getMultilineInput('changed-services'),
     prebuiltBranch: core.getInput('prebuilt-branch', { required: true }),
+    overrideServices: core.getMultilineInput('override-services'),
+    overridePrebuiltBranch: core.getInput('override-prebuilt-branch') || undefined,
     destinationRepositoryToken: core.getInput('destination-repository-token', { required: true }),
     substituteVariables: core.getMultilineInput('substitute-variables'),
-    currentHeadSha: core.getInput('current-head-sha', { required: true }),
-    excludeServices: core.getMultilineInput('exclude-services'),
-    invertExcludeServices: core.getBooleanInput('invert-exclude-services') || false,
   })
   core.setOutput('services', JSON.stringify(outputs.services))
 }

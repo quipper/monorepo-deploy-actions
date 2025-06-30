@@ -9,12 +9,12 @@ type Inputs = {
   namespace: string
   sourceRepository: string
   destinationRepository: string
+  changedServices: string[]
   prebuiltBranch: string
+  overridePrebuiltBranch: string | undefined
+  overrideServices: string[]
   destinationRepositoryToken: string
   substituteVariables: string[]
-  currentHeadSha: string
-  excludeServices: string[]
-  invertExcludeServices: boolean
 }
 
 type Outputs = {
@@ -41,6 +41,23 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   })
   core.endGroup()
 
+  let override
+  if (inputs.overridePrebuiltBranch) {
+    core.startGroup(`Checking out the override prebuilt branch: ${inputs.overridePrebuiltBranch}`)
+    override = {
+      services: inputs.overrideServices,
+      prebuiltBranch: {
+        name: inputs.overridePrebuiltBranch,
+        directory: await git.checkout({
+          repository: inputs.destinationRepository,
+          branch: inputs.overridePrebuiltBranch,
+          token: inputs.destinationRepositoryToken,
+        }),
+      },
+    }
+    core.endGroup()
+  }
+
   core.startGroup(`Checking out the namespace branch: ${namespaceBranch}`)
   const namespaceDirectory = await git.checkoutOrInitRepository({
     repository: inputs.destinationRepository,
@@ -49,20 +66,21 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   })
   core.endGroup()
 
-  const substituteVariables = parseSubstituteVariables(inputs.substituteVariables)
-
   const services = await prebuilt.syncServicesFromPrebuilt({
-    currentHeadSha: inputs.currentHeadSha,
-    overlay: inputs.overlay,
-    namespace: inputs.namespace,
-    sourceRepositoryName,
-    destinationRepository: inputs.destinationRepository,
-    prebuiltBranch: inputs.prebuiltBranch,
-    prebuiltDirectory,
+    applicationContext: {
+      overlay: inputs.overlay,
+      namespace: inputs.namespace,
+      project: inputs.sourceRepository,
+      destinationRepository: inputs.destinationRepository,
+    },
+    changedServices: inputs.changedServices,
+    prebuiltBranch: {
+      name: inputs.prebuiltBranch,
+      directory: prebuiltDirectory,
+    },
+    override,
     namespaceDirectory,
-    substituteVariables,
-    excludeServices: inputs.excludeServices,
-    invertExcludeServices: inputs.invertExcludeServices,
+    substituteVariables: parseSubstituteVariables(inputs.substituteVariables),
   })
 
   if ((await git.status(namespaceDirectory)) === '') {
