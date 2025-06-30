@@ -1,3 +1,4 @@
+import assert from 'assert'
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 import * as fs from 'fs/promises'
@@ -32,28 +33,12 @@ type Inputs = {
 export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[]> => {
   await cleanupManifests(inputs)
 
-  await copyServices({
-    applicationContext: inputs.applicationContext,
-    namespaceDirectory: inputs.namespaceDirectory,
-    filterService: (service) => {
-      return !inputs.changedServices.includes(service)
-    },
-    prebuiltBranch: inputs.prebuiltBranch.name,
-    prebuiltDirectory: inputs.prebuiltBranch.directory,
-    substituteVariables: inputs.substituteVariables,
-  })
+  await copyServiceManifestsFromPrebuiltBranch(inputs)
+  await copyApplicationManifestsFromPrebuiltBranch(inputs)
 
   if (inputs.overridePrebuiltBranch) {
-    await copyServices({
-      applicationContext: inputs.applicationContext,
-      namespaceDirectory: inputs.namespaceDirectory,
-      filterService: (service) => {
-        return !inputs.changedServices.includes(service) && inputs.overrideServices.includes(service)
-      },
-      prebuiltBranch: inputs.overridePrebuiltBranch.name,
-      prebuiltDirectory: inputs.overridePrebuiltBranch.directory,
-      substituteVariables: inputs.substituteVariables,
-    })
+    await copyServiceManifestsFromOverridePrebuiltBranch(inputs)
+    await copyApplicationManifestsFromOverridePrebuiltBranch(inputs)
   }
 
   return await listApplicationManifests(inputs.namespaceDirectory)
@@ -62,6 +47,7 @@ export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[
 const cleanupManifests = async (inputs: Inputs): Promise<void> => {
   const patterns = [
     `${inputs.namespaceDirectory}/**`,
+    // Do not delete the changed services.
     ...inputs.changedServices.map((service) => `!${inputs.namespaceDirectory}/applications/*--${service}.yaml`),
     ...inputs.changedServices.map((service) => `!${inputs.namespaceDirectory}/services/${service}/*.yaml`),
     `!${inputs.namespaceDirectory}/.git/**`,
@@ -74,82 +60,122 @@ const cleanupManifests = async (inputs: Inputs): Promise<void> => {
   }
 }
 
-type CopyServicesInputs = {
-  applicationContext: ApplicationContext
-  namespaceDirectory: string
-  filterService: (service: string) => boolean
-  prebuiltBranch: string
-  prebuiltDirectory: string
-  substituteVariables: Map<string, string>
+const copyServiceManifestsFromPrebuiltBranch = async (inputs: Inputs) => {
+  const patterns = [
+    `${inputs.prebuiltBranch.directory}/services/*/*.yaml`,
+    // Do not overwrite the changed services.
+    ...inputs.changedServices.map((service) => `!${inputs.prebuiltBranch.directory}/services/${service}/*.yaml`),
+  ]
+  core.info(`Copying the service manifests with patterns:\n${patterns.join('\n')}`)
+  const globber = await glob.create(patterns.join('\n'), { matchDirectories: false })
+  for await (const prebuiltServiceManifestPath of globber.globGenerator()) {
+    const service = path.basename(path.dirname(prebuiltServiceManifestPath))
+    core.info(`Copying the service manifest of ${service}`)
+    await copyServiceManifest(
+      prebuiltServiceManifestPath,
+      `${inputs.namespaceDirectory}/services/${service}/${path.basename(prebuiltServiceManifestPath)}`,
+      inputs.substituteVariables,
+    )
+  }
 }
 
-const copyServices = async (inputs: CopyServicesInputs): Promise<void> => {
-  const prebuiltServices = await findPrebuiltServices(inputs.prebuiltDirectory)
-  const filteredPrebuiltServices = prebuiltServices.filter((s) => inputs.filterService(s.service))
-  for (const prebuiltService of filteredPrebuiltServices) {
-    core.info(`Service ${prebuiltService.service}: copying from the branch ${inputs.prebuiltBranch}`)
-    await writeServiceManifests({
-      fromDirectory: `${inputs.prebuiltDirectory}/services/${prebuiltService.service}`,
-      toDirectory: `${inputs.namespaceDirectory}/services/${prebuiltService.service}`,
-      substituteVariables: inputs.substituteVariables,
-    })
+const copyServiceManifestsFromOverridePrebuiltBranch = async (inputs: Inputs) => {
+  const prebuiltBranch = inputs.overridePrebuiltBranch
+  assert(prebuiltBranch)
+  const patterns = [
+    ...inputs.overrideServices.map((service) => `${prebuiltBranch.directory}/services/${service}/*.yaml`),
+    // Do not overwrite the changed services.
+    ...inputs.changedServices.map((service) => `!${prebuiltBranch.directory}/services/${service}/*.yaml`),
+  ]
+  core.info(`Copying the service manifests with patterns:\n${patterns.join('\n')}`)
+  const globber = await glob.create(patterns.join('\n'), { matchDirectories: false })
+  for await (const prebuiltServiceManifestPath of globber.globGenerator()) {
+    const service = path.basename(path.dirname(prebuiltServiceManifestPath))
+    core.info(`Copying the service manifest of ${service}`)
+    await copyServiceManifest(
+      prebuiltServiceManifestPath,
+      `${inputs.namespaceDirectory}/services/${service}/${path.basename(prebuiltServiceManifestPath)}`,
+      inputs.substituteVariables,
+    )
+  }
+}
+
+const copyServiceManifest = async (from: string, to: string, substituteVariables: Map<string, string>) => {
+  core.info(`Reading ${from}`)
+  let content = await fs.readFile(from, 'utf-8')
+  for (const [k, v] of substituteVariables) {
+    const placeholder = '${' + k + '}'
+    content = content.replaceAll(placeholder, v)
+  }
+  core.info(`Writing ${to}`)
+  await io.mkdirP(path.dirname(to))
+  await fs.writeFile(to, content)
+}
+
+const copyApplicationManifestsFromPrebuiltBranch = async (inputs: Inputs) => {
+  const patterns = [
+    `${inputs.prebuiltBranch.directory}/applications/*--*.yaml`,
+    // Do not overwrite the changed services.
+    ...inputs.changedServices.map((service) => `!${inputs.prebuiltBranch.directory}/applications/*--${service}.yaml`),
+  ]
+  core.info(`Copying the application manifests with patterns:\n${patterns.join('\n')}`)
+  const globber = await glob.create(patterns.join('\n'), { matchDirectories: false })
+  for await (const prebuiltApplicationManifestPath of globber.globGenerator()) {
+    const serviceMatcher = path.basename(prebuiltApplicationManifestPath).match(/--(.+?)\.yaml$/)
+    assert(serviceMatcher, `Path ${prebuiltApplicationManifestPath} must be of the form NAMESPACE--SERVICE.yaml`)
+    const service = serviceMatcher[1]
+    core.info(`Copying the application manifest of ${service}`)
     await writeApplicationManifest({
-      applicationContext: inputs.applicationContext,
-      service: prebuiltService.service,
-      namespaceDirectory: inputs.namespaceDirectory,
-      prebuiltBranch: inputs.prebuiltBranch,
-      prebuiltApplicationHeadRef: prebuiltService.applicationHeadRef,
-      prebuiltApplicationHeadSha: prebuiltService.applicationHeadSha,
-    })
-  }
-}
-
-type PrebuiltService = {
-  service: string
-  applicationHeadRef: string | undefined
-  applicationHeadSha: string | undefined
-}
-
-const findPrebuiltServices = async (prebuiltDirectory: string): Promise<PrebuiltService[]> => {
-  const prebuiltServices = []
-  const globber = await glob.create(`${prebuiltDirectory}/applications/*.yaml`, {
-    matchDirectories: false,
-  })
-  for await (const manifestPath of globber.globGenerator()) {
-    const application = await parseApplicationManifest(manifestPath)
-    if (application instanceof Error) {
-      const error: Error = application
-      core.info(`Ignored an invalid application manifest: ${manifestPath}: ${String(error)}`)
-      continue
-    }
-    if (!application.spec.source.path.startsWith('services/')) {
-      core.info(`Ignored a non-service application manifest: ${manifestPath}`)
-      continue
-    }
-    // Assumes that spec.source.path is in the form of "services/NAME".
-    const service = path.basename(application.spec.source.path)
-    prebuiltServices.push({
       service,
-      applicationHeadRef: application.metadata.annotations['github.head-ref'],
-      applicationHeadSha: application.metadata.annotations['github.head-sha'],
+      applicationContext: inputs.applicationContext,
+      namespaceDirectory: inputs.namespaceDirectory,
+      prebuiltBranch: inputs.prebuiltBranch.name,
+      prebuiltApplicationManifestPath,
     })
   }
-  return prebuiltServices
+}
+
+const copyApplicationManifestsFromOverridePrebuiltBranch = async (inputs: Inputs) => {
+  const prebuiltBranch = inputs.overridePrebuiltBranch
+  assert(prebuiltBranch)
+  const patterns = [
+    ...inputs.overrideServices.map((service) => `${prebuiltBranch.directory}/applications/*--${service}.yaml`),
+    // Do not overwrite the changed services.
+    ...inputs.changedServices.map((service) => `!${prebuiltBranch.directory}/applications/*--${service}.yaml`),
+  ]
+  core.info(`Copying the application manifests with patterns:\n${patterns.join('\n')}`)
+  const globber = await glob.create(patterns.join('\n'), { matchDirectories: false })
+  for await (const prebuiltApplicationManifestPath of globber.globGenerator()) {
+    const serviceMatcher = path.basename(prebuiltApplicationManifestPath).match(/--(.+?)\.yaml$/)
+    assert(serviceMatcher, `Path ${prebuiltApplicationManifestPath} must be of the form NAMESPACE--SERVICE.yaml`)
+    const service = serviceMatcher[1]
+    core.info(`Copying the application manifest of ${service}`)
+    await writeApplicationManifest({
+      service,
+      applicationContext: inputs.applicationContext,
+      namespaceDirectory: inputs.namespaceDirectory,
+      prebuiltBranch: inputs.prebuiltBranch.name,
+      prebuiltApplicationManifestPath,
+    })
+  }
 }
 
 type WriteApplicationManifestInputs = {
-  applicationContext: ApplicationContext
   service: string
+  applicationContext: ApplicationContext
   namespaceDirectory: string
   prebuiltBranch: string
-  prebuiltApplicationHeadRef: string | undefined
-  prebuiltApplicationHeadSha: string | undefined
+  prebuiltApplicationManifestPath: string
 }
 
 const writeApplicationManifest = async (inputs: WriteApplicationManifestInputs) => {
-  const applicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.applicationContext.namespace}--${inputs.service}.yaml`
-  core.info(`Writing the application manifest: ${applicationManifestPath}`)
-  await io.mkdirP(`${inputs.namespaceDirectory}/applications`)
+  const prebuiltApplication = await parseApplicationManifest(inputs.prebuiltApplicationManifestPath)
+  if (prebuiltApplication instanceof Error) {
+    const error: Error = prebuiltApplication
+    core.info(`Ignored an invalid application manifest: ${inputs.prebuiltApplicationManifestPath}: ${String(error)}`)
+    return
+  }
+
   const application = {
     apiVersion: 'argoproj.io/v1alpha1',
     kind: 'Application',
@@ -159,8 +185,8 @@ const writeApplicationManifest = async (inputs: WriteApplicationManifestInputs) 
       finalizers: ['resources-finalizer.argocd.argoproj.io'],
       annotations: {
         'github.action': 'bootstrap-pull-request',
-        'github.head-ref': inputs.prebuiltApplicationHeadRef,
-        'github.head-sha': inputs.prebuiltApplicationHeadSha,
+        'github.head-ref': prebuiltApplication.metadata.annotations['github.head-ref'],
+        'github.head-sha': prebuiltApplication.metadata.annotations['github.head-sha'],
         'built-from-prebuilt-branch': inputs.prebuiltBranch,
       },
     },
@@ -182,31 +208,10 @@ const writeApplicationManifest = async (inputs: WriteApplicationManifestInputs) 
       },
     },
   }
+  const applicationManifestPath = `${inputs.namespaceDirectory}/applications/${inputs.applicationContext.namespace}--${inputs.service}.yaml`
+  core.info(`Writing the application manifest: ${applicationManifestPath}`)
+  await io.mkdirP(`${inputs.namespaceDirectory}/applications`)
   await fs.writeFile(applicationManifestPath, yaml.dump(application))
-}
-
-type WriteServiceManifestsInputs = {
-  fromDirectory: string
-  toDirectory: string
-  substituteVariables: Map<string, string>
-}
-
-const writeServiceManifests = async (inputs: WriteServiceManifestsInputs) => {
-  const globber = await glob.create(`${inputs.fromDirectory}/*.yaml`, {
-    matchDirectories: false,
-  })
-  for await (const fromPath of globber.globGenerator()) {
-    core.info(`Reading ${fromPath}`)
-    let content = await fs.readFile(fromPath, 'utf-8')
-    for (const [k, v] of inputs.substituteVariables) {
-      const placeholder = '${' + k + '}'
-      content = content.replaceAll(placeholder, v)
-    }
-    const toPath = `${inputs.toDirectory}/${path.basename(fromPath)}`
-    core.info(`Writing ${toPath}`)
-    await io.mkdirP(inputs.toDirectory)
-    await fs.writeFile(toPath, content)
-  }
 }
 
 export type Service = {
