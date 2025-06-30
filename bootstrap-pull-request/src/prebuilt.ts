@@ -16,7 +16,7 @@ type ApplicationContext = {
 type Inputs = {
   applicationContext: ApplicationContext
   namespaceDirectory: string
-  preserveServices: string[]
+  changedServices: string[]
   prebuiltBranch: {
     name: string
     directory: string
@@ -36,7 +36,7 @@ export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[
     applicationContext: inputs.applicationContext,
     namespaceDirectory: inputs.namespaceDirectory,
     filterService: (service) => {
-      return !inputs.preserveServices.includes(service)
+      return !inputs.changedServices.includes(service)
     },
     prebuiltBranch: inputs.prebuiltBranch.name,
     prebuiltDirectory: inputs.prebuiltBranch.directory,
@@ -48,7 +48,7 @@ export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[
       applicationContext: inputs.applicationContext,
       namespaceDirectory: inputs.namespaceDirectory,
       filterService: (service) => {
-        return !inputs.preserveServices.includes(service) && inputs.overrideServices.includes(service)
+        return !inputs.changedServices.includes(service) && inputs.overrideServices.includes(service)
       },
       prebuiltBranch: inputs.overridePrebuiltBranch.name,
       prebuiltDirectory: inputs.overridePrebuiltBranch.directory,
@@ -62,8 +62,8 @@ export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[
 const cleanupManifests = async (inputs: Inputs): Promise<void> => {
   const patterns = [
     `${inputs.namespaceDirectory}/**`,
-    ...inputs.preserveServices.map((service) => `!${inputs.namespaceDirectory}/applications/*--${service}.yaml`),
-    ...inputs.preserveServices.map((service) => `!${inputs.namespaceDirectory}/services/${service}/*.yaml`),
+    ...inputs.changedServices.map((service) => `!${inputs.namespaceDirectory}/applications/*--${service}.yaml`),
+    ...inputs.changedServices.map((service) => `!${inputs.namespaceDirectory}/services/${service}/*.yaml`),
     `!${inputs.namespaceDirectory}/.git/**`,
   ]
   core.info(`Cleaning up the manifests with patterns:\n${patterns.join('\n')}`)

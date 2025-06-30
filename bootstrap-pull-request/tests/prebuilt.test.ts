@@ -19,7 +19,7 @@ describe('syncServicesFromPrebuilt', () => {
         project: 'source-repository',
         destinationRepository: 'octocat/destination-repository',
       },
-      preserveServices: [],
+      changedServices: [],
       prebuiltBranch: {
         name: 'prebuilt/source-repository/pr',
         directory: `${__dirname}/fixtures/prebuilt`,
@@ -57,7 +57,7 @@ describe('syncServicesFromPrebuilt', () => {
     expect(await readContent(`${namespaceDirectory}/services/b/generated.yaml`)).toBe(serviceB)
   })
 
-  it('does not write a service if in the preserveServices', async () => {
+  it('does not write a service if in the changedServices', async () => {
     const namespaceDirectory = await createEmptyDirectory()
     await fs.mkdir(`${namespaceDirectory}/applications`)
     await fs.mkdir(`${namespaceDirectory}/services/a`, { recursive: true })
@@ -71,7 +71,7 @@ describe('syncServicesFromPrebuilt', () => {
         project: 'source-repository',
         destinationRepository: 'octocat/destination-repository',
       },
-      preserveServices: ['a'],
+      changedServices: ['a'],
       prebuiltBranch: {
         name: 'prebuilt/source-repository/pr',
         directory: `${__dirname}/fixtures/prebuilt`,
@@ -101,7 +101,7 @@ describe('syncServicesFromPrebuilt', () => {
         project: 'source-repository',
         destinationRepository: 'octocat/destination-repository',
       },
-      preserveServices: [],
+      changedServices: [],
       prebuiltBranch: {
         name: 'prebuilt/source-repository/pr',
         directory: `${__dirname}/fixtures/prebuilt`,

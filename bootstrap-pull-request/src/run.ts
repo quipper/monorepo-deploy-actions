@@ -9,7 +9,7 @@ type Inputs = {
   namespace: string
   sourceRepository: string
   destinationRepository: string
-  preserveServices: string[]
+  changedServices: string[]
   prebuiltBranch: string
   overridePrebuiltBranch: string | undefined
   overrideServices: string[]
@@ -70,7 +70,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
       project: inputs.sourceRepository,
       destinationRepository: inputs.destinationRepository,
     },
-    preserveServices: inputs.preserveServices,
+    changedServices: inputs.changedServices,
     prebuiltBranch: {
       name: inputs.prebuiltBranch,
       directory: prebuiltDirectory,

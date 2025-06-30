@@ -15,8 +15,8 @@ inputs:
   destination-repository:
     description: Destination repository
     required: true
-  preserve-services:
-    description: List of services to preserve in the namespace branch
+  changed-services:
+    description: List of services changed in the pull request
     required: false
   prebuilt-branch:
     description: Name of prebuilt branch in the destination repository
