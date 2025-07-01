@@ -9,7 +9,7 @@ const readContent = async (filename: string) => await fs.readFile(filename, 'utf
 const createEmptyDirectory = async () => await fs.mkdtemp(path.join(os.tmpdir(), 'bootstrap-pull-request-'))
 
 describe('syncServicesFromPrebuilt', () => {
-  it('copies the manifests', async () => {
+  it('copies the manifests from the prebuilt branch', async () => {
     const namespaceDirectory = await createEmptyDirectory()
 
     const services = await syncServicesFromPrebuilt({
@@ -134,6 +134,60 @@ describe('syncServicesFromPrebuilt', () => {
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--b.yaml`)).toBe(applicationB)
   })
+
+  it('copies the manifests from the overridden prebuilt branch', async () => {
+    const namespaceDirectory = await createEmptyDirectory()
+
+    const services = await syncServicesFromPrebuilt({
+      applicationContext: {
+        overlay: 'pr',
+        namespace: 'pr-123',
+        project: 'source-repository',
+        destinationRepository: 'octocat/destination-repository',
+      },
+      changedServices: ['b'],
+      prebuiltBranch: {
+        name: 'prebuilt/source-repository/pr',
+        directory: `${__dirname}/fixtures/prebuilt`,
+      },
+      override: {
+        services: ['c'],
+        prebuiltBranch: {
+          name: 'prebuilt/source-repository/pr/override',
+          directory: `${__dirname}/fixtures/override-prebuilt`,
+        },
+      },
+      namespaceDirectory,
+      substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
+    })
+
+    expect(services).toStrictEqual<Service[]>([
+      {
+        service: 'a',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
+      // Service b does not exist. It will be deployed by another workflow.
+      {
+        service: 'c',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr/override',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
+    ])
+    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--c.yaml'])
+    expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
+    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe(serviceA)
+    expect(await readContent(`${namespaceDirectory}/applications/pr-123--c.yaml`)).toBe(applicationC)
+    expect(await readContent(`${namespaceDirectory}/services/c/generated.yaml`)).toBe(serviceC)
+  })
 })
 
 const applicationA = `\
@@ -216,6 +270,33 @@ spec:
       prune: true
 `
 
+const applicationC = `\
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pr-123--c
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    github.action: bootstrap-pull-request
+    github.head-ref: main
+    github.head-sha: main-branch-sha
+    built-from-prebuilt-branch: prebuilt/source-repository/pr/override
+spec:
+  project: source-repository
+  source:
+    repoURL: https://github.com/octocat/destination-repository.git
+    targetRevision: ns/source-repository/pr/pr-123
+    path: services/c
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: pr-123
+  syncPolicy:
+    automated:
+      prune: true
+`
+
 const serviceA = `\
 # fixture
 name: a
@@ -225,5 +306,11 @@ namespace: pr-123
 const serviceB = `\
 # fixture
 name: b
+namespace: pr-123
+`
+
+const serviceC = `\
+# fixture
+name: c
 namespace: pr-123
 `

@@ -156,7 +156,7 @@ const copyApplicationManifestsFromOverridePrebuiltBranch = async (inputs: Inputs
       service,
       applicationContext: inputs.applicationContext,
       namespaceDirectory: inputs.namespaceDirectory,
-      prebuiltBranch: inputs.prebuiltBranch.name,
+      prebuiltBranch: override.prebuiltBranch.name,
       prebuiltApplicationManifestPath,
     })
   }
