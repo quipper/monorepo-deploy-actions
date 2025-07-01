@@ -15,9 +15,18 @@ inputs:
   destination-repository:
     description: Destination repository
     required: true
+  changed-services:
+    description: List of services changed in the pull request
+    required: false
   prebuilt-branch:
-    description: Name of prebuilt branch in the destination repository.
+    description: Name of prebuilt branch in the destination repository
     required: true
+  override-services:
+    description: If set, copy these services from override-prebuilt-branch
+    required: false
+  override-prebuilt-branch:
+    description: If set, copy override-services from this branch instead of prebuilt-branch
+    required: false
   destination-repository-token:
     description: GitHub token for destination repository
     required: true
@@ -25,16 +34,6 @@ inputs:
   substitute-variables:
     description: Pairs of key=value to substitute the prebuilt manifests (multiline)
     required: false
-  current-head-sha:
-    description: SHA of current head commit (For internal use)
-    default: ${{ github.event.pull_request.head.sha || github.sha }}
-  exclude-services:
-    description: List of services to exclude from the overlay (multiline)
-    required: false
-  invert-exclude-services:
-    description: Invert the exclude list
-    required: false
-    default: "false"
 
 outputs:
   services:

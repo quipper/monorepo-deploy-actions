@@ -1,0 +1,3 @@
+# fixture
+name: c
+namespace: ${NAMESPACE}
