@@ -32,6 +32,12 @@ export const run = async (inputs: Inputs): Promise<Outputs> => {
 const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
   const namespaceBranch = `ns/${sourceRepositoryName}/${inputs.overlay}/${inputs.namespace}`
+  const applicationContext = {
+    overlay: inputs.overlay,
+    namespace: inputs.namespace,
+    project: sourceRepositoryName,
+    destinationRepository: inputs.destinationRepository,
+  }
 
   core.startGroup(`Checking out the prebuilt branch: ${inputs.prebuiltBranch}`)
   const prebuiltDirectory = await git.checkout({
@@ -67,12 +73,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   core.endGroup()
 
   const services = await prebuilt.syncServicesFromPrebuilt({
-    applicationContext: {
-      overlay: inputs.overlay,
-      namespace: inputs.namespace,
-      project: inputs.sourceRepository,
-      destinationRepository: inputs.destinationRepository,
-    },
+    applicationContext,
     changedServices: inputs.changedServices,
     prebuiltBranch: {
       name: inputs.prebuiltBranch,
