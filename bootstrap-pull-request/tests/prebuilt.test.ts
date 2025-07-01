@@ -9,7 +9,7 @@ const readContent = async (filename: string) => await fs.readFile(filename, 'utf
 const createEmptyDirectory = async () => await fs.mkdtemp(path.join(os.tmpdir(), 'bootstrap-pull-request-'))
 
 describe('syncServicesFromPrebuilt', () => {
-  it('creates the manifests if empty', async () => {
+  it('copies the manifests', async () => {
     const namespaceDirectory = await createEmptyDirectory()
 
     const services = await syncServicesFromPrebuilt({

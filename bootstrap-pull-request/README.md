@@ -40,7 +40,9 @@ jobs:
           overlay: pr
           namespace: pr-${{ github.event.number }}
           destination-repository: octocat/generated-manifests
+          # If a service is changed in the pull request, it should be deployed by another workflow.
           changed-services: ${{ steps.changed-services.outputs.result }}
+          # If a service is not changed in the pull request, copy it from the prebuilt branch.
           prebuilt-branch: prebuilt/source-repository/main/workload
           destination-repository-token: ${{ steps.destination-repository-github-app.outputs.token }}
           substitute-variables: |
@@ -64,30 +66,85 @@ It creates the following directory structure.
         └── generated.yaml
 ```
 
-It bootstraps the namespace branch by the following steps:
+This action writes a service into the namespace branch by the following rules:
 
-1. Clean up the existing manifests
-2. Copy the services from prebuilt branch
-3. Copy the services from override directory (if specified)
+- If a service is changed in the pull request, it should be deployed by git-push-service action of another workflow.
+  This action will not overwrite the service.
+- If a service is not changed in the pull request, this action will copy the service from the prebuilt branch.
 
-### 1. Clean up the existing manifests
+Here is the diagram.
 
-This action deletes the existing manifests in the namespace branch before copying.
-It does not delete the services of `changed-services` input.
+```mermaid
+graph TB
+  subgraph Pull request
+    S1[If a service is changed]
+    S2[If a service is not changed]
+  end
+  subgraph Prebuilt branch
+    S2 -..-> PS2[Prebuilt service manifest]
+  end
+  subgraph Namespace branch
+    S1 -- git-push-service --> NS1[Service manifest]
+    PS2 -- bootstrap-pull-request --> NS2[Service manifest]
+  end
+```
 
-### 2. Copy the services from prebuilt branch
+## Override the prebuilt branch
 
-This action copies the services from prebuilt branch to the namespace branch.
-It does not copy the services of `changed-services` input.
+You can override the prebuilt branch for the specific services.
+For example,
 
-All placeholders will be replaced during copying the service manifests.
-For example, if `NAMESPACE=pr-123` is given by `substitute-variables` input,
-this action will replace `${NAMESPACE}` with `pr-123`.
+```yaml
+jobs:
+  bootstrap-pull-request:
+    steps:
+      - uses: actions/checkout@v4
+      # ...omit...
+      - uses: quipper/monorepo-deploy-actions/bootstrap-pull-request@v1
+        with:
+          overlay: pr
+          namespace: pr-${{ github.event.number }}
+          destination-repository: octocat/generated-manifests
+          # If a service is changed in the pull request, it should be deployed by another workflow.
+          changed-services: ${{ steps.changed-services.outputs.result }}
+          # If a service is not changed in the pull request, copy it from this prebuilt branch.
+          prebuilt-branch: prebuilt/source-repository/main/proxy
+          # For the specific services, copy them from this prebuilt branch.
+          override-prebuilt-branch: prebuilt/source-repository/main/workload
+          override-services: ${{ steps.dependent-services.outputs.result }}
+          destination-repository-token: ${{ steps.destination-repository-github-app.outputs.token }}
+          substitute-variables: |
+            NAMESPACE=pr-${{ github.event.number }}
+```
 
-### 3. Copy the services from override prebuilt directory
+This action writes a service into the namespace branch by the following rules:
 
-When `override-services` input is specified, this action copies the services from another prebuilt directory to the namespace branch.
-It does not copy the services of `changed-services` input.
+- If a service is changed in the pull request, it should be deployed by git-push-service action of another workflow.
+  This action will not overwrite the service.
+- If a service is in `override-services`, this action will copy the service from `override-prebuilt-branch`.
+- If a service is not changed in the pull request, this action will copy the service from `prebuilt-branch`.
+
+Here is the diagram.
+
+```mermaid
+graph TB
+  subgraph Pull request
+    S1[If a service is changed]
+    S2[If a service is in override-services]
+    S3[If a service is not changed]
+  end
+  subgraph override-prebuilt-branch
+    S2 -..-> PS2[Prebuilt service manifest]
+  end
+  subgraph Prebuilt branch
+    S3 -..-> PS3[Prebuilt service manifest]
+  end
+  subgraph Namespace branch
+    S1 -- git-push-service --> NS1[Service manifest]
+    PS2 -- bootstrap-pull-request --> NS2[Service manifest]
+    PS3 -- bootstrap-pull-request --> NS3[Service manifest]
+  end
+```
 
 ## Specification
 
