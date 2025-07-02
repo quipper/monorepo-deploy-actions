@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import * as github from '@actions/github'
+import * as github from './github.js'
 import * as git from './git.js'
 import * as prebuilt from './prebuilt.js'
 import { retryExponential } from './retry.js'
@@ -21,15 +21,14 @@ type Outputs = {
   services: prebuilt.Service[]
 }
 
-export const run = async (inputs: Inputs): Promise<Outputs> => {
-  const outputs = await retryExponential(() => bootstrapNamespace(inputs), {
+export const run = async (inputs: Inputs, context: github.Context): Promise<Outputs> => {
+  return await retryExponential(() => bootstrapNamespace(inputs, context), {
     maxAttempts: 50,
     waitMs: 10000,
   })
-  return outputs
 }
 
-const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
+const bootstrapNamespace = async (inputs: Inputs, context: github.Context): Promise<Outputs | Error> => {
   const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
   const namespaceBranch = `ns/${sourceRepositoryName}/${inputs.overlay}/${inputs.namespace}`
   const applicationContext = {
@@ -90,7 +89,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   }
 
   core.startGroup(`Pushing the namespace branch`)
-  const commitSha = await git.commit(namespaceDirectory, commitMessage(inputs.namespace))
+  const commitSha = await git.commit(namespaceDirectory, commitMessage(context, inputs.namespace))
   const pushCode = await git.pushByFastForward(namespaceDirectory)
   if (pushCode > 0) {
     // Retry from checkout if fast-forward was failed
@@ -98,7 +97,7 @@ const bootstrapNamespace = async (inputs: Inputs): Promise<Outputs | Error> => {
   }
   core.endGroup()
 
-  writeSummary(inputs, commitSha, services)
+  writeSummary(inputs, context, commitSha, services)
   await core.summary.write()
   return { services }
 }
@@ -113,10 +112,10 @@ const parseSubstituteVariables = (substituteVariables: string[]): Map<string, st
   return m
 }
 
-const writeSummary = (inputs: Inputs, commitSha: string, services: prebuilt.Service[]) => {
+const writeSummary = (inputs: Inputs, context: github.Context, commitSha: string, services: prebuilt.Service[]) => {
   core.summary.addHeading('bootstrap-pull-request summary', 2)
 
-  const commitUrl = `${github.context.serverUrl}/${inputs.destinationRepository}/commit/${commitSha}`
+  const commitUrl = `${context.serverUrl}/${inputs.destinationRepository}/commit/${commitSha}`
   core.summary.addRaw('<p>')
   core.summary.addRaw('Pushed ')
   core.summary.addLink(commitSha, commitUrl)
@@ -130,11 +129,11 @@ const writeSummary = (inputs: Inputs, commitSha: string, services: prebuilt.Serv
     ],
     ...services.map((service) => {
       if (service.builtFrom.pullRequest) {
-        const shaLink = `<a href="${github.context.serverUrl}/${inputs.sourceRepository}/tree/${service.builtFrom.pullRequest.headSha}">${service.builtFrom.pullRequest.headSha}</a>`
+        const shaLink = `<a href="${context.serverUrl}/${inputs.sourceRepository}/tree/${service.builtFrom.pullRequest.headSha}">${service.builtFrom.pullRequest.headSha}</a>`
         return [service.service, `Current pull request at ${shaLink}`]
       }
       if (service.builtFrom.prebuilt) {
-        const shaLink = `<a href="${github.context.serverUrl}/${inputs.sourceRepository}/tree/${service.builtFrom.prebuilt.builtFrom.headSha}">${service.builtFrom.prebuilt.builtFrom.headSha}</a>`
+        const shaLink = `<a href="${context.serverUrl}/${inputs.sourceRepository}/tree/${service.builtFrom.prebuilt.builtFrom.headSha}">${service.builtFrom.prebuilt.builtFrom.headSha}</a>`
         return [service.service, `${service.builtFrom.prebuilt.builtFrom.headRef}@${shaLink}`]
       }
       return [service.service, '(unknown)']
@@ -142,6 +141,6 @@ const writeSummary = (inputs: Inputs, commitSha: string, services: prebuilt.Serv
   ])
 }
 
-const commitMessage = (namespace: string) => `Bootstrap namespace ${namespace}
-${github.context.action}
-${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}`
+const commitMessage = (context: github.Context, namespace: string) => `Bootstrap namespace ${namespace}
+${context.action}
+${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
