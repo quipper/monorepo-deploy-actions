@@ -24,11 +24,14 @@ export const checkout = async (opts: CheckoutOptions) => {
     ['config', '--local', 'http.https://github.com/.extraheader', `AUTHORIZATION: basic ${credentials}`],
     { cwd },
   )
-  await exec.exec(
+  const code = await exec.exec(
     'git',
     ['fetch', '--no-tags', '--depth=1', 'origin', `+refs/heads/${opts.branch}:refs/remotes/origin/${opts.branch}`],
-    { cwd },
+    { cwd, ignoreReturnCode: true },
   )
+  if (code !== 0) {
+    throw new Error(`Branch ${opts.branch} not found in the repository ${opts.repository}`)
+  }
   await exec.exec('git', ['checkout', opts.branch], { cwd })
   return cwd
 }
