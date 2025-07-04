@@ -1,6 +1,8 @@
 import * as core from '@actions/core'
+import * as fs from 'fs/promises'
 import * as github from './github.js'
 import * as git from './git.js'
+import * as path from 'path'
 import * as prebuilt from './prebuilt.js'
 import { retryExponential } from './retry.js'
 
@@ -29,17 +31,10 @@ export const run = async (inputs: Inputs, context: github.Context): Promise<Outp
 }
 
 const bootstrapNamespace = async (inputs: Inputs, context: github.Context): Promise<Outputs | Error> => {
-  const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
-  const namespaceBranch = `ns/${sourceRepositoryName}/${inputs.overlay}/${inputs.namespace}`
-  const applicationContext = {
-    overlay: inputs.overlay,
-    namespace: inputs.namespace,
-    project: sourceRepositoryName,
-    destinationRepository: inputs.destinationRepository,
-  }
-
   core.startGroup(`Checking out the prebuilt branch: ${inputs.prebuiltBranch}`)
-  const prebuiltDirectory = await git.checkout({
+  const prebuiltDirectory = await createWorkspace(context, 'prebuilt-branch-')
+  await git.checkout({
+    workingDirectory: prebuiltDirectory,
     repository: inputs.destinationRepository,
     branch: inputs.prebuiltBranch,
     token: inputs.destinationRepositoryToken,
@@ -49,22 +44,29 @@ const bootstrapNamespace = async (inputs: Inputs, context: github.Context): Prom
   let override
   if (inputs.overridePrebuiltBranch) {
     core.startGroup(`Checking out the override prebuilt branch: ${inputs.overridePrebuiltBranch}`)
+    const overridePrebuiltDirectory = await createWorkspace(context, 'override-prebuilt-branch-')
+    await git.checkout({
+      workingDirectory: overridePrebuiltDirectory,
+      repository: inputs.destinationRepository,
+      branch: inputs.overridePrebuiltBranch,
+      token: inputs.destinationRepositoryToken,
+    })
     override = {
       services: inputs.overrideServices,
       prebuiltBranch: {
         name: inputs.overridePrebuiltBranch,
-        directory: await git.checkout({
-          repository: inputs.destinationRepository,
-          branch: inputs.overridePrebuiltBranch,
-          token: inputs.destinationRepositoryToken,
-        }),
+        directory: overridePrebuiltDirectory,
       },
     }
     core.endGroup()
   }
 
+  const [, sourceRepositoryName] = inputs.sourceRepository.split('/')
+  const namespaceBranch = `ns/${sourceRepositoryName}/${inputs.overlay}/${inputs.namespace}`
   core.startGroup(`Checking out the namespace branch: ${namespaceBranch}`)
-  const namespaceDirectory = await git.checkoutOrInitRepository({
+  const namespaceDirectory = await createWorkspace(context, 'namespace-branch-')
+  await git.checkoutOrInitRepository({
+    workingDirectory: namespaceDirectory,
     repository: inputs.destinationRepository,
     branch: namespaceBranch,
     token: inputs.destinationRepositoryToken,
@@ -72,7 +74,12 @@ const bootstrapNamespace = async (inputs: Inputs, context: github.Context): Prom
   core.endGroup()
 
   const services = await prebuilt.syncServicesFromPrebuilt({
-    applicationContext,
+    applicationContext: {
+      overlay: inputs.overlay,
+      namespace: inputs.namespace,
+      project: sourceRepositoryName,
+      destinationRepository: inputs.destinationRepository,
+    },
     changedServices: inputs.changedServices,
     prebuiltBranch: {
       name: inputs.prebuiltBranch,
@@ -101,6 +108,9 @@ const bootstrapNamespace = async (inputs: Inputs, context: github.Context): Prom
   await core.summary.write()
   return { services }
 }
+
+const createWorkspace = async (context: github.Context, prefix: string) =>
+  await fs.mkdtemp(path.join(context.runnerTemp, prefix))
 
 const parseSubstituteVariables = (substituteVariables: string[]): Map<string, string> => {
   const m = new Map<string, string>()

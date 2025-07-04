@@ -8,6 +8,7 @@ export type Context = {
   action: string
   runId: string
   serverUrl: string
+  runnerTemp: string
 }
 
 export const getContext = (): Context => {
@@ -17,6 +18,7 @@ export const getContext = (): Context => {
     action: getEnv('GITHUB_ACTION'),
     runId: getEnv('GITHUB_RUN_ID'),
     serverUrl: getEnv('GITHUB_SERVER_URL'),
+    runnerTemp: getEnv('RUNNER_TEMP'),
   }
 }
 

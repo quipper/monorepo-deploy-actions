@@ -1,18 +1,16 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import * as os from 'os'
-import * as path from 'path'
-import { promises as fs } from 'fs'
 
 type CheckoutOptions = {
+  workingDirectory: string
   repository: string
   branch: string
   token: string
 }
 
 export const checkout = async (opts: CheckoutOptions) => {
-  const cwd = await fs.mkdtemp(path.join(process.env.RUNNER_TEMP || os.tmpdir(), 'git-'))
-  core.info(`Cloning ${opts.repository} into ${cwd}`)
+  core.info(`Cloning ${opts.repository} into ${opts.workingDirectory}`)
+  const cwd = opts.workingDirectory
   await exec.exec('git', ['version'], { cwd })
   await exec.exec('git', ['init', '--initial-branch', opts.branch], { cwd })
   await exec.exec('git', ['config', '--local', 'gc.auto', '0'], { cwd })
@@ -37,8 +35,8 @@ export const checkout = async (opts: CheckoutOptions) => {
 }
 
 export const checkoutOrInitRepository = async (opts: CheckoutOptions) => {
-  const cwd = await fs.mkdtemp(path.join(process.env.RUNNER_TEMP || os.tmpdir(), 'git-'))
-  core.info(`Cloning ${opts.repository} into ${cwd}`)
+  core.info(`Cloning ${opts.repository} into ${opts.workingDirectory}`)
+  const cwd = opts.workingDirectory
   await exec.exec('git', ['version'], { cwd })
   await exec.exec('git', ['init', '--initial-branch', opts.branch], { cwd })
   await exec.exec('git', ['config', '--local', 'gc.auto', '0'], { cwd })
