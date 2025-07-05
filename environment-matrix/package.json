@@ -32,7 +32,7 @@
     "typescript-eslint": "8.35.1",
     "vitest": "3.2.4",
     "@types/js-yaml": "4.0.9",
-    "@types/minimatch": "5.1.2"
+    "@types/minimatch": "6.0.0"
   },
   "packageManager": "pnpm@10.12.4"
 }

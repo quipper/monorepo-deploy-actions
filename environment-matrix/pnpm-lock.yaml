@@ -40,8 +40,8 @@ importers:
         specifier: 4.0.9
         version: 4.0.9
       '@types/minimatch':
-        specifier: 5.1.2
-        version: 5.1.2
+        specifier: 6.0.0
+        version: 6.0.0
       '@types/node':
         specifier: 20.19.4
         version: 20.19.4
@@ -1040,6 +1040,10 @@ packages:
 
   '@types/minimatch@5.1.2':
     resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==}
+
+  '@types/minimatch@6.0.0':
+    resolution: {integrity: sha512-zmPitbQ8+6zNutpwgcQuLcsEpn/Cj54Kbn7L5pX0Os5kdWplB7xPgEh/g+SWOB/qmows2gpuCaPyduq8ZZRnxA==}
+    deprecated: This is a stub types definition. minimatch provides its own type definitions, so you do not need this installed.
 
   '@types/node@20.19.1':
     resolution: {integrity: sha512-jJD50LtlD2dodAEO653i3YF04NWak6jN3ky+Ri3Em3mGR39/glWiboM/IePaRbgwSfqM1TpGXfAg8ohn/4dTgA==}
@@ -3026,6 +3030,10 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/minimatch@5.1.2': {}
+
+  '@types/minimatch@6.0.0':
+    dependencies:
+      minimatch: 10.0.3
 
   '@types/node@20.19.1':
     dependencies:
