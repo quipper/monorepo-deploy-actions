@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { createPull } from './pull.js'
+import { createOrUpdatePull } from './pull.js'
 import { checkIfBranchExists, createBranch } from './branch.js'
 import { Octokit } from '@octokit/action'
 import { Context } from './github.js'
@@ -47,7 +47,7 @@ export const run = async (inputs: Inputs, octokit: Octokit, context: Context): P
 
   core.info(`Creating a pull request from ${inputs.head} to ${inputs.base}`)
   const timestamp = formatISO8601LocalTime(inputs.now(), inputs.timeZone)
-  const pull = await createPull(octokit, {
+  const pull = await createOrUpdatePull(octokit, {
     owner: context.repo.owner,
     repo: context.repo.repo,
     head: inputs.head,
