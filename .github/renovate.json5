@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base",
+    "config:recommended",
     "helpers:pinGitHubActionDigests",
     "github>int128/typescript-action-renovate-config#v1.7.0",
     ":automergeMinor",
@@ -11,6 +11,9 @@
   // DO NOT enable platformAutomerge,
   // because this repository does not have a required check in the branch protection rules.
   "platformAutomerge": false,
+  "timezone": "Asia/Tokyo",
+  "schedule": ["after 10am and before 3pm on Monday"],
+  "minimumReleaseAge": "7 days",
   "packageRules": [
     {
       "matchPaths": ["*/**"],
