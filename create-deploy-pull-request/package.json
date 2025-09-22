@@ -26,7 +26,7 @@
     "typescript": "5.9.2",
     "typescript-eslint": "8.43.0",
     "vitest": "3.2.4",
-    "msw": "2.11.1"
+    "msw": "2.11.2"
   },
   "packageManager": "pnpm@10.15.1"
 }
