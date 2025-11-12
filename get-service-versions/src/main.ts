@@ -8,6 +8,7 @@ const main = async (): Promise<void> => {
     sourceRepository: core.getInput('source-repository', { required: true }),
     destinationRepository: core.getInput('destination-repository', { required: true }),
     destinationRepositoryToken: core.getInput('destination-repository-token', { required: true }),
+    successIfNotFound: core.getBooleanInput('success-if-not-found') || true,
   })
 }
 

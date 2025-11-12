@@ -8,6 +8,7 @@ type Inputs = {
   sourceRepository: string
   destinationRepository: string
   destinationRepositoryToken: string
+  successIfNotFound: boolean
 }
 
 type Outputs = ApplicationVersion[]
@@ -20,9 +21,20 @@ export const run = async (inputs: Inputs): Promise<void> => {
   }
 }
 
-const getServiceVersions = async (inputs: Inputs): Promise<Outputs> => {
+export const getServiceVersions = async (inputs: Inputs): Promise<Outputs> => {
   core.info(`Checking out the namespace branch`)
-  const namespaceDirectory = await checkoutNamespaceBranch(inputs)
+  let namespaceDirectory: string
+
+  try {
+    namespaceDirectory = await checkoutNamespaceBranch(inputs)
+  } catch (error) {
+    if (inputs.successIfNotFound) {
+      core.warning(`Namespace branch not found, returning empty list`)
+      return []
+    }
+
+    throw error
+  }
   core.debug(`Namespace directory: ${namespaceDirectory}`)
 
   const applicationFiles = await listApplicationFiles(namespaceDirectory)
