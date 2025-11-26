@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "biome check src tests",
+    "check": "biome check",
     "build": "ncc build --source-map --license licenses.txt src/main.ts",
     "test": "vitest"
   },
