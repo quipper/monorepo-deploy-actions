@@ -1,7 +1,7 @@
+import { HttpResponse, http } from 'msw'
+import { afterAll, afterEach, beforeAll, expect, it } from 'vitest'
 import { run } from '../src/run.js'
 import { getOctokit, server } from './github.js'
-import { http, HttpResponse } from 'msw'
-import { beforeAll, afterEach, afterAll, it, expect } from 'vitest'
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())

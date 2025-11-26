@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { Octokit } from '@octokit/action'
+import type { Octokit } from '@octokit/action'
 
 type CreatePullOptions = {
   owner: string
