@@ -1,4 +1,4 @@
-import assert from 'assert'
+import assert from 'node:assert'
 import { Octokit } from '@octokit/action'
 import { retry } from '@octokit/plugin-retry'
 
