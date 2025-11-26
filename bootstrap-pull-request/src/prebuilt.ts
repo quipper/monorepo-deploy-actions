@@ -1,9 +1,9 @@
-import assert from 'assert'
+import assert from 'node:assert'
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
-import * as fs from 'fs/promises'
 import * as io from '@actions/io'
-import * as path from 'path'
 import * as yaml from 'js-yaml'
 import { parseApplicationManifest } from './application.js'
 
@@ -14,7 +14,7 @@ type ApplicationContext = {
   destinationRepository: string
 }
 
-type Inputs = {
+export type Inputs = {
   applicationContext: ApplicationContext
   namespaceDirectory: string
   changedServices: string[]
@@ -106,7 +106,7 @@ const copyServiceManifest = async (from: string, to: string, substituteVariables
   core.info(`Reading ${from}`)
   let content = await fs.readFile(from, 'utf-8')
   for (const [k, v] of substituteVariables) {
-    const placeholder = '${' + k + '}'
+    const placeholder = `\${${k}}`
     content = content.replaceAll(placeholder, v)
   }
   core.info(`Writing ${to}`)

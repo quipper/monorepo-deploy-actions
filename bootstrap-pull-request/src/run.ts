@@ -1,8 +1,8 @@
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
 import * as core from '@actions/core'
-import * as fs from 'fs/promises'
-import * as github from './github.js'
 import * as git from './git.js'
-import * as path from 'path'
+import type * as github from './github.js'
 import * as prebuilt from './prebuilt.js'
 import { retryExponential } from './retry.js'
 
@@ -41,7 +41,7 @@ const bootstrapNamespace = async (inputs: Inputs, context: github.Context): Prom
   })
   core.endGroup()
 
-  let override
+  let override: prebuilt.Inputs['override']
   if (inputs.overridePrebuiltBranch) {
     core.startGroup(`Checking out the override prebuilt branch: ${inputs.overridePrebuiltBranch}`)
     const overridePrebuiltDirectory = await createWorkspace(context, 'override-prebuilt-branch-')

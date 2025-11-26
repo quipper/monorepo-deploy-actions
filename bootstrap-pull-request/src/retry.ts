@@ -17,7 +17,7 @@ export const retryExponential = async <T>(f: () => Promise<T | Error>, spec: Ret
       throw value
     }
 
-    const waitMs = Math.ceil(Math.pow(attempt, 2) + Math.random() * spec.waitMs)
+    const waitMs = Math.ceil(attempt ** 2 + Math.random() * spec.waitMs)
     core.warning(`Retrying after ${waitMs} ms: ${String(value)}`)
     await sleep(waitMs)
   }
