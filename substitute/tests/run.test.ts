@@ -1,8 +1,8 @@
-import * as os from 'os'
-import { promises as fs } from 'fs'
-import * as path from 'path'
+import { promises as fs } from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
+import { describe, expect, it, test } from 'vitest'
 import { parseVariables, run } from '../src/run.js'
-import { test, describe, it, expect } from 'vitest'
 
 test('variables are replaced', async () => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'substitute-action-'))

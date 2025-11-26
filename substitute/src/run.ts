@@ -1,4 +1,4 @@
-import { promises as fs } from 'fs'
+import { promises as fs } from 'node:fs'
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 
@@ -35,7 +35,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
 const replace = (s: string, variables: Map<string, string>): string => {
   let result = s
   for (const [k, v] of variables) {
-    const placeholder = '${' + k + '}'
+    const placeholder = `\${${k}}`
     core.info(`replace ${placeholder} => ${v}`)
     result = replaceAll(result, placeholder, v)
   }
