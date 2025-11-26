@@ -1,8 +1,8 @@
-import * as os from 'os'
-import * as path from 'path'
-import { promises as fs } from 'fs'
-import { Service, syncServicesFromPrebuilt } from '../src/prebuilt.js'
-import { describe, it, expect } from 'vitest'
+import { promises as fs } from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
+import { describe, expect, it } from 'vitest'
+import { type Service, syncServicesFromPrebuilt } from '../src/prebuilt.js'
 
 const readContent = async (filename: string) => await fs.readFile(filename, 'utf-8')
 

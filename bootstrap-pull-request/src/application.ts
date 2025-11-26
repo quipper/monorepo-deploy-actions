@@ -1,5 +1,5 @@
-import assert from 'assert'
-import fs from 'fs/promises'
+import assert from 'node:assert'
+import fs from 'node:fs/promises'
 import * as yaml from 'js-yaml'
 
 export type PartialApplication = {
@@ -46,7 +46,7 @@ function assertIsPartialApplication(o: unknown): asserts o is PartialApplication
 }
 
 export const parseApplicationManifest = async (filename: string): Promise<PartialApplication | Error> => {
-  let application
+  let application: unknown
   try {
     application = yaml.load(await fs.readFile(filename, 'utf-8'))
   } catch (error) {
