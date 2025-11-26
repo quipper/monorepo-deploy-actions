@@ -1,13 +1,13 @@
-import * as os from 'os'
-import { promises as fs } from 'fs'
-import * as path from 'path'
+import { promises as fs } from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as git from './git.js'
 import * as glob from '@actions/glob'
 import { writeManifests } from './arrange.js'
-import { retry } from './retry.js'
+import * as git from './git.js'
 import { updateBranchByPullRequest } from './pull.js'
+import { retry } from './retry.js'
 
 type Inputs = {
   manifests: string
@@ -31,7 +31,7 @@ type Outputs = {
   }
 }
 
-export const run = async (inputs: Inputs): Promise<Outputs | void> => {
+export const run = async (inputs: Inputs): Promise<Outputs | undefined> => {
   const globber = await glob.create(inputs.manifests, { matchDirectories: false })
   const manifests = await globber.glob()
   core.info(`found ${manifests.length} manifest(s) in ${inputs.manifests}`)
@@ -67,7 +67,7 @@ export const run = async (inputs: Inputs): Promise<Outputs | void> => {
   return outputs
 }
 
-const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | void | Error> => {
+const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | undefined | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-service-action-'))
   core.info(`Created a workspace at ${workspace}`)
 

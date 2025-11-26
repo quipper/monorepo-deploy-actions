@@ -1,8 +1,8 @@
-import * as os from 'os'
-import * as fs from 'fs/promises'
-import * as path from 'path'
+import * as fs from 'node:fs/promises'
+import * as os from 'node:os'
+import * as path from 'node:path'
+import { expect, it } from 'vitest'
 import { writeManifests } from '../src/arrange.js'
-import { it, expect } from 'vitest'
 
 const readContent = async (f: string) => await fs.readFile(f, 'utf-8')
 

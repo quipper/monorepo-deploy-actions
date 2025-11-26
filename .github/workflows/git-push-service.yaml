@@ -21,10 +21,23 @@ defaults:
     working-directory: git-push-service
   
 jobs:
-  autofix:
-    uses: ./.github/workflows/autofix.yaml
-    with:
-      working-directory: git-push-service
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions: 
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version-file: .node-version
+      - run: npm install -g pnpm@latest-10
+      - run: pnpm i
+        working-directory: git-push-service
+      - run: pnpm check --fix
+        working-directory: git-push-service
+      - uses: int128/update-generated-files-action@f6dc44e35ce252932e9018f1c38d1e2a4ff80e14 # v2.60.0
 
   test:
     runs-on: ubuntu-latest

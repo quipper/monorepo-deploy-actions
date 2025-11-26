@@ -1,7 +1,7 @@
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
 import * as core from '@actions/core'
-import * as fs from 'fs/promises'
 import * as io from '@actions/io'
-import * as path from 'path'
 import * as yaml from 'js-yaml'
 
 type Inputs = {
