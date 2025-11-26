@@ -1,8 +1,8 @@
-import { promises as fs } from 'fs'
-import * as os from 'os'
-import * as path from 'path'
+import { promises as fs } from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
+import { describe, expect, test } from 'vitest'
 import { addToServices, deleteFromServices } from '../src/patch.js'
-import { describe, test, expect } from 'vitest'
 
 const patch = path.join(__dirname, 'fixtures/kustomization.yaml')
 

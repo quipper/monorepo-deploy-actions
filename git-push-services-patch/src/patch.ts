@@ -1,7 +1,7 @@
+import { promises as fs } from 'node:fs'
+import * as path from 'node:path'
 import * as core from '@actions/core'
-import { promises as fs } from 'fs'
 import * as io from '@actions/io'
-import * as path from 'path'
 
 type Inputs = {
   workspace: string

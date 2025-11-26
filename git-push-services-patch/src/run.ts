@@ -1,9 +1,9 @@
-import * as os from 'os'
-import { promises as fs } from 'fs'
-import * as path from 'path'
+import { promises as fs } from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
 import * as core from '@actions/core'
-import * as git from './git.js'
 import * as github from '@actions/github'
+import * as git from './git.js'
 import * as patch from './patch.js'
 import { retry } from './retry.js'
 
@@ -36,7 +36,7 @@ export const run = async (inputs: Inputs): Promise<void> =>
     waitMillisecond: 10000,
   })
 
-const push = async (inputs: Inputs): Promise<void | Error> => {
+const push = async (inputs: Inputs): Promise<undefined | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-services-patch-'))
   core.info(`created workspace at ${workspace}`)
 
