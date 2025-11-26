@@ -1,6 +1,6 @@
+import assert from 'node:assert'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import assert from 'assert'
 
 type Inputs = {
   owner: string

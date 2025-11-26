@@ -1,7 +1,7 @@
+import assert from 'node:assert'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import { run } from './run.js'
-import assert from 'assert'
 
 const main = async (): Promise<void> => {
   await run({
