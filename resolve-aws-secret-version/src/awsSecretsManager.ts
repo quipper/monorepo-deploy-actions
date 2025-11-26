@@ -1,11 +1,15 @@
-import assert from 'assert'
-import { ListSecretVersionIdsCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
+import assert from 'node:assert'
+import {
+  ListSecretVersionIdsCommand,
+  type ListSecretVersionIdsCommandOutput,
+  SecretsManagerClient,
+} from '@aws-sdk/client-secrets-manager'
 
 // get the current version id for the secret
 export const getCurrentVersionId = async (secretId: string): Promise<string> => {
   const client = new SecretsManagerClient({})
   const listCommand = new ListSecretVersionIdsCommand({ SecretId: secretId })
-  let listOutput
+  let listOutput: ListSecretVersionIdsCommandOutput
   try {
     listOutput = await client.send(listCommand)
   } catch (error) {

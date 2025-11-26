@@ -1,7 +1,7 @@
-import { promises as fs } from 'fs'
-import * as os from 'os'
+import { promises as fs } from 'node:fs'
+import * as os from 'node:os'
+import { expect, it, vi } from 'vitest'
 import { replaceSecretVersionIds, updateManifest } from '../src/resolve.js'
-import { vi, it, expect } from 'vitest'
 
 it('replaces the placeholder of AWSSecret with the current version id', async () => {
   const manager = { getCurrentVersionId: vi.fn() }
