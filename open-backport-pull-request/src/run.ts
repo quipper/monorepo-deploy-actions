@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as format from './format.js'
-import { Context, getOctokit, Octokit } from './github.js'
+import { type Context, getOctokit, type Octokit } from './github.js'
 
 type Inputs = {
   githubToken: string

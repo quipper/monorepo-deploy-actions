@@ -1,6 +1,6 @@
-import { Context } from '../src/github.js'
+import { describe, expect, it } from 'vitest'
 import { getCommitMessage, getPullRequestBody, getPullRequestTitle } from '../src/format.js'
-import { describe, it, expect } from 'vitest'
+import type { Context } from '../src/github.js'
 
 const context: Context = {
   actor: 'octocat',
