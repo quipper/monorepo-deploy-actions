@@ -1,6 +1,6 @@
-import assert from 'assert'
-import * as pluginRetry from '@octokit/plugin-retry'
+import assert from 'node:assert'
 import * as github from '@actions/github'
+import * as pluginRetry from '@octokit/plugin-retry'
 
 export type Octokit = ReturnType<typeof github.getOctokit>
 

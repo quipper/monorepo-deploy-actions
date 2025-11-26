@@ -1,6 +1,6 @@
+import { describe, expect, it, test } from 'vitest'
 import { findEnvironmentsFromRules, matchEnvironment } from '../src/matcher.js'
-import { Rules } from '../src/rule.js'
-import { test, describe, it, expect } from 'vitest'
+import type { Rules } from '../src/rule.js'
 
 const rules: Rules = [
   {

@@ -1,8 +1,8 @@
-import * as github from '@actions/github'
+import type * as github from '@actions/github'
 import * as glob from '@actions/glob'
 import { minimatch } from 'minimatch'
-import { Environment, Rule, Rules } from './rule.js'
 import { assertPullRequestPayload } from './github.js'
+import type { Environment, Rule, Rules } from './rule.js'
 
 type Context = Pick<typeof github.context, 'eventName' | 'ref' | 'payload'>
 

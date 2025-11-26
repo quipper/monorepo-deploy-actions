@@ -1,9 +1,9 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { parseRulesYAML } from './rule.js'
-import { findEnvironmentsFromRules } from './matcher.js'
 import { createDeployment } from './deployment.js'
 import { getOctokit } from './github.js'
+import { findEnvironmentsFromRules } from './matcher.js'
+import { parseRulesYAML } from './rule.js'
 
 type Inputs = {
   rules: string

@@ -1,8 +1,8 @@
+import assert from 'node:assert'
 import * as core from '@actions/core'
-import * as github from '@actions/github'
-import { Octokit, assertPullRequestPayload } from './github.js'
-import assert from 'assert'
-import { GitHubDeployment } from './rule.js'
+import type * as github from '@actions/github'
+import { assertPullRequestPayload, type Octokit } from './github.js'
+import type { GitHubDeployment } from './rule.js'
 
 type Context = Pick<typeof github.context, 'eventName' | 'repo' | 'ref' | 'payload'>
 

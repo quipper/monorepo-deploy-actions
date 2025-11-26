@@ -1,5 +1,5 @@
+import { Ajv, type JTDSchemaType } from 'ajv/dist/jtd.js'
 import * as yaml from 'js-yaml'
-import { Ajv, JTDSchemaType } from 'ajv/dist/jtd.js'
 
 export type Outputs = Record<string, string>
 
