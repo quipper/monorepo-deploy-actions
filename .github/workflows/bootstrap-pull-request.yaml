@@ -85,7 +85,7 @@ jobs:
           prebuilt-branch: bootstrap-pull-request-e2e-prebuilt-${{ github.run_id }}
           substitute-variables: NAMESPACE=pr-${{ github.event.number }}
 
-      # the action should be idempotent
+      # This action should be idempotent
       - uses: ./bootstrap-pull-request
         with:
           overlay: overlay-${{ github.run_id }}
@@ -93,6 +93,7 @@ jobs:
           destination-repository: ${{ github.repository }}
           prebuilt-branch: bootstrap-pull-request-e2e-prebuilt-${{ github.run_id }}
           substitute-variables: NAMESPACE=pr-${{ github.event.number }}
+          aggregate-prebuilt-services-to-namespace-directory: true
 
       - name: Clean up the namespace branch
         continue-on-error: true
