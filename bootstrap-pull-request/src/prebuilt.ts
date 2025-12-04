@@ -49,7 +49,8 @@ export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[
 const cleanupManifests = async (inputs: Inputs): Promise<void> => {
   const patterns = [
     `${inputs.namespaceDirectory}/**`,
-    // Do not delete the changed services.
+    // Keep the changed services.
+    // These should be deployed by other workflows.
     ...inputs.changedServices.map((service) => `!${inputs.namespaceDirectory}/applications/*--${service}.yaml`),
     ...inputs.changedServices.map((service) => `!${inputs.namespaceDirectory}/services/${service}/*.yaml`),
     // Keep the .git directory.
