@@ -21,6 +21,8 @@ export type Inputs = {
   prebuiltBranch: {
     name: string
     directory: string
+    // This flag does not affect the override prebuilt branch,
+    // because a manifest of override prebuilt branch is typically too large.
     aggregateToNamespaceDirectory: boolean
   }
   override?: {
