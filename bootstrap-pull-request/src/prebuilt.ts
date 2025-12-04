@@ -21,6 +21,7 @@ export type Inputs = {
   prebuiltBranch: {
     name: string
     directory: string
+    aggregateToNamespaceDirectory: boolean
   }
   override?: {
     services: string[]
@@ -37,11 +38,8 @@ export const syncServicesFromPrebuilt = async (inputs: Inputs): Promise<Service[
 
   await copyServiceManifestsFromPrebuiltBranch(inputs)
   await copyApplicationManifestsFromPrebuiltBranch(inputs)
-
-  if (inputs.override) {
-    await copyServiceManifestsFromOverridePrebuiltBranch(inputs)
-    await copyApplicationManifestsFromOverridePrebuiltBranch(inputs)
-  }
+  await copyServiceManifestsFromOverridePrebuiltBranch(inputs)
+  await copyApplicationManifestsFromOverridePrebuiltBranch(inputs)
 
   return await listApplicationManifests(inputs.namespaceDirectory)
 }
@@ -52,6 +50,7 @@ const cleanupManifests = async (inputs: Inputs): Promise<void> => {
     // Do not delete the changed services.
     ...inputs.changedServices.map((service) => `!${inputs.namespaceDirectory}/applications/*--${service}.yaml`),
     ...inputs.changedServices.map((service) => `!${inputs.namespaceDirectory}/services/${service}/*.yaml`),
+    // Keep the .git directory.
     `!${inputs.namespaceDirectory}/.git/**`,
   ]
   core.info(`Cleaning up the manifests with patterns:\n${patterns.join('\n')}`)
@@ -72,18 +71,29 @@ const copyServiceManifestsFromPrebuiltBranch = async (inputs: Inputs) => {
   const globber = await glob.create(patterns.join('\n'), { matchDirectories: false })
   for await (const prebuiltServiceManifestPath of globber.globGenerator()) {
     const service = path.basename(path.dirname(prebuiltServiceManifestPath))
-    core.info(`Copying the service manifest of ${service}`)
-    await copyServiceManifest(
-      prebuiltServiceManifestPath,
-      `${inputs.namespaceDirectory}/services/${service}/${path.basename(prebuiltServiceManifestPath)}`,
-      inputs.substituteVariables,
-    )
+    if (inputs.prebuiltBranch.aggregateToNamespaceDirectory) {
+      core.info(`Copying the service manifest of ${service} into applications`)
+      await copyServiceManifest(
+        prebuiltServiceManifestPath,
+        `${inputs.namespaceDirectory}/applications/${inputs.applicationContext.namespace}--${service}--${path.basename(prebuiltServiceManifestPath)}`,
+        inputs.substituteVariables,
+      )
+    } else {
+      core.info(`Copying the service manifest of ${service} into services`)
+      await copyServiceManifest(
+        prebuiltServiceManifestPath,
+        `${inputs.namespaceDirectory}/services/${service}/${path.basename(prebuiltServiceManifestPath)}`,
+        inputs.substituteVariables,
+      )
+    }
   }
 }
 
 const copyServiceManifestsFromOverridePrebuiltBranch = async (inputs: Inputs) => {
-  const { override } = inputs
-  assert(override)
+  const override = inputs.override
+  if (override === undefined) {
+    return
+  }
   const patterns = [
     ...override.services.map((service) => `${override.prebuiltBranch.directory}/services/${service}/*.yaml`),
     // Do not overwrite the changed services.
@@ -115,6 +125,9 @@ const copyServiceManifest = async (from: string, to: string, substituteVariables
 }
 
 const copyApplicationManifestsFromPrebuiltBranch = async (inputs: Inputs) => {
+  if (inputs.prebuiltBranch.aggregateToNamespaceDirectory) {
+    return
+  }
   const patterns = [
     `${inputs.prebuiltBranch.directory}/applications/*--*.yaml`,
     // Do not overwrite the changed services.
@@ -138,8 +151,10 @@ const copyApplicationManifestsFromPrebuiltBranch = async (inputs: Inputs) => {
 }
 
 const copyApplicationManifestsFromOverridePrebuiltBranch = async (inputs: Inputs) => {
-  const { override } = inputs
-  assert(override)
+  const override = inputs.override
+  if (override === undefined) {
+    return
+  }
   const patterns = [
     ...override.services.map((service) => `${override.prebuiltBranch.directory}/applications/*--${service}.yaml`),
     // Do not overwrite the changed services.

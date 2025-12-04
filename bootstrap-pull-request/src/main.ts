@@ -11,6 +11,7 @@ const main = async (): Promise<void> => {
       destinationRepository: core.getInput('destination-repository', { required: true }),
       changedServices: core.getMultilineInput('changed-services'),
       prebuiltBranch: core.getInput('prebuilt-branch', { required: true }),
+      aggregatePrebuiltServicesToNamespaceDirectory: core.getBooleanInput('aggregate-prebuilt-services-to-namespace-directory'),
       overrideServices: core.getMultilineInput('override-services'),
       overridePrebuiltBranch: core.getInput('override-prebuilt-branch') || undefined,
       destinationRepositoryToken: core.getInput('destination-repository-token', { required: true }),

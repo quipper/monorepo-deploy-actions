@@ -146,6 +146,25 @@ graph TB
   end
 ```
 
+## Aggregate prebuilt services to the namespace directory
+
+For a large monorepo, Argo CD may have performance issues when there are many directories to watch.
+To mitigate the issue, you can aggregate the prebuilt services into the namespace directory.
+
+When `aggregate-prebuilt-services-to-namespace-directory` is set to `true`,
+this action copies the prebuilt manifests into the namespace directory instead of their service directories.
+Here is the directory structure.
+
+```
+.
+├── applications
+|   ├── ${namespace}--${changed-service}.yaml
+|   └── ${namespace}--${prebuilt-service}--generated.yaml
+└── services
+    └── ${changed-service}
+        └── generated.yaml
+```
+
 ## Specification
 
 See [action.yaml](action.yaml).
