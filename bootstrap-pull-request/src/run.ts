@@ -13,6 +13,7 @@ type Inputs = {
   destinationRepository: string
   changedServices: string[]
   prebuiltBranch: string
+  aggregatePrebuiltServicesToNamespaceDirectory: boolean
   overridePrebuiltBranch: string | undefined
   overrideServices: string[]
   destinationRepositoryToken: string
@@ -84,6 +85,7 @@ const bootstrapNamespace = async (inputs: Inputs, context: github.Context): Prom
     prebuiltBranch: {
       name: inputs.prebuiltBranch,
       directory: prebuiltDirectory,
+      aggregateToNamespaceDirectory: inputs.aggregatePrebuiltServicesToNamespaceDirectory,
     },
     override,
     namespaceDirectory,
