@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prebuilt--c
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    github.head-ref: main
+    github.head-sha: main-branch-sha
+    github.action: git-push-service
+spec:
+  project: source-repository
+  source:
+    repoURL: https://github.com/octocat/destination-repository.git
+    targetRevision: prebuilt/source-repository/pr
+    path: services/c
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prebuilt
+  syncPolicy:
+    automated:
+      prune: true

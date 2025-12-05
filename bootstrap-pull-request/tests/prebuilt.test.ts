@@ -48,11 +48,25 @@ describe('syncServicesFromPrebuilt', () => {
           },
         },
       },
+      {
+        service: 'c',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
     ])
-    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
+    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual([
+      'pr-123--a.yaml',
+      'pr-123--b.yaml',
+      'pr-123--c.yaml',
+    ])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
-    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe(serviceA)
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--b.yaml`)).toBe(applicationB)
+    expect(await fs.readdir(`${namespaceDirectory}/services`)).toStrictEqual(['a', 'b', 'c'])
+    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe(serviceA)
     expect(await readContent(`${namespaceDirectory}/services/b/generated.yaml`)).toBe(serviceB)
   })
 
@@ -99,10 +113,24 @@ describe('syncServicesFromPrebuilt', () => {
           },
         },
       },
+      {
+        service: 'c',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
     ])
 
-    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual(['pr-123--a.yaml', 'pr-123--b.yaml'])
+    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual([
+      'pr-123--a.yaml',
+      'pr-123--b.yaml',
+      'pr-123--c.yaml',
+    ])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(existingApplicationA)
+    expect(await fs.readdir(`${namespaceDirectory}/services`)).toStrictEqual(['a', 'b', 'c'])
     expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe('this-should-be-kept')
   })
 
@@ -147,14 +175,25 @@ describe('syncServicesFromPrebuilt', () => {
           },
         },
       },
+      {
+        service: 'c',
+        builtFrom: {
+          prebuilt: {
+            prebuiltBranch: 'prebuilt/source-repository/pr',
+            builtFrom: { headRef: 'main', headSha: 'main-branch-sha' },
+          },
+        },
+      },
     ])
     expect(await fs.readdir(`${namespaceDirectory}/applications`, { recursive: true })).toStrictEqual([
       'pr-123--a.yaml',
       'pr-123--b.yaml',
+      'pr-123--c.yaml',
       // pr-123--outdated.yaml should not exist
     ])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--b.yaml`)).toBe(applicationB)
+    expect(await fs.readdir(`${namespaceDirectory}/services`)).toStrictEqual(['a', 'b', 'c'])
   })
 
   it('copies the manifests from the overridden prebuilt branch', async () => {
@@ -211,8 +250,9 @@ describe('syncServicesFromPrebuilt', () => {
       'pr-123--c.yaml',
     ])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
-    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe(serviceA)
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--c.yaml`)).toBe(applicationC)
+    expect(await fs.readdir(`${namespaceDirectory}/services`)).toStrictEqual(['a', 'c'])
+    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe(serviceA)
     expect(await readContent(`${namespaceDirectory}/services/c/generated.yaml`)).toBe(serviceC)
   })
 })
@@ -245,9 +285,11 @@ describe('syncServicesFromPrebuilt with aggregateToNamespaceDirectory', () => {
     expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual([
       'pr-123--a--generated.yaml',
       'pr-123--b--generated.yaml',
+      'pr-123--c--generated.yaml',
     ])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a--generated.yaml`)).toBe(serviceA)
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--b--generated.yaml`)).toBe(serviceB)
+    expect(await readContent(`${namespaceDirectory}/applications/pr-123--c--generated.yaml`)).toBe(serviceC)
   })
 
   it('does not overwrite the changed services', async () => {
@@ -290,10 +332,12 @@ describe('syncServicesFromPrebuilt with aggregateToNamespaceDirectory', () => {
     expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual([
       'pr-123--a.yaml',
       'pr-123--b--generated.yaml',
+      'pr-123--c--generated.yaml',
     ])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(existingApplicationA)
-    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe('this-should-be-kept')
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--b--generated.yaml`)).toBe(serviceB)
+    expect(await fs.readdir(`${namespaceDirectory}/services`)).toStrictEqual(['a'])
+    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe('this-should-be-kept')
   })
 
   it('copies the manifests from the overridden prebuilt branch', async () => {
@@ -343,6 +387,7 @@ describe('syncServicesFromPrebuilt with aggregateToNamespaceDirectory', () => {
     ])
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--a--generated.yaml`)).toBe(serviceA)
     expect(await readContent(`${namespaceDirectory}/applications/pr-123--c.yaml`)).toBe(applicationC)
+    expect(await fs.readdir(`${namespaceDirectory}/services`)).toStrictEqual(['c'])
     expect(await readContent(`${namespaceDirectory}/services/c/generated.yaml`)).toBe(serviceC)
   })
 })
