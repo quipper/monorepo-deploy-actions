@@ -65,10 +65,13 @@ const cleanupManifests = async (inputs: Inputs): Promise<void> => {
 }
 
 const copyServiceManifestsFromPrebuiltBranch = async (inputs: Inputs) => {
+  const overriddenServices = inputs.override?.services ?? []
   const patterns = [
     `${inputs.prebuiltBranch.directory}/services/*/*.yaml`,
-    // Do not overwrite the changed services.
+    // Keep the changed services.
     ...inputs.changedServices.map((service) => `!${inputs.prebuiltBranch.directory}/services/${service}/*.yaml`),
+    // Exclude the overridden services.
+    ...overriddenServices.map((service) => `!${inputs.prebuiltBranch.directory}/services/${service}/*.yaml`),
   ]
   core.info(`Copying the service manifests with patterns:\n${patterns.join('\n')}`)
   const globber = await glob.create(patterns.join('\n'), { matchDirectories: false })
@@ -99,7 +102,7 @@ const copyServiceManifestsFromOverridePrebuiltBranch = async (inputs: Inputs) =>
   }
   const patterns = [
     ...override.services.map((service) => `${override.prebuiltBranch.directory}/services/${service}/*.yaml`),
-    // Do not overwrite the changed services.
+    // Keep the changed services.
     ...inputs.changedServices.map((service) => `!${override.prebuiltBranch.directory}/services/${service}/*.yaml`),
   ]
   core.info(`Copying the service manifests with patterns:\n${patterns.join('\n')}`)
@@ -131,10 +134,13 @@ const copyApplicationManifestsFromPrebuiltBranch = async (inputs: Inputs) => {
   if (inputs.prebuiltBranch.aggregateToNamespaceDirectory) {
     return
   }
+  const overriddenServices = inputs.override?.services ?? []
   const patterns = [
     `${inputs.prebuiltBranch.directory}/applications/*--*.yaml`,
-    // Do not overwrite the changed services.
+    // Keep the changed services.
     ...inputs.changedServices.map((service) => `!${inputs.prebuiltBranch.directory}/applications/*--${service}.yaml`),
+    // Exclude the overridden services.
+    ...overriddenServices.map((service) => `!${inputs.prebuiltBranch.directory}/applications/*--${service}.yaml`),
   ]
   core.info(`Copying the application manifests with patterns:\n${patterns.join('\n')}`)
   const globber = await glob.create(patterns.join('\n'), { matchDirectories: false })
