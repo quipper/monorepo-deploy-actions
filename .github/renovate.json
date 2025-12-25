@@ -9,20 +9,32 @@
   ],
   "platformAutomerge": true,
   "timezone": "Asia/Tokyo",
-  "schedule": ["after 10am and before 3pm on Monday"],
+  "schedule": [
+    "after 10am and before 3pm on Monday"
+  ],
   "minimumReleaseAge": "7 days",
-  "labels": ["renovate/{{depName}}"],
+  "labels": [
+    "renovate/{{depName}}"
+  ],
   "packageRules": [
     {
       "description": "Split updates per action",
-      "matchFileNames": ["*/**"],
+      "matchFileNames": [
+        "*/**"
+      ],
       "additionalBranchPrefix": "{{packageFileDir}}-",
       "commitMessageSuffix": "({{packageFileDir}})",
-      "matchPackageNames": ["!node", "!@types/node"]
+      "matchPackageNames": [
+        "!node",
+        "!@types/node"
+      ]
     },
     {
       "description": "Do not update the dependencies of @actions/github. See https://github.com/quipper/monorepo-deploy-actions/pull/1362",
-      "matchPackageNames": ["@octokit/core", "@octokit/plugin-retry"],
+      "matchPackageNames": [
+        "@octokit/core",
+        "@octokit/plugin-retry"
+      ],
       "enabled": false
     }
   ]
