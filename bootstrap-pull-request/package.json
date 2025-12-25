@@ -23,7 +23,7 @@
     "@vercel/ncc": "0.38.4",
     "pnpm": "10.15.1",
     "typescript": "5.9.2",
-    "vitest": "3.2.4"
+    "vitest": "4.0.16"
   },
   "packageManager": "pnpm@10.15.1"
 }
