@@ -18,7 +18,7 @@
     "@biomejs/biome": "2.3.10",
     "@tsconfig/node20": "20.1.8",
     "@types/js-yaml": "4.0.9",
-    "@types/node": "20.19.24",
+    "@types/node": "20.19.27",
     "@vercel/ncc": "0.38.4",
     "aws-sdk-client-mock": "4.1.0",
     "pnpm": "10.26.0",
