@@ -31,8 +31,8 @@ importers:
         specifier: 2.3.10
         version: 2.3.10
       '@tsconfig/node20':
-        specifier: 20.1.6
-        version: 20.1.6
+        specifier: 20.1.8
+        version: 20.1.8
       '@types/js-yaml':
         specifier: 4.0.9
         version: 4.0.9
@@ -449,8 +449,8 @@ packages:
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
-  '@tsconfig/node20@20.1.6':
-    resolution: {integrity: sha512-sz+Hqx9zwZDpZIV871WSbUzSqNIsXzghZydypnfgzPKLltVJfkINfUeTct31n/tTSa9ZE1ZOfKdRre1uHHquYQ==}
+  '@tsconfig/node20@20.1.8':
+    resolution: {integrity: sha512-Em+IdPfByIzWRRpqWL4Z7ArLHZGxmc36BxE3jCz9nBFSm+5aLaPMZyjwu4yetvyKXeogWcxik4L1jB5JTWfw7A==}
 
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
@@ -1005,7 +1005,7 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
-  '@tsconfig/node20@20.1.6': {}
+  '@tsconfig/node20@20.1.8': {}
 
   '@types/chai@5.2.3':
     dependencies:
