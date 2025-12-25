@@ -22,7 +22,7 @@
     "@tsconfig/node20": "20.1.8",
     "@types/js-yaml": "4.0.9",
     "@types/minimatch": "6.0.0",
-    "@types/node": "20.19.24",
+    "@types/node": "20.19.27",
     "@vercel/ncc": "0.38.4",
     "pnpm": "10.26.0",
     "typescript": "5.9.3",
