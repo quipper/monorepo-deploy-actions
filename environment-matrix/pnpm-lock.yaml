@@ -27,8 +27,8 @@ importers:
         specifier: 4.1.1
         version: 4.1.1
       minimatch:
-        specifier: 10.0.3
-        version: 10.0.3
+        specifier: 10.1.1
+        version: 10.1.1
     devDependencies:
       '@biomejs/biome':
         specifier: 2.3.10
@@ -1224,6 +1224,10 @@ packages:
 
   minimatch@10.0.3:
     resolution: {integrity: sha512-IPZ167aShDZZUMdRk66cyQAW3qr0WzbHkPdMYa8bzZhlHhO3jALbKdxcaak7W9FfT2rZNpQuUu4Od7ILEpXSaw==}
+    engines: {node: 20 || >=22}
+
+  minimatch@10.1.1:
+    resolution: {integrity: sha512-enIvLvRAFZYXJzkCYG5RKmPfrFArdLv+R+lbQ53BmIMLIry74bjKzX6iHAm8WYamJkhSSEabrWN5D97XnKObjQ==}
     engines: {node: 20 || >=22}
 
   minimatch@3.1.2:
@@ -2769,6 +2773,10 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
 
   minimatch@10.0.3:
+    dependencies:
+      '@isaacs/brace-expansion': 5.0.0
+
+  minimatch@10.1.1:
     dependencies:
       '@isaacs/brace-expansion': 5.0.0
 
