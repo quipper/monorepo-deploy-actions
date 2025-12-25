@@ -8,9 +8,7 @@
     ":label(renovate/{{depName}})",
     ":reviewer(team:sre-jp)",
   ],
-  // DO NOT enable platformAutomerge,
-  // because this repository does not have a required check in the branch protection rules.
-  "platformAutomerge": false,
+  "platformAutomerge": true,
   "timezone": "Asia/Tokyo",
   "schedule": ["after 10am and before 3pm on Monday"],
   "minimumReleaseAge": "7 days",
