@@ -19,14 +19,14 @@
   "packageRules": [
     {
       "description": "Split updates per action",
-      "matchPaths": [
+      "matchFileNames": [
         "*/**"
       ],
       "additionalBranchPrefix": "{{packageFileDir}}-",
       "commitMessageSuffix": "({{packageFileDir}})",
-      "excludePackageNames": [
-        "node",
-        "@types/node"
+      "matchPackageNames": [
+        "!node",
+        "!@types/node"
       ]
     },
     {
