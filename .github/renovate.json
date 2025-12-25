@@ -30,7 +30,9 @@
       "commitMessageSuffix": "({{packageFileDir}})",
       "matchPackageNames": [
         "!node",
-        "!@types/node"
+        "!@types/node",
+        "!@actions/*",
+        "!pnpm"
       ]
     },
     {
