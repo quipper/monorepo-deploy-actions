@@ -5,32 +5,37 @@
     "helpers:pinGitHubActionDigests",
     "github>int128/typescript-action-renovate-config#v1.10.0",
     ":automergeMinor",
-    ":label(renovate/{{depName}})",
-    ":reviewer(team:sre-jp)",
+    ":reviewer(team:sre-jp)"
   ],
   "platformAutomerge": true,
   "timezone": "Asia/Tokyo",
-  "schedule": ["after 10am and before 3pm on Monday"],
+  "schedule": [
+    "after 10am and before 3pm on Monday"
+  ],
   "minimumReleaseAge": "7 days",
+  "labels": [
+    "renovate/{{depName}}"
+  ],
   "packageRules": [
     {
-      "matchPaths": ["*/**"],
+      "description": "Split updates per action",
+      "matchPaths": [
+        "*/**"
+      ],
       "additionalBranchPrefix": "{{packageFileDir}}-",
       "commitMessageSuffix": "({{packageFileDir}})",
       "excludePackageNames": [
-        // update all action.yaml in single pull request
         "node",
-        "@types/node",
-      ],
+        "@types/node"
+      ]
     },
     {
-      // Do not update the dependencies of @actions/github.
-      // https://github.com/quipper/monorepo-deploy-actions/pull/1362
+      "description": "Do not update the dependencies of @actions/github. See https://github.com/quipper/monorepo-deploy-actions/pull/1362",
       "matchPackageNames": [
         "@octokit/core",
-        "@octokit/plugin-retry",
+        "@octokit/plugin-retry"
       ],
-      "enabled": false,
-    },
+      "enabled": false
+    }
   ]
 }
