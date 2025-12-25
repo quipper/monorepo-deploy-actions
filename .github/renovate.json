@@ -8,13 +8,17 @@
     ":reviewer(team:sre-jp)"
   ],
   "platformAutomerge": true,
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
   "timezone": "Asia/Tokyo",
   "schedule": [
     "after 10am and before 3pm on Monday"
   ],
   "minimumReleaseAge": "7 days",
   "labels": [
-    "renovate/{{depName}}"
+    "renovate",
+    "renovate/{{depName}}",
+    "{{packageFileDir}}"
   ],
   "packageRules": [
     {
