@@ -31,8 +31,8 @@ importers:
         specifier: 0.38.4
         version: 0.38.4
       msw:
-        specifier: 2.12.4
-        version: 2.12.4(@types/node@20.19.27)(typescript@5.9.3)
+        specifier: 2.12.7
+        version: 2.12.7(@types/node@20.19.27)(typescript@5.9.3)
       pnpm:
         specifier: 10.26.1
         version: 10.26.1
@@ -41,7 +41,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 4.0.16
-        version: 4.0.16(@types/node@20.19.27)(msw@2.12.4(@types/node@20.19.27)(typescript@5.9.3))
+        version: 4.0.16(@types/node@20.19.27)(msw@2.12.7(@types/node@20.19.27)(typescript@5.9.3))
 
   bootstrap-pull-request:
     dependencies:
@@ -1306,8 +1306,8 @@ packages:
       typescript:
         optional: true
 
-  msw@2.12.4:
-    resolution: {integrity: sha512-rHNiVfTyKhzc0EjoXUBVGteNKBevdjOlVC6GlIRXpy+/3LHEIGRovnB5WPjcvmNODVQ1TNFnoa7wsGbd0V3epg==}
+  msw@2.12.7:
+    resolution: {integrity: sha512-retd5i3xCZDVWMYjHEVuKTmhqY8lSsxujjVrZiGbbdoxxIBg5S7rCuYy/YQpfrTYIxpd/o0Kyb/3H+1udBMoYg==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -2795,13 +2795,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@4.0.16(msw@2.12.4(@types/node@20.19.27)(typescript@5.9.3))(vite@6.3.5(@types/node@20.19.27))':
+  '@vitest/mocker@4.0.16(msw@2.12.7(@types/node@20.19.27)(typescript@5.9.3))(vite@6.3.5(@types/node@20.19.27))':
     dependencies:
       '@vitest/spy': 4.0.16
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      msw: 2.12.4(@types/node@20.19.27)(typescript@5.9.3)
+      msw: 2.12.7(@types/node@20.19.27)(typescript@5.9.3)
       vite: 6.3.5(@types/node@20.19.27)
 
   '@vitest/pretty-format@4.0.16':
@@ -3014,7 +3014,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  msw@2.12.4(@types/node@20.19.27)(typescript@5.9.3):
+  msw@2.12.7(@types/node@20.19.27)(typescript@5.9.3):
     dependencies:
       '@inquirer/confirm': 5.1.6(@types/node@20.19.27)
       '@mswjs/interceptors': 0.40.0
@@ -3246,10 +3246,10 @@ snapshots:
       '@types/node': 20.19.27
       fsevents: 2.3.3
 
-  vitest@4.0.16(@types/node@20.19.27)(msw@2.12.4(@types/node@20.19.27)(typescript@5.9.3)):
+  vitest@4.0.16(@types/node@20.19.27)(msw@2.12.7(@types/node@20.19.27)(typescript@5.9.3)):
     dependencies:
       '@vitest/expect': 4.0.16
-      '@vitest/mocker': 4.0.16(msw@2.12.4(@types/node@20.19.27)(typescript@5.9.3))(vite@6.3.5(@types/node@20.19.27))
+      '@vitest/mocker': 4.0.16(msw@2.12.7(@types/node@20.19.27)(typescript@5.9.3))(vite@6.3.5(@types/node@20.19.27))
       '@vitest/pretty-format': 4.0.16
       '@vitest/runner': 4.0.16
       '@vitest/snapshot': 4.0.16
