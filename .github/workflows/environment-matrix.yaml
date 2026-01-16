@@ -19,7 +19,7 @@ on:
 defaults:
   run:
     working-directory: environment-matrix
-  
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
           node-version-file: .node-version
       - run: npm install -g pnpm@latest-10
       - run: pnpm i
-      - run: pnpm check --fix
+      - run: pnpm check
       - uses: int128/update-generated-files-action@3d23e5bef5a471517ce6a7d07c32e7cff7903e0d # v2.75.0
 
   test:
