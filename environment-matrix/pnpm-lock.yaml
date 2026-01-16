@@ -20,15 +20,15 @@ importers:
       '@octokit/plugin-retry':
         specifier: 6.0.1
         version: 6.0.1(@octokit/core@5.2.0)
-      ajv:
-        specifier: 8.17.1
-        version: 8.17.1
       js-yaml:
         specifier: 4.1.1
         version: 4.1.1
       minimatch:
         specifier: 10.1.1
         version: 10.1.1
+      zod:
+        specifier: ^4.3.5
+        version: 4.3.5
     devDependencies:
       '@biomejs/biome':
         specifier: 2.3.11
@@ -1548,6 +1548,9 @@ packages:
   yoctocolors-cjs@2.1.2:
     resolution: {integrity: sha512-cYVsTjKl8b+FrnidjibDWskAv7UKOfcwaVZdp/it9n1s9fU3IkgDbhdIRKCW4JDsAlECJY0ytoVPT3sK6kideA==}
     engines: {node: '>=18'}
+
+  zod@4.3.5:
+    resolution: {integrity: sha512-k7Nwx6vuWx1IJ9Bjuf4Zt1PEllcwe7cls3VNzm4CQ1/hgtFUK2bRNG3rvnpPUhFjmqJKAKtjV576KnUkHocg/g==}
 
 snapshots:
 
@@ -3115,3 +3118,5 @@ snapshots:
       yargs-parser: 21.1.1
 
   yoctocolors-cjs@2.1.2: {}
+
+  zod@4.3.5: {}
