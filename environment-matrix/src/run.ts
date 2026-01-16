@@ -3,7 +3,7 @@ import * as github from '@actions/github'
 import { createDeployment } from './deployment.js'
 import { getOctokit } from './github.js'
 import { findEnvironmentsFromRules } from './matcher.js'
-import { parseRulesYAML } from './rule.js'
+import { parseRulesYAML, type Rules } from './rule.js'
 
 type Inputs = {
   rules: string
@@ -15,7 +15,12 @@ type Outputs = {
 }
 
 export const run = async (inputs: Inputs): Promise<Outputs> => {
-  const rules = parseRulesYAML(inputs.rules)
+  let rules: Rules
+  try {
+    rules = parseRulesYAML(inputs.rules)
+  } catch (error) {
+    throw new Error(`Invalid rules. Check the syntax error: ${error}`, { cause: error })
+  }
   core.startGroup('Rules')
   core.info(JSON.stringify(rules, undefined, 2))
   core.endGroup()
