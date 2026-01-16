@@ -54,7 +54,7 @@ test('parse a valid YAML', () => {
 })
 
 test('parse an empty string', () => {
-  expect(() => parseRulesYAML('')).toThrow(`invalid rules YAML:  must be array`)
+  expect(() => parseRulesYAML('')).toThrow(`invalid_type`)
 })
 
 describe('parse an invalid object', () => {
@@ -67,7 +67,7 @@ describe('parse an invalid object', () => {
         overlay: pr
         namespace: pr-1
 `
-    expect(() => parseRulesYAML(yaml)).toThrow(`invalid rules YAML: /0/pull_request must have property 'head'`)
+    expect(() => parseRulesYAML(yaml)).toThrow(`invalid_type`)
   })
 
   test('missing field in environment', () => {
@@ -79,6 +79,6 @@ describe('parse an invalid object', () => {
     - overlay: pr
       namespace: pr-1
 `
-    expect(() => parseRulesYAML(yaml)).toThrow(`invalid rules YAML: /0/environments/0 must have property 'outputs'`)
+    expect(() => parseRulesYAML(yaml)).toThrow(`invalid_type`)
   })
 })

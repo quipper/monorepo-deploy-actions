@@ -166,21 +166,20 @@ jobs:
 The following fields are available in the rules YAML.
 
 ```yaml
-- pull_request: # on pull_request event
-    base: # base branch name (wildcard available)
-    head: # head branch name (wildcard available)
-  environments:
+- pull_request: # Conditions for pull_request events
+    base: # A glob pattern of base branch
+    head: # A glob pattern of head branch
+  environments: # Environments evaluated when the conditions match
     - outputs:
-        key: value # map<string, string>
-      github-deployment: # optional
-        environment: pr-1 # environment name
-- push: # on push event
-    ref: refs/heads/main # ref name (wildcard available)
-  environments: [] # same as above
+        key: value # Key-value pairs of outputs to return
+      github-deployment: # If set, create a GitHub deployment for this environment
+        environment: pr-1 # The name of the environment
+- push: # Conditions for push events
+    ref: refs/heads/main # A glob pattern of ref
+  environments: []
 ```
 
-It supports the wildcard pattern.
-See https://github.com/isaacs/minimatch for details.
+For details, see the type definition in [src/rule.ts](src/rule.ts).
 
 ### Outputs
 
