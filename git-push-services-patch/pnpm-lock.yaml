@@ -15,8 +15,8 @@ importers:
         specifier: 2.0.0
         version: 2.0.0
       '@actions/github':
-        specifier: 6.0.1
-        version: 6.0.1
+        specifier: 7.0.0
+        version: 7.0.0
       '@actions/io':
         specifier: 2.0.0
         version: 2.0.0
@@ -245,6 +245,9 @@ packages:
 
   '@actions/github@6.0.1':
     resolution: {integrity: sha512-xbZVcaqD4XnQAe35qSQqskb3SqIAfRyLBrHMd/8TuL7hJSz2QtbDwnNM8zWx4zO5l2fnGtseNE3MbEvD7BxVMw==}
+
+  '@actions/github@7.0.0':
+    resolution: {integrity: sha512-PyGODO938aoBTZd/IfN/+e+Pd5hUcVpyf+thm4CPESLeqhdSkq5QwMTGX9v84XHE1ifmHWBQ60KB8kIgm96opw==}
 
   '@actions/glob@0.5.0':
     resolution: {integrity: sha512-tST2rjPvJLRZLuT9NMUtyBjvj9Yo0MiJS3ow004slMvm8GFM+Zv9HvMJ7HWzfUyJnGrJvDsYkWBaaG3YKXRtCw==}
@@ -1552,6 +1555,16 @@ snapshots:
   '@actions/github@6.0.1':
     dependencies:
       '@actions/http-client': 2.2.3
+      '@octokit/core': 5.2.0
+      '@octokit/plugin-paginate-rest': 9.2.2(@octokit/core@5.2.0)
+      '@octokit/plugin-rest-endpoint-methods': 10.4.1(@octokit/core@5.2.0)
+      '@octokit/request': 8.4.1
+      '@octokit/request-error': 5.1.1
+      undici: 5.28.5
+
+  '@actions/github@7.0.0':
+    dependencies:
+      '@actions/http-client': 3.0.1
       '@octokit/core': 5.2.0
       '@octokit/plugin-paginate-rest': 9.2.2(@octokit/core@5.2.0)
       '@octokit/plugin-rest-endpoint-methods': 10.4.1(@octokit/core@5.2.0)
