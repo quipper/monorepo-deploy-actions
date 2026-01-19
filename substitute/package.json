@@ -17,9 +17,9 @@
     "@tsconfig/node20": "20.1.8",
     "@types/node": "20.19.28",
     "@vercel/ncc": "0.38.4",
-    "pnpm": "10.27.0",
+    "pnpm": "10.28.0",
     "typescript": "5.9.3",
     "vitest": "4.0.16"
   },
-  "packageManager": "pnpm@10.27.0"
+  "packageManager": "pnpm@10.28.0"
 }
