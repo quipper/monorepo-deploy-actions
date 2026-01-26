@@ -19,9 +19,9 @@
     "@types/node": "20.19.30",
     "@vercel/ncc": "0.38.4",
     "msw": "2.12.7",
-    "pnpm": "10.28.1",
+    "pnpm": "10.28.2",
     "typescript": "5.9.3",
     "vitest": "4.0.17"
   },
-  "packageManager": "pnpm@10.28.1"
+  "packageManager": "pnpm@10.28.2"
 }
