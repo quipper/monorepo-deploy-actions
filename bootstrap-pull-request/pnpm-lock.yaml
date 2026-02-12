@@ -18,8 +18,8 @@ importers:
         specifier: 0.6.1
         version: 0.6.1
       '@actions/io':
-        specifier: 2.0.0
-        version: 2.0.0
+        specifier: 3.0.2
+        version: 3.0.2
       js-yaml:
         specifier: 4.1.1
         version: 4.1.1
