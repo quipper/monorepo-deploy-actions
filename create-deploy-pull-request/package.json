@@ -18,7 +18,7 @@
     "@tsconfig/node20": "20.1.8",
     "@types/node": "20.19.33",
     "@vercel/ncc": "0.38.4",
-    "msw": "2.12.7",
+    "msw": "2.12.9",
     "pnpm": "10.29.2",
     "typescript": "5.9.3",
     "vitest": "4.0.18"
