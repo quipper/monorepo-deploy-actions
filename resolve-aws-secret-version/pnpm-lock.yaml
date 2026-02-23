@@ -15,8 +15,8 @@ importers:
         specifier: 0.6.1
         version: 0.6.1
       '@aws-sdk/client-secrets-manager':
-        specifier: 3.985.0
-        version: 3.985.0
+        specifier: 3.990.0
+        version: 3.990.0
       js-yaml:
         specifier: 4.1.1
         version: 4.1.1
@@ -287,8 +287,8 @@ packages:
     resolution: {integrity: sha512-St2EK5i91vwv9LmDUmWevZYl+Y/TYRP/AHm7gxZm1LkEf1VEjkSizUMm91JOnH6y+0Clok9mqe6jZ/XossMXlw==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/client-secrets-manager@3.985.0':
-    resolution: {integrity: sha512-lssQ48JBYTjbpCc2oyev83fvnSnRAbTVzp5GLMuGCxlk9mdME80ArUJL14ZQrzay+7p3m6RdoBmPaa7RWlVTZA==}
+  '@aws-sdk/client-secrets-manager@3.990.0':
+    resolution: {integrity: sha512-cf4ZLsjczU/Rh+QAxoXUbc/2OKAm8WWC3j1axE4qIO6FLziJCze94sTSCmhSMeLoSjixtIORERQeAXYnjrYVAg==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/client-sso@3.830.0':
@@ -434,10 +434,6 @@ packages:
   '@aws-sdk/util-endpoints@3.828.0':
     resolution: {integrity: sha512-RvKch111SblqdkPzg3oCIdlGxlQs+k+P7Etory9FmxPHyPDvsP1j1c74PmgYqtzzMWmoXTjd+c9naUHh9xG8xg==}
     engines: {node: '>=18.0.0'}
-
-  '@aws-sdk/util-endpoints@3.985.0':
-    resolution: {integrity: sha512-vth7UfGSUR3ljvaq8V4Rc62FsM7GUTH/myxPWkaEgOrprz1/Pc72EgTXxj+cPPPDAfHFIpjhkB7T7Td0RJx+BA==}
-    engines: {node: '>=20.0.0'}
 
   '@aws-sdk/util-endpoints@3.990.0':
     resolution: {integrity: sha512-kVwtDc9LNI3tQZHEMNbkLIOpeDK8sRSTuT8eMnzGY+O+JImPisfSTjdh+jw9OTznu+MYZjQsv0258sazVKunYg==}
@@ -1950,7 +1946,7 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-secrets-manager@3.985.0':
+  '@aws-sdk/client-secrets-manager@3.990.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
@@ -1962,7 +1958,7 @@ snapshots:
       '@aws-sdk/middleware-user-agent': 3.972.10
       '@aws-sdk/region-config-resolver': 3.972.3
       '@aws-sdk/types': 3.973.1
-      '@aws-sdk/util-endpoints': 3.985.0
+      '@aws-sdk/util-endpoints': 3.990.0
       '@aws-sdk/util-user-agent-browser': 3.972.3
       '@aws-sdk/util-user-agent-node': 3.972.8
       '@smithy/config-resolver': 4.4.6
@@ -2510,14 +2506,6 @@ snapshots:
       '@aws-sdk/types': 3.821.0
       '@smithy/types': 4.3.1
       '@smithy/util-endpoints': 3.0.6
-      tslib: 2.8.1
-
-  '@aws-sdk/util-endpoints@3.985.0':
-    dependencies:
-      '@aws-sdk/types': 3.973.1
-      '@smithy/types': 4.12.0
-      '@smithy/url-parser': 4.2.8
-      '@smithy/util-endpoints': 3.2.8
       tslib: 2.8.1
 
   '@aws-sdk/util-endpoints@3.990.0':
