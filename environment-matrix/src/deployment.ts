@@ -40,6 +40,7 @@ export const createDeployment = async (octokit: Octokit, context: Context, deplo
     repo: context.repo.repo,
     ref,
     environment: deployment.environment,
+    task: deployment.task,
     auto_merge: false,
     required_contexts: [],
     transient_environment: context.eventName === 'pull_request',
