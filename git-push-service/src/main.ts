@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import * as github from './github.js'
 import { run } from '../src/run.js'
 
 const main = async (): Promise<void> => {
@@ -14,7 +15,7 @@ const main = async (): Promise<void> => {
     token: core.getInput('token', { required: true }),
     currentHeadRef: core.getInput('current-head-ref', { required: true }),
     currentHeadSha: core.getInput('current-head-sha', { required: true }),
-  })
+  }, github.getContext())
   if (outputs?.destinationPullRequest !== undefined) {
     core.setOutput('destination-pull-request-number', outputs.destinationPullRequest.number)
     core.setOutput('destination-pull-request-url', outputs.destinationPullRequest.url)
