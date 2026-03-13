@@ -97,3 +97,4 @@ Thumbs.db
 # Ignore built ts files
 lib/
 dist/
+package-lock.json
