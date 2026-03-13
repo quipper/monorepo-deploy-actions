@@ -49,6 +49,7 @@ const rules: Rules = [
 test('pull_request with any branches', async () => {
   const context = {
     eventName: 'pull_request',
+    repo: { owner: 'owner', repo: 'repo' },
     payload: {
       pull_request: {
         number: 1,
@@ -71,6 +72,7 @@ test('pull_request with any branches', async () => {
 test('pull_request with patterns', async () => {
   const context = {
     eventName: 'pull_request',
+    repo: { owner: 'owner', repo: 'repo' },
     payload: {
       pull_request: {
         number: 2,
@@ -93,6 +95,7 @@ test('pull_request with patterns', async () => {
 test('push', async () => {
   const context = {
     eventName: 'push',
+    repo: { owner: 'owner', repo: 'repo' },
     payload: {},
     ref: 'refs/heads/main',
   }
@@ -109,6 +112,7 @@ test('push', async () => {
 test('push with no match', async () => {
   const context = {
     eventName: 'push',
+    repo: { owner: 'owner', repo: 'repo' },
     payload: {},
     ref: 'refs/tags/v1.0.0',
   }

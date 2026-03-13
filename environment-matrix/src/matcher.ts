@@ -1,10 +1,7 @@
-import type * as github from '@actions/github'
 import * as glob from '@actions/glob'
 import { minimatch } from 'minimatch'
-import { assertPullRequestPayload } from './github.js'
+import { assertPullRequestPayload, type Context } from './github.js'
 import type { Environment, Rule, Rules } from './rule.js'
-
-type Context = Pick<typeof github.context, 'eventName' | 'ref' | 'payload'>
 
 export const findEnvironmentsFromRules = async (rules: Rules, context: Context): Promise<Environment[] | undefined> => {
   for (const rule of rules) {
