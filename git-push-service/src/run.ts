@@ -67,7 +67,11 @@ export const run = async (inputs: Inputs, context: github.Context): Promise<Outp
   return outputs
 }
 
-const push = async (manifests: string[], inputs: Inputs, context: github.Context): Promise<Outputs | undefined | Error> => {
+const push = async (
+  manifests: string[],
+  inputs: Inputs,
+  context: github.Context,
+): Promise<Outputs | undefined | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-service-action-'))
   core.info(`Created a workspace at ${workspace}`)
 
