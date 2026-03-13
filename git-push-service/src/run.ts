@@ -2,10 +2,10 @@ import { promises as fs } from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import * as core from '@actions/core'
-import * as github from '@actions/github'
 import * as glob from '@actions/glob'
 import { writeManifests } from './arrange.js'
 import * as git from './git.js'
+import type * as github from './github.js'
 import { updateBranchByPullRequest } from './pull.js'
 import { retry } from './retry.js'
 
@@ -31,7 +31,7 @@ type Outputs = {
   }
 }
 
-export const run = async (inputs: Inputs): Promise<Outputs | undefined> => {
+export const run = async (inputs: Inputs, context: github.Context): Promise<Outputs | undefined> => {
   const globber = await glob.create(inputs.manifests, { matchDirectories: false })
   const manifests = await globber.glob()
   core.info(`found ${manifests.length} manifest(s) in ${inputs.manifests}`)
@@ -41,12 +41,12 @@ export const run = async (inputs: Inputs): Promise<Outputs | undefined> => {
 
   if (!inputs.updateViaPullRequest) {
     // Retry when fast-forward is failed
-    const outputs = await retry(async () => push(manifests, inputs), {
+    const outputs = await retry(async () => push(manifests, inputs, context), {
       maxAttempts: 50,
       waitMillisecond: 10000,
     })
     if (outputs) {
-      writeSummary(inputs, outputs)
+      writeSummary(inputs, outputs, context)
     }
     await core.summary.write()
     return outputs
@@ -56,23 +56,27 @@ export const run = async (inputs: Inputs): Promise<Outputs | undefined> => {
   // - Branch already exists, i.e., other job created the branch.
   // - Pull request is conflicted.
   //   This should not be happen if you enable the concurrency option in the workflow.
-  const outputs = await retry(async () => push(manifests, inputs), {
+  const outputs = await retry(async () => push(manifests, inputs, context), {
     maxAttempts: 3,
     waitMillisecond: 10000,
   })
   if (outputs) {
-    writeSummary(inputs, outputs)
+    writeSummary(inputs, outputs, context)
   }
   await core.summary.write()
   return outputs
 }
 
-const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | undefined | Error> => {
+const push = async (
+  manifests: string[],
+  inputs: Inputs,
+  context: github.Context,
+): Promise<Outputs | undefined | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-service-action-'))
   core.info(`Created a workspace at ${workspace}`)
 
   const [owner, repo] = inputs.destinationRepository.split('/')
-  const project = github.context.repo.repo
+  const project = context.repo.repo
   let destinationBranch = `ns/${project}/${inputs.overlay}/${inputs.namespace}`
   if (inputs.destinationBranch) {
     destinationBranch = inputs.destinationBranch
@@ -103,7 +107,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | unde
     core.info('Nothing to commit')
     return
   }
-  const message = `Deploy ${project}/${inputs.namespace}/${inputs.service}\n\n${commitMessageFooter}`
+  const message = `Deploy ${project}/${inputs.namespace}/${inputs.service}\n\n${getCommitMessageFooter(context)}`
   await core.group(`Creating a commit`, () => git.commit(workspace, message))
 
   if (!inputs.updateViaPullRequest) {
@@ -131,7 +135,7 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | unde
     owner,
     repo,
     title: `Deploy ${project}/${inputs.namespace}/${inputs.service}`,
-    body: commitMessageFooter,
+    body: getCommitMessageFooter(context),
     branch: destinationBranch,
     workspace,
     project,
@@ -145,12 +149,12 @@ const push = async (manifests: string[], inputs: Inputs): Promise<Outputs | unde
   return { destinationBranch, destinationPullRequest }
 }
 
-const writeSummary = (inputs: Inputs, outputs: Outputs) => {
+const writeSummary = (inputs: Inputs, outputs: Outputs, context: github.Context) => {
   core.summary.addHeading(`git-push-service summary`, 2)
 
   core.summary.addRaw(`<p>`)
   core.summary.addRaw(`Pushed the service <code>${inputs.service}</code> to the namespace branch: `)
-  const destinationBranchUrl = `${github.context.serverUrl}/${inputs.destinationRepository}/tree/${outputs.destinationBranch}`
+  const destinationBranchUrl = `${context.serverUrl}/${inputs.destinationRepository}/tree/${outputs.destinationBranch}`
   core.summary.addLink(destinationBranchUrl, destinationBranchUrl)
   core.summary.addRaw(`</p>`)
 
@@ -162,8 +166,9 @@ const writeSummary = (inputs: Inputs, outputs: Outputs) => {
   }
 }
 
-const commitMessageFooter = [
-  'git-push-service',
-  `${github.context.payload.repository?.html_url ?? ''}/commit/${github.context.sha}`,
-  `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}`,
-].join('\n')
+const getCommitMessageFooter = (context: github.Context) =>
+  [
+    'git-push-service',
+    `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha}`,
+    `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+  ].join('\n')
