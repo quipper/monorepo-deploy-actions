@@ -2,8 +2,8 @@ import { promises as fs } from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import * as core from '@actions/core'
-import * as github from '@actions/github'
 import * as git from './git.js'
+import type * as github from './github.js'
 import * as patch from './patch.js'
 import { retry } from './retry.js'
 
@@ -30,18 +30,18 @@ export const operationOf = (s: string): Operation => {
   throw new Error(`unknown operation ${s}`)
 }
 
-export const run = async (inputs: Inputs): Promise<void> =>
-  await retry(async () => await push(inputs), {
+export const run = async (inputs: Inputs, context: github.Context): Promise<void> =>
+  await retry(async () => await push(inputs, context), {
     maxAttempts: 50,
     waitMillisecond: 10000,
   })
 
-const push = async (inputs: Inputs): Promise<undefined | Error> => {
+const push = async (inputs: Inputs, context: github.Context): Promise<undefined | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-services-patch-'))
   core.info(`created workspace at ${workspace}`)
 
   const [owner, repo] = inputs.destinationRepository.split('/')
-  const project = github.context.repo.repo
+  const project = context.repo.repo
   const branch = `ns/${project}/${inputs.overlay}/${inputs.namespace}`
 
   core.startGroup(`checkout branch ${branch}`)
@@ -71,7 +71,7 @@ const push = async (inputs: Inputs): Promise<undefined | Error> => {
     return
   }
   return await core.group(`push branch ${branch}`, async () => {
-    const message = `${commitMessage(inputs.namespace, inputs.operation)}\n\n${commitMessageFooter}`
+    const message = `${commitMessage(inputs.namespace, inputs.operation)}\n\n${getCommitMessageFooter(context)}`
     await git.commit(workspace, message)
     const code = await git.pushByFastForward(workspace, branch)
     if (code > 0) {
@@ -87,8 +87,9 @@ const commitMessage = (namespace: string, operation: Operation) => {
   return `Delete patch from ${namespace}`
 }
 
-const commitMessageFooter = [
-  'git-push-services-patch',
-  `${github.context.payload.repository?.html_url ?? ''}/commit/${github.context.sha}`,
-  `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}`,
-].join('\n')
+const getCommitMessageFooter = (context: github.Context) =>
+  [
+    'git-push-services-patch',
+    `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha}`,
+    `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+  ].join('\n')
