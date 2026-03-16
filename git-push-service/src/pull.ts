@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import * as github from '@actions/github'
+import type { Octokit } from '@octokit/action'
 import * as git from './git.js'
 import { catchHttpStatus, retry } from './retry.js'
 
@@ -13,7 +13,6 @@ type Inputs = {
   project: string
   namespace: string
   service: string
-  token: string
 }
 
 type PullRequest = {
@@ -21,7 +20,7 @@ type PullRequest = {
   url: string
 }
 
-export const updateBranchByPullRequest = async (inputs: Inputs): Promise<PullRequest | Error> => {
+export const updateBranchByPullRequest = async (octokit: Octokit, inputs: Inputs): Promise<PullRequest | Error> => {
   const topicBranch = `git-push-service--${inputs.namespace}--${inputs.service}--${Date.now()}`
   const code = await core.group(`push branch ${topicBranch}`, () =>
     git.pushByFastForward(inputs.workspace, topicBranch),
@@ -30,7 +29,6 @@ export const updateBranchByPullRequest = async (inputs: Inputs): Promise<PullReq
     return new Error(`failed to push branch ${topicBranch} by fast-forward`)
   }
 
-  const octokit = github.getOctokit(inputs.token)
   core.info(`creating a pull request from ${topicBranch} into ${inputs.branch}`)
   const { data: pull } = await octokit.rest.pulls.create({
     owner: inputs.owner,
