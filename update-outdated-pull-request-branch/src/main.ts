@@ -8,7 +8,7 @@ const main = async (): Promise<void> => {
       expirationDays: Number(core.getInput('expiration-days')),
     },
     github.getOctokit(),
-    github.getContext(),
+    await github.getContext(),
   )
 }
 
