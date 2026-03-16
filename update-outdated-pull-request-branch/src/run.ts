@@ -1,16 +1,14 @@
 import assert from 'node:assert'
 import * as core from '@actions/core'
-import * as github from '@actions/github'
+import type { Octokit } from '@octokit/action'
 import type * as githubContext from './github.js'
 
 type Inputs = {
   expirationDays: number
-  token: string
 }
 
-export const run = async (inputs: Inputs, context: githubContext.Context): Promise<void> => {
+export const run = async (inputs: Inputs, octokit: Octokit, context: githubContext.Context): Promise<void> => {
   assert(inputs.expirationDays > 0, 'expiration-days must be a positive number')
-  const octokit = github.getOctokit(inputs.token)
 
   core.info(`Fetching the head commit ${context.pullRequestHeadSHA}`)
   const { data: headCommit } = await octokit.rest.git.getCommit({

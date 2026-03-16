@@ -5,10 +5,6 @@ inputs:
   expiration-days:
     description: Expiration days, must be a positive number
     required: true
-  token:
-    description: GitHub token
-    required: true
-    default: ${{ github.token }}
 
 runs:
   using: 'node20'
