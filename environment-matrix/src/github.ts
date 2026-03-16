@@ -1,13 +1,9 @@
 import assert from 'node:assert'
 import { readFileSync } from 'node:fs'
-import * as github from '@actions/github'
-import * as pluginRetry from '@octokit/plugin-retry'
+import { Octokit } from '@octokit/action'
+import { retry } from '@octokit/plugin-retry'
 
-export type Octokit = ReturnType<typeof github.getOctokit>
-
-export const getOctokit = (token: string): Octokit => {
-  return github.getOctokit(token, { previews: ['ant-man', 'flash'] }, pluginRetry.retry)
-}
+export const getOctokit = () => new (Octokit.plugin(retry))()
 
 // picked from https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request
 export type PullRequestPayload = {
