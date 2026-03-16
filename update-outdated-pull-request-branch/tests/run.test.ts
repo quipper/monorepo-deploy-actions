@@ -1,8 +1,8 @@
+import type { WebhookEvent } from '@octokit/webhooks-types'
 import { HttpResponse, http } from 'msw'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { isExpired, run } from '../src/run.js'
 import { getOctokit, server } from './github.js'
-import { WebhookEvent } from '@octokit/webhooks-types'
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
