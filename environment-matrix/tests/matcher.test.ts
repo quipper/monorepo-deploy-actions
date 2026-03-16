@@ -1,3 +1,4 @@
+import type { WebhookEvent } from '@octokit/webhooks-types'
 import { describe, expect, it, test } from 'vitest'
 import { findEnvironmentsFromRules, matchEnvironment } from '../src/matcher.js'
 import type { Rules } from '../src/rule.js'
@@ -56,7 +57,7 @@ test('pull_request with any branches', async () => {
         head: { ref: 'topic' },
         base: { ref: 'main' },
       },
-    },
+    } as WebhookEvent,
     ref: 'refs/pull/1/merge',
   }
   expect(await findEnvironmentsFromRules(rules, context)).toStrictEqual([
@@ -79,7 +80,7 @@ test('pull_request with patterns', async () => {
         head: { ref: 'microservice/qa' },
         base: { ref: 'microservice/production' },
       },
-    },
+    } as WebhookEvent,
     ref: 'refs/pull/2/merge',
   }
   expect(await findEnvironmentsFromRules(rules, context)).toStrictEqual([
@@ -96,7 +97,7 @@ test('push', async () => {
   const context = {
     eventName: 'push',
     repo: { owner: 'owner', repo: 'repo' },
-    payload: {},
+    payload: {} as WebhookEvent,
     ref: 'refs/heads/main',
   }
   expect(await findEnvironmentsFromRules(rules, context)).toStrictEqual([
@@ -113,7 +114,7 @@ test('push with no match', async () => {
   const context = {
     eventName: 'push',
     repo: { owner: 'owner', repo: 'repo' },
-    payload: {},
+    payload: {} as WebhookEvent,
     ref: 'refs/tags/v1.0.0',
   }
   expect(await findEnvironmentsFromRules(rules, context)).toBeUndefined()

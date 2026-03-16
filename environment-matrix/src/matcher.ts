@@ -1,6 +1,6 @@
 import * as glob from '@actions/glob'
 import { minimatch } from 'minimatch'
-import { assertPullRequestPayload, type Context } from './github.js'
+import type { Context } from './github.js'
 import type { Environment, Rule, Rules } from './rule.js'
 
 export const findEnvironmentsFromRules = async (rules: Rules, context: Context): Promise<Environment[] | undefined> => {
@@ -18,12 +18,12 @@ export const findEnvironmentsFromRules = async (rules: Rules, context: Context):
 }
 
 const matchRule = (rule: Rule, context: Context): boolean => {
-  if (context.eventName === 'pull_request' && rule.pull_request !== undefined) {
-    assertPullRequestPayload(context.payload.pull_request)
-    return (
-      minimatch(context.payload.pull_request.base.ref, rule.pull_request.base) &&
-      minimatch(context.payload.pull_request.head.ref, rule.pull_request.head)
-    )
+  if ('pull_request' in context.payload) {
+    const baseBranch = context.payload.pull_request.base.ref
+    const headBranch = context.payload.pull_request.head.ref
+    if (rule.pull_request !== undefined) {
+      return minimatch(baseBranch, rule.pull_request.base) && minimatch(headBranch, rule.pull_request.head)
+    }
   }
   if (context.eventName === 'push' && rule.push !== undefined) {
     return minimatch(context.ref, rule.push.ref)
