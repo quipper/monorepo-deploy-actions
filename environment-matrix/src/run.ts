@@ -1,20 +1,19 @@
 import * as core from '@actions/core'
+import type { Octokit } from '@octokit/action'
 import { createDeployment } from './deployment.js'
 import type * as github from './github.js'
-import { getOctokit } from './github.js'
 import { findEnvironmentsFromRules } from './matcher.js'
 import { parseRulesYAML, type Rules } from './rule.js'
 
 type Inputs = {
   rules: string
-  token: string
 }
 
 type Outputs = {
   json: Record<string, string>[]
 }
 
-export const run = async (inputs: Inputs, context: github.Context): Promise<Outputs> => {
+export const run = async (inputs: Inputs, octokit: Octokit, context: github.Context): Promise<Outputs> => {
   let rules: Rules
   try {
     rules = parseRulesYAML(inputs.rules)
@@ -31,7 +30,6 @@ export const run = async (inputs: Inputs, context: github.Context): Promise<Outp
   }
 
   core.info(`Creating GitHub Deployments for environments`)
-  const octokit = getOctokit(inputs.token)
   for (const environment of environments) {
     if (environment['github-deployment']) {
       const deployment = await createDeployment(octokit, context, environment['github-deployment'])

@@ -6,8 +6,8 @@ const main = async (): Promise<void> => {
   const outputs = await run(
     {
       rules: core.getInput('rules', { required: true }),
-      token: core.getInput('token'),
     },
+    github.getOctokit(),
     github.getContext(),
   )
   core.setOutput('json', outputs.json)
