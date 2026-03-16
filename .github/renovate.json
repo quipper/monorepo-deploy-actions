@@ -40,14 +40,6 @@
         "!@actions/*",
         "!pnpm"
       ]
-    },
-    {
-      "description": "Do not update the dependencies of @actions/github. See https://github.com/quipper/monorepo-deploy-actions/pull/1362",
-      "matchPackageNames": [
-        "@octokit/core",
-        "@octokit/plugin-retry"
-      ],
-      "enabled": false
     }
   ]
 }
