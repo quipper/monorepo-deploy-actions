@@ -4,7 +4,6 @@ import { run } from './run.js'
 
 const main = async (): Promise<void> => {
   const inputs = {
-    githubToken: core.getInput('github-token', { required: true }),
     headBranch: core.getInput('head-branch', { required: true }),
     baseBranch: core.getInput('base-branch', { required: true }),
     skipCI: core.getBooleanInput('skip-ci', { required: true }),
@@ -12,7 +11,11 @@ const main = async (): Promise<void> => {
     pullRequestBody: core.getInput('pull-request-body', { required: false }),
     pullRequestTitle: core.getInput('pull-request-title', { required: false }),
   }
-  const outputs = await run(inputs, github.getContext())
+  const outputs = await run(
+    inputs,
+    github.getOctokit(core.getInput('github-token', { required: true })),
+    github.getContext(),
+  )
   if (outputs) {
     core.setOutput('pull-request-url', outputs.pullRequestUrl)
     core.setOutput('base-branch', outputs.baseBranch)

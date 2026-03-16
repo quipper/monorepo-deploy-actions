@@ -1,9 +1,9 @@
 import * as core from '@actions/core'
+import type { Octokit } from '@octokit/action'
 import * as format from './format.js'
-import { type Context, getOctokit, type Octokit } from './github.js'
+import type { Context } from './github.js'
 
 type Inputs = {
-  githubToken: string
   headBranch: string
   baseBranch: string
   skipCI: boolean
@@ -19,9 +19,7 @@ type Outputs = {
   merged: boolean
 }
 
-export const run = async (inputs: Inputs, context: Context): Promise<Outputs | undefined> => {
-  const octokit = getOctokit(inputs.githubToken)
-
+export const run = async (inputs: Inputs, octokit: Octokit, context: Context): Promise<Outputs | undefined> => {
   core.info(`Comparing ${inputs.baseBranch} and ${inputs.headBranch} branch`)
   const { data: compare } = await octokit.rest.repos.compareCommitsWithBasehead({
     owner: context.repo.owner,
