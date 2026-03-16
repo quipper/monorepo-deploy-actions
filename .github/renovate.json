@@ -14,6 +14,12 @@
   "schedule": [
     "after 10am and before 3pm on Monday"
   ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "after 10am and before 3pm on Monday"
+    ]
+  },
   "minimumReleaseAge": "7 days",
   "labels": [
     "renovate",
