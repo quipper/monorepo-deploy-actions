@@ -1,27 +1,15 @@
-import assert from 'node:assert'
 import * as core from '@actions/core'
-import * as github from '@actions/github'
+import * as github from './github.js'
 import { run } from './run.js'
 
 const main = async (): Promise<void> => {
-  await run({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    pullRequestNumber: github.context.issue.number,
-    pullRequestHeadSHA: getPullRequestHeadSHA(),
-    expirationDays: Number(core.getInput('expiration-days')),
-    token: core.getInput('token'),
-  })
-}
-
-const getPullRequestHeadSHA = (): string => {
-  assert(github.context.payload.pull_request, 'This action must be run on pull_request event')
-  const head: unknown = github.context.payload.pull_request.head
-  assert(typeof head === 'object')
-  assert(head !== null)
-  assert('sha' in head)
-  assert(typeof head.sha === 'string')
-  return head.sha
+  await run(
+    {
+      expirationDays: Number(core.getInput('expiration-days')),
+      token: core.getInput('token'),
+    },
+    github.getContext(),
+  )
 }
 
 main().catch((e: Error) => {
