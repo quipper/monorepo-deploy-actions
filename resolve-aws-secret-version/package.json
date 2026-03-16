@@ -21,9 +21,9 @@
     "@types/node": "20.19.35",
     "@vercel/ncc": "0.38.4",
     "aws-sdk-client-mock": "4.1.0",
-    "pnpm": "10.30.3",
+    "pnpm": "10.31.0",
     "typescript": "5.9.3",
     "vitest": "4.0.18"
   },
-  "packageManager": "pnpm@10.30.3"
+  "packageManager": "pnpm@10.31.0"
 }
