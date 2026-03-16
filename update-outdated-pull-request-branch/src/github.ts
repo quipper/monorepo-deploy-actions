@@ -1,5 +1,9 @@
 import assert from 'node:assert'
 import * as fs from 'node:fs'
+import { Octokit } from '@octokit/action'
+import { retry } from '@octokit/plugin-retry'
+
+export const getOctokit = () => new (Octokit.plugin(retry))()
 
 export type Context = {
   repo: {

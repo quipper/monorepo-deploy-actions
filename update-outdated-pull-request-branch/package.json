@@ -10,13 +10,15 @@
   },
   "dependencies": {
     "@actions/core": "3.0.0",
-    "@actions/github": "9.0.0"
+    "@octokit/action": "8.0.4",
+    "@octokit/plugin-retry": "6.0.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.6",
     "@tsconfig/node20": "20.1.9",
     "@types/node": "20.19.37",
     "@vercel/ncc": "0.38.4",
+    "msw": "2.12.10",
     "pnpm": "10.31.0",
     "typescript": "5.9.3",
     "vitest": "4.0.18"
