@@ -1,6 +1,7 @@
 import assert from 'node:assert'
 import * as core from '@actions/core'
-import { assertPullRequestPayload, type Context, type Octokit } from './github.js'
+import type { Octokit } from '@octokit/action'
+import { assertPullRequestPayload, type Context } from './github.js'
 import type { GitHubDeployment } from './rule.js'
 
 export const createDeployment = async (octokit: Octokit, context: Context, deployment: GitHubDeployment) => {
