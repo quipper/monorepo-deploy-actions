@@ -13,7 +13,7 @@
     "@actions/glob": "0.6.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.4",
+    "@biomejs/biome": "2.4.6",
     "@tsconfig/node20": "20.1.9",
     "@types/node": "20.19.35",
     "@vercel/ncc": "0.38.4",
