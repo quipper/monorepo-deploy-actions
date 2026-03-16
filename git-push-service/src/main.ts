@@ -17,6 +17,7 @@ const main = async (): Promise<void> => {
       currentHeadRef: core.getInput('current-head-ref', { required: true }),
       currentHeadSha: core.getInput('current-head-sha', { required: true }),
     },
+    github.getOctokit(),
     github.getContext(),
   )
   if (outputs?.destinationPullRequest !== undefined) {

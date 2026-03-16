@@ -3,6 +3,7 @@ import * as os from 'node:os'
 import * as path from 'node:path'
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
+import type { Octokit } from '@octokit/action'
 import { writeManifests } from './arrange.js'
 import * as git from './git.js'
 import type * as github from './github.js'
@@ -31,7 +32,7 @@ type Outputs = {
   }
 }
 
-export const run = async (inputs: Inputs, context: github.Context): Promise<Outputs | undefined> => {
+export const run = async (inputs: Inputs, octokit: Octokit, context: github.Context): Promise<Outputs | undefined> => {
   const globber = await glob.create(inputs.manifests, { matchDirectories: false })
   const manifests = await globber.glob()
   core.info(`found ${manifests.length} manifest(s) in ${inputs.manifests}`)
@@ -41,7 +42,7 @@ export const run = async (inputs: Inputs, context: github.Context): Promise<Outp
 
   if (!inputs.updateViaPullRequest) {
     // Retry when fast-forward is failed
-    const outputs = await retry(async () => push(manifests, inputs, context), {
+    const outputs = await retry(async () => push(manifests, inputs, octokit, context), {
       maxAttempts: 50,
       waitMillisecond: 10000,
     })
@@ -56,7 +57,7 @@ export const run = async (inputs: Inputs, context: github.Context): Promise<Outp
   // - Branch already exists, i.e., other job created the branch.
   // - Pull request is conflicted.
   //   This should not be happen if you enable the concurrency option in the workflow.
-  const outputs = await retry(async () => push(manifests, inputs, context), {
+  const outputs = await retry(async () => push(manifests, inputs, octokit, context), {
     maxAttempts: 3,
     waitMillisecond: 10000,
   })
@@ -70,6 +71,7 @@ export const run = async (inputs: Inputs, context: github.Context): Promise<Outp
 const push = async (
   manifests: string[],
   inputs: Inputs,
+  octokit: Octokit,
   context: github.Context,
 ): Promise<Outputs | undefined | Error> => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-service-action-'))
@@ -131,7 +133,7 @@ const push = async (
   }
 
   core.info(`Updating branch ${destinationBranch} by a pull request`)
-  const destinationPullRequest = await updateBranchByPullRequest({
+  const destinationPullRequest = await updateBranchByPullRequest(octokit, {
     owner,
     repo,
     title: `Deploy ${project}/${inputs.namespace}/${inputs.service}`,
@@ -141,7 +143,6 @@ const push = async (
     project,
     namespace: inputs.namespace,
     service: inputs.service,
-    token: inputs.token,
   })
   if (destinationPullRequest instanceof Error) {
     return destinationPullRequest
