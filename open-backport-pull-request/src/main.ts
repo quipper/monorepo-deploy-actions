@@ -4,7 +4,6 @@ import { run } from './run.js'
 
 const main = async (): Promise<void> => {
   const inputs = {
-    githubToken: core.getInput('github-token', { required: true }),
     headBranch: core.getInput('head-branch', { required: true }),
     baseBranch: core.getInput('base-branch', { required: true }),
     skipCI: core.getBooleanInput('skip-ci', { required: true }),

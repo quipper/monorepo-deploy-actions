@@ -1,10 +1,10 @@
 import assert from 'node:assert'
-import * as github from '@actions/github'
-import * as octokitPluginRetry from '@octokit/plugin-retry'
+import { Octokit as OctokitAction } from '@octokit/action'
+import { retry } from '@octokit/plugin-retry'
 
-export type Octokit = ReturnType<typeof github.getOctokit>
+export type Octokit = OctokitAction
 
-export const getOctokit = (token: string) => github.getOctokit(token, {}, octokitPluginRetry.retry)
+export const getOctokit = () => new (OctokitAction.plugin(retry))()
 
 export type Context = {
   actor: string
