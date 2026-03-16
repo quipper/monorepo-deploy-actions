@@ -1,36 +1,10 @@
 import assert from 'node:assert'
-import { readFileSync } from 'node:fs'
+import * as fs from 'node:fs/promises'
 import { Octokit } from '@octokit/action'
 import { retry } from '@octokit/plugin-retry'
+import type { WebhookEvent } from '@octokit/webhooks-types'
 
 export const getOctokit = () => new (Octokit.plugin(retry))()
-
-// picked from https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request
-export type PullRequestPayload = {
-  head: {
-    ref: string
-  }
-  base: {
-    ref: string
-  }
-}
-
-export function assertPullRequestPayload(x: unknown): asserts x is PullRequestPayload {
-  assert(typeof x === 'object')
-  assert(x != null)
-
-  assert('base' in x)
-  assert(typeof x.base === 'object')
-  assert(x.base != null)
-  assert('ref' in x.base)
-  assert(typeof x.base.ref === 'string')
-
-  assert('head' in x)
-  assert(typeof x.head === 'object')
-  assert(x.head != null)
-  assert('ref' in x.head)
-  assert(typeof x.head.ref === 'string')
-}
 
 export type Context = {
   eventName: string
@@ -39,33 +13,22 @@ export type Context = {
     repo: string
   }
   ref: string
-  payload: {
-    pull_request?: unknown
-  }
+  payload: WebhookEvent
 }
 
-export const getContext = (): Context => {
+export const getContext = async (): Promise<Context> => {
   // https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
   return {
     eventName: getEnv('GITHUB_EVENT_NAME'),
     repo: getRepo(),
     ref: getEnv('GITHUB_REF'),
-    payload: getPayload(),
+    payload: JSON.parse(await fs.readFile(getEnv('GITHUB_EVENT_PATH'), 'utf-8')) as WebhookEvent,
   }
 }
 
 const getRepo = () => {
   const [owner, repo] = getEnv('GITHUB_REPOSITORY').split('/')
   return { owner, repo }
-}
-
-const getPayload = (): Context['payload'] => {
-  const eventPath = process.env.GITHUB_EVENT_PATH
-  if (!eventPath) {
-    return {}
-  }
-  const content = readFileSync(eventPath, 'utf8')
-  return JSON.parse(content) as Context['payload']
 }
 
 const getEnv = (name: string): string => {

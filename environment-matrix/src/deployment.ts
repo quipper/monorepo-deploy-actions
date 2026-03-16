@@ -1,7 +1,7 @@
 import assert from 'node:assert'
 import * as core from '@actions/core'
 import type { Octokit } from '@octokit/action'
-import { assertPullRequestPayload, type Context } from './github.js'
+import type { Context } from './github.js'
 import type { GitHubDeployment } from './rule.js'
 
 export const createDeployment = async (octokit: Octokit, context: Context, deployment: GitHubDeployment) => {
@@ -62,9 +62,8 @@ export const createDeployment = async (octokit: Octokit, context: Context, deplo
 }
 
 const getDeploymentRef = (context: Context): string => {
-  if (context.eventName === 'pull_request') {
+  if ('pull_request' in context.payload) {
     // Set the head ref to associate a deployment with the pull request
-    assertPullRequestPayload(context.payload.pull_request)
     return context.payload.pull_request.head.ref
   }
   return context.ref
