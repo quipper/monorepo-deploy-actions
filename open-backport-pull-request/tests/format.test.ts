@@ -8,7 +8,7 @@ const context: Context = {
     owner: 'owner',
     repo: 'repo',
   },
-  runId: 1,
+  runId: '1',
 }
 
 describe('getCommitMessage', () => {

@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import * as github from '@actions/github'
+import * as github from './github.js'
 import { run } from './run.js'
 
 const main = async (): Promise<void> => {
@@ -12,7 +12,7 @@ const main = async (): Promise<void> => {
     pullRequestBody: core.getInput('pull-request-body', { required: false }),
     pullRequestTitle: core.getInput('pull-request-title', { required: false }),
   }
-  const outputs = await run(inputs, github.context)
+  const outputs = await run(inputs, github.getContext())
   if (outputs) {
     core.setOutput('pull-request-url', outputs.pullRequestUrl)
     core.setOutput('base-branch', outputs.baseBranch)
