@@ -2,6 +2,7 @@ import { HttpResponse, http } from 'msw'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { isExpired, run } from '../src/run.js'
 import { getOctokit, server } from './github.js'
+import { WebhookEvent } from '@octokit/webhooks-types'
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
@@ -25,8 +26,14 @@ describe('run', () => {
     )
     await run({ expirationDays: 7 }, getOctokit(), {
       repo: { owner: 'test-owner', repo: 'test-repo' },
-      pullRequestNumber: 1,
-      pullRequestHeadSHA: 'test-sha',
+      payload: {
+        pull_request: {
+          number: 1,
+          head: {
+            sha: 'test-sha',
+          },
+        },
+      } as WebhookEvent,
     })
     expect(updateBranchCalled).toBe(false)
   })
@@ -48,8 +55,14 @@ describe('run', () => {
     )
     await run({ expirationDays: 7 }, getOctokit(), {
       repo: { owner: 'test-owner', repo: 'test-repo' },
-      pullRequestNumber: 1,
-      pullRequestHeadSHA: 'test-sha',
+      payload: {
+        pull_request: {
+          number: 1,
+          head: {
+            sha: 'test-sha',
+          },
+        },
+      } as WebhookEvent,
     })
     expect(updateBranchCalled).toBe(true)
   })
