@@ -4,7 +4,7 @@ import { retry } from '@octokit/plugin-retry'
 
 export const getOctokit = (token: string) =>
   new (Octokit.plugin(retry))({
-    // Disable @octokit/action authStrategy and use the github-token input instead.
+    // Remove the authStrategy of @octokit/action and use the github-token input instead.
     authStrategy: null,
     auth: token,
   })
