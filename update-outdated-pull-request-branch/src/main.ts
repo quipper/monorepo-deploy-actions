@@ -3,15 +3,13 @@ import * as github from './github.js'
 import { run } from './run.js'
 
 const main = async (): Promise<void> => {
-  const context = github.getContext()
-  await run({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    pullRequestNumber: context.pullRequestNumber,
-    pullRequestHeadSHA: context.pullRequestHeadSHA,
-    expirationDays: Number(core.getInput('expiration-days')),
-    token: core.getInput('token'),
-  })
+  await run(
+    {
+      expirationDays: Number(core.getInput('expiration-days')),
+      token: core.getInput('token'),
+    },
+    github.getContext(),
+  )
 }
 
 main().catch((e: Error) => {
