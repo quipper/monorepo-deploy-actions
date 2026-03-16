@@ -1,10 +1,8 @@
 import assert from 'node:assert'
-import { Octokit as OctokitAction } from '@octokit/action'
+import { Octokit } from '@octokit/action'
 import { retry } from '@octokit/plugin-retry'
 
-export type Octokit = OctokitAction
-
-export const getOctokit = () => new (OctokitAction.plugin(retry))()
+export const getOctokit = (token: string) => new (Octokit.plugin(retry))({ auth: token })
 
 export type Context = {
   actor: string
