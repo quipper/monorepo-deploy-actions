@@ -22,14 +22,14 @@ type PullRequest = {
 
 export const updateBranchByPullRequest = async (octokit: Octokit, inputs: Inputs): Promise<PullRequest | Error> => {
   const topicBranch = `git-push-service--${inputs.namespace}--${inputs.service}--${Date.now()}`
-  const code = await core.group(`push branch ${topicBranch}`, () =>
+  const code = await core.group(`Push branch ${topicBranch}`, () =>
     git.pushByFastForward(inputs.workspace, topicBranch),
   )
   if (code > 0) {
-    return new Error(`failed to push branch ${topicBranch} by fast-forward`)
+    return new Error(`Failed to push branch ${topicBranch} by fast-forward`)
   }
 
-  core.info(`creating a pull request from ${topicBranch} into ${inputs.branch}`)
+  core.info(`Creating a pull request from ${topicBranch} into ${inputs.branch}`)
   const { data: pull } = await octokit.rest.pulls.create({
     owner: inputs.owner,
     repo: inputs.repo,
@@ -38,16 +38,24 @@ export const updateBranchByPullRequest = async (octokit: Octokit, inputs: Inputs
     title: inputs.title,
     body: inputs.body,
   })
-  core.info(`created ${pull.html_url}`)
+  core.info(`Created ${pull.html_url}`)
 
-  core.info(`adding labels to #${pull.number}`)
+  core.info(`Adding labels to #${pull.number}`)
   await octokit.rest.issues.addLabels({
     owner: inputs.owner,
     repo: inputs.repo,
     issue_number: pull.number,
     labels: [`project:${inputs.project}`, `namespace:${inputs.namespace}`, `service:${inputs.service}`],
+    request: {
+      // GitHub API may return 422 error.
+      // For example: HttpError: Validation Failed: {"resource":"Label","code":"unprocessable","field":"data","message":"Could not resolve to a node with the global id of 'PR_...'."}
+      // This option will retry regardless of the response code.
+      // See https://github.com/octokit/plugin-retry.js/
+      retries: 3,
+      retryAfter: 1,
+    },
   })
-  core.info(`added labels to #${pull.number}`)
+  core.info(`Added labels to #${pull.number}`)
 
   // GitHub merge API returns 405 in the following cases:
   // - "Base branch was modified" error.
@@ -70,7 +78,7 @@ export const updateBranchByPullRequest = async (octokit: Octokit, inputs: Inputs
               pull_number: pull.number,
               merge_method: 'squash',
             })
-            core.info(`merged ${pull.html_url} as ${merge.sha}`)
+            core.info(`Merged ${pull.html_url} as ${merge.sha}`)
             return {
               number: pull.number,
               url: pull.html_url,
