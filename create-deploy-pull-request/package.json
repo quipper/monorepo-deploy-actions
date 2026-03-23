@@ -11,7 +11,7 @@
   "dependencies": {
     "@actions/core": "3.0.0",
     "@octokit/action": "8.0.4",
-    "@octokit/plugin-retry": "6.1.0"
+    "@octokit/plugin-retry": "8.1.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.7",
