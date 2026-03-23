@@ -37,8 +37,8 @@ importers:
         specifier: 2.12.11
         version: 2.12.11(@types/node@20.19.37)(typescript@5.9.3)
       pnpm:
-        specifier: 10.31.0
-        version: 10.31.0
+        specifier: 10.32.1
+        version: 10.32.1
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -736,8 +736,8 @@ packages:
     resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
     engines: {node: '>=12'}
 
-  pnpm@10.31.0:
-    resolution: {integrity: sha512-45JziL+qgHjOt5t0j/wegnToTXUWPme8IuBsDTrtQ90VMVHL8R1/gwH/SsuYxovcXK32mJUygB/6/js+SmPCaA==}
+  pnpm@10.32.1:
+    resolution: {integrity: sha512-pwaTjw6JrBRWtlY+q07fHR+vM2jRGR/FxZeQ6W3JGORFarLmfWE94QQ9LoyB+HMD5rQNT/7KnfFe8a1Wc0jyvg==}
     engines: {node: '>=18.12'}
     hasBin: true
 
@@ -1505,7 +1505,7 @@ snapshots:
 
   picomatch@4.0.3: {}
 
-  pnpm@10.31.0: {}
+  pnpm@10.32.1: {}
 
   postcss@8.5.8:
     dependencies:
