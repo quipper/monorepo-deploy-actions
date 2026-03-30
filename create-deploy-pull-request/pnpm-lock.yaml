@@ -31,8 +31,8 @@ importers:
         specifier: 0.38.4
         version: 0.38.4
       msw:
-        specifier: 2.12.11
-        version: 2.12.11(@types/node@20.19.37)(typescript@5.9.3)
+        specifier: 2.12.14
+        version: 2.12.14(@types/node@20.19.37)(typescript@5.9.3)
       pnpm:
         specifier: 10.32.1
         version: 10.32.1
@@ -41,7 +41,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 4.1.0
-        version: 4.1.0(@types/node@20.19.37)(msw@2.12.11(@types/node@20.19.37)(typescript@5.9.3))(vite@8.0.1(@types/node@20.19.37))
+        version: 4.1.0(@types/node@20.19.37)(msw@2.12.14(@types/node@20.19.37)(typescript@5.9.3))(vite@8.0.1(@types/node@20.19.37))
 
 packages:
 
@@ -571,8 +571,8 @@ packages:
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
-  msw@2.12.11:
-    resolution: {integrity: sha512-dVg20zi2I2EvnwH/+WupzsOC2mCa7qsIhyMAWtfRikn6RKtwL9+7SaF1IQ5LyZry4tlUtf6KyTVhnlQiZXozTQ==}
+  msw@2.12.14:
+    resolution: {integrity: sha512-4KXa4nVBIBjbDbd7vfQNuQ25eFxug0aropCQFoI0JdOBuJWamkT1yLVIWReFI8SiTRc+H1hKzaNk+cLk2N9rtQ==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -1115,13 +1115,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.0(msw@2.12.11(@types/node@20.19.37)(typescript@5.9.3))(vite@8.0.1(@types/node@20.19.37))':
+  '@vitest/mocker@4.1.0(msw@2.12.14(@types/node@20.19.37)(typescript@5.9.3))(vite@8.0.1(@types/node@20.19.37))':
     dependencies:
       '@vitest/spy': 4.1.0
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      msw: 2.12.11(@types/node@20.19.37)(typescript@5.9.3)
+      msw: 2.12.14(@types/node@20.19.37)(typescript@5.9.3)
       vite: 8.0.1(@types/node@20.19.37)
 
   '@vitest/pretty-format@4.1.0':
@@ -1268,7 +1268,7 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  msw@2.12.11(@types/node@20.19.37)(typescript@5.9.3):
+  msw@2.12.14(@types/node@20.19.37)(typescript@5.9.3):
     dependencies:
       '@inquirer/confirm': 5.1.21(@types/node@20.19.37)
       '@mswjs/interceptors': 0.41.3
@@ -1421,10 +1421,10 @@ snapshots:
       '@types/node': 20.19.37
       fsevents: 2.3.3
 
-  vitest@4.1.0(@types/node@20.19.37)(msw@2.12.11(@types/node@20.19.37)(typescript@5.9.3))(vite@8.0.1(@types/node@20.19.37)):
+  vitest@4.1.0(@types/node@20.19.37)(msw@2.12.14(@types/node@20.19.37)(typescript@5.9.3))(vite@8.0.1(@types/node@20.19.37)):
     dependencies:
       '@vitest/expect': 4.1.0
-      '@vitest/mocker': 4.1.0(msw@2.12.11(@types/node@20.19.37)(typescript@5.9.3))(vite@8.0.1(@types/node@20.19.37))
+      '@vitest/mocker': 4.1.0(msw@2.12.14(@types/node@20.19.37)(typescript@5.9.3))(vite@8.0.1(@types/node@20.19.37))
       '@vitest/pretty-format': 4.1.0
       '@vitest/runner': 4.1.0
       '@vitest/snapshot': 4.1.0
