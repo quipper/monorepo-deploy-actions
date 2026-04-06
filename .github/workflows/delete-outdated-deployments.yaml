@@ -13,4 +13,4 @@ jobs:
     runs-on: ubuntu-slim
     timeout-minutes: 10
     steps:
-      - uses: int128/delete-deployments-action@ae9f09c3e7ebe55b18f5c250395201d443904df6 # v1.48.0
+      - uses: int128/delete-deployments-action@a674bd9032db2bea638bf9f73613d079ed2cbe80 # v1.49.0
