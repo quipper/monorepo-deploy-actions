@@ -12,7 +12,7 @@
     "@actions/core": "3.0.0",
     "@actions/glob": "0.6.1",
     "@octokit/action": "8.0.4",
-    "@octokit/plugin-retry": "6.1.0",
+    "@octokit/plugin-retry": "8.1.0",
     "js-yaml": "4.1.1",
     "minimatch": "10.2.5",
     "zod": "4.3.6"
