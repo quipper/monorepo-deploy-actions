@@ -10,7 +10,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@actions/core": "3.0.0",
+    "@actions/core": "3.0.1",
     "@octokit/action": "8.0.4",
     "@octokit/plugin-retry": "6.1.0"
   },
