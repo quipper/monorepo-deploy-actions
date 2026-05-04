@@ -9,7 +9,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@actions/core": "3.0.0"
+    "@actions/core": "3.0.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.13",
