@@ -660,8 +660,8 @@ packages:
     resolution: {integrity: sha512-knvyeauYhqjOYvQ66MznSMs83wmHrCycNEN6Ao+2AeYEfxUIkuiVxdEa1qlGEPK+We3n0THiDciYSsCcgW/DoA==}
     engines: {node: '>=12.0.0'}
 
-  fast-xml-builder@1.1.5:
-    resolution: {integrity: sha512-4TJn/8FKLeslLAH3dnohXqE3QSoxkhvaMzepOIZytwJXZO69Bfz0HBdDHzOTOon6G59Zrk6VQ2bEiv1t61rfkA==}
+  fast-xml-builder@1.1.6:
+    resolution: {integrity: sha512-exq7uOuwxoIsWZ7wKf9CV4Q0/yEAHxtktYDjCGsGrg+uKnNY/ly04Wkb2npZo5GEwz963yu+PRp+HLJf/qRrpQ==}
 
   fast-xml-parser@5.7.2:
     resolution: {integrity: sha512-P7oW7tLbYnhOLQk/Gv7cZgzgMPP/XN03K02/Jy6Y/NHzyIAIpxuZIM/YqAkfiXFPxA2CTm7NtCijK9EDu09u2w==}
@@ -1862,14 +1862,14 @@ snapshots:
 
   expect-type@1.3.0: {}
 
-  fast-xml-builder@1.1.5:
+  fast-xml-builder@1.1.6:
     dependencies:
       path-expression-matcher: 1.5.0
 
   fast-xml-parser@5.7.2:
     dependencies:
       '@nodable/entities': 2.1.0
-      fast-xml-builder: 1.1.5
+      fast-xml-builder: 1.1.6
       path-expression-matcher: 1.5.0
       strnum: 2.2.3
 
