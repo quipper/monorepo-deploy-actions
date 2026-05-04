@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@actions/core": "3.0.1",
-    "@actions/glob": "0.6.1",
+    "@actions/glob": "0.7.0",
     "@aws-sdk/client-secrets-manager": "3.1037.0",
     "js-yaml": "4.1.1"
   },
