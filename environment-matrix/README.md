@@ -174,6 +174,7 @@ The following fields are available in the rules YAML.
         key: value # Key-value pairs of outputs to return
       github-deployment: # If set, create a GitHub deployment for this environment
         environment: pr-1 # The name of the environment
+        task: argocd # (optional) The name of the deployment task
 - push: # Conditions for push events
     ref: refs/heads/main # A glob pattern of ref
   environments: []

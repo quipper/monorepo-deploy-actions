@@ -4,6 +4,7 @@ import { z } from 'zod'
 const GitHubDeployment = z
   .object({
     environment: z.string().describe(`The name of the environment`),
+    task: z.string().optional().describe(`The name of the deployment task`),
   })
   .describe(`GitHub deployment to create`)
 
