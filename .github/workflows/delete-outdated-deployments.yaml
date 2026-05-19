@@ -12,5 +12,7 @@ jobs:
   delete:
     runs-on: ubuntu-slim
     timeout-minutes: 10
+    permissions:
+      deployments: write
     steps:
       - uses: int128/delete-deployments-action@816f7fef3829d9b9efe75513bcc70a0e517647d3 # v1.53.0
