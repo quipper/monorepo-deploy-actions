@@ -101,11 +101,11 @@ destination-repository  (branch: ns/${source-repository}/${overlay}/${namespace}
 
 ## Development
 
-Node.js and pnpm is required.
+Node.js and Corepack is required.
 
 ```sh
-brew install node@20
-npm install -g pnpm@latest-10
+brew install node@24
+npm install -g corepack
 ```
 
 ### Release workflow
