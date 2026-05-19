@@ -44,5 +44,5 @@ outputs:
     description: JSON string of services. See prebuilt.ts for the JSON schema
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
