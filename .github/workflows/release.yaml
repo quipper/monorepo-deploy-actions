@@ -29,4 +29,4 @@ jobs:
             pnpm run build
             popd
           done
-      - uses: int128/release-typescript-action@a7c8dd107b38f1a3b4f20f6a17a8e39517b43220 # v1.65.0
+      - uses: int128/release-typescript-action@b31a67ca526d132a2542951d075a0de0587dae6d # v1.67.0
