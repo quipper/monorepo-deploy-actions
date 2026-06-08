@@ -12,7 +12,7 @@
     "@actions/core": "3.0.1",
     "@actions/glob": "0.7.0",
     "@aws-sdk/client-secrets-manager": "3.1053.0",
-    "js-yaml": "4.1.1"
+    "js-yaml": "4.2.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
