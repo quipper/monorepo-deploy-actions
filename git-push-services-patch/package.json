@@ -18,9 +18,9 @@
     "@tsconfig/node24": "24.0.4",
     "@types/node": "24.12.4",
     "@vercel/ncc": "0.38.4",
-    "pnpm": "11.5.0",
+    "pnpm": "11.5.2",
     "typescript": "6.0.3",
     "vitest": "4.1.7"
   },
-  "packageManager": "pnpm@11.5.0"
+  "packageManager": "pnpm@11.5.2"
 }
