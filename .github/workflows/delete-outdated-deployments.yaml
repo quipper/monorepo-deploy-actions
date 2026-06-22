@@ -15,4 +15,4 @@ jobs:
     permissions:
       deployments: write
     steps:
-      - uses: int128/delete-deployments-action@33badf3d3b08d20b2ff8e25f921c24769b47cf14 # v1.56.0
+      - uses: int128/delete-deployments-action@ea5f414eb0ca464aabc68c86aa16e1877e2d9843 # v1.57.0
