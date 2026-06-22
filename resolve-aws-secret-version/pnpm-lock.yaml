@@ -34,8 +34,8 @@ importers:
         specifier: 24.13.2
         version: 24.13.2
       '@vercel/ncc':
-        specifier: 0.38.4
-        version: 0.38.4
+        specifier: 0.44.0
+        version: 0.44.0
       aws-sdk-client-mock:
         specifier: 4.1.0
         version: 4.1.0
@@ -408,8 +408,8 @@ packages:
   '@types/sinonjs__fake-timers@15.0.1':
     resolution: {integrity: sha512-Ko2tjWJq8oozHzHV+reuvS5KYIRAokHnGbDwGh/J64LntgpbuylF74ipEL24HCyRjf9FOlBiBHWBR1RlVKsI1w==}
 
-  '@vercel/ncc@0.38.4':
-    resolution: {integrity: sha512-8LwjnlP39s08C08J5NstzriPvW1SP8Zfpp1BvC2sI35kPeZnHfxVkCwu4/+Wodgnd60UtT1n8K8zw+Mp7J9JmQ==}
+  '@vercel/ncc@0.44.0':
+    resolution: {integrity: sha512-pHyI+bZokSgIscTKFSmpNk5vZzmOrb9RW0Vu4SRyqUvkJ0kgg3PzaZLLDVTFXhbUiCqg0/Eu8L4fKtgViA92kg==}
     hasBin: true
 
   '@vitest/expect@4.1.8':
@@ -1223,7 +1223,7 @@ snapshots:
 
   '@types/sinonjs__fake-timers@15.0.1': {}
 
-  '@vercel/ncc@0.38.4': {}
+  '@vercel/ncc@0.44.0': {}
 
   '@vitest/expect@4.1.8':
     dependencies:
