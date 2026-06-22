@@ -15,7 +15,7 @@
     "@octokit/plugin-retry": "8.1.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.16",
+    "@biomejs/biome": "2.5.0",
     "@tsconfig/node24": "24.0.4",
     "@types/node": "24.13.1",
     "@vercel/ncc": "0.38.4",
