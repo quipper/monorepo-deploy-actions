@@ -21,8 +21,8 @@ importers:
         specifier: 8.1.0
         version: 8.1.0(@octokit/core@7.0.6)
       js-yaml:
-        specifier: 4.2.0
-        version: 4.2.0
+        specifier: 4.3.0
+        version: 4.3.0
       minimatch:
         specifier: 10.2.5
         version: 10.2.5
@@ -427,8 +427,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  js-yaml@4.2.0:
-    resolution: {integrity: sha512-ePWsvanv0DWuDRsW8dnt+R4jQ31SCRCQ7hhNcPXZPsoBZiemuZNYGf7adZdqX2D86j6rvKp3RpCxVTSb8WQlOw==}
+  js-yaml@4.3.0:
+    resolution: {integrity: sha512-1td788aAnnZ5qs7V2QIRl1owjtYpbKt749Y3xauqQgwIIGF/xXWz1wMTEBx5O3LK3lXLVuqXPdPxj2BoFHaW9Q==}
     hasBin: true
 
   json-with-bigint@3.5.8:
@@ -1009,7 +1009,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  js-yaml@4.2.0:
+  js-yaml@4.3.0:
     dependencies:
       argparse: 2.0.1
 
