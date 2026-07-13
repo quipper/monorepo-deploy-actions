@@ -22,7 +22,7 @@
     "@tsconfig/node24": "24.0.4",
     "@types/js-yaml": "4.0.9",
     "@types/node": "24.13.2",
-    "@vercel/ncc": "0.44.0",
+    "@vercel/ncc": "0.44.1",
     "pnpm": "11.9.0",
     "typescript": "6.0.3",
     "vitest": "4.1.9"
