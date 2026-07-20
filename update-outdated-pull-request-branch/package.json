@@ -21,7 +21,7 @@
     "@vercel/ncc": "0.44.1",
     "msw": "2.15.0",
     "pnpm": "11.11.0",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "vitest": "4.1.10"
   },
   "packageManager": "pnpm@11.11.0"
