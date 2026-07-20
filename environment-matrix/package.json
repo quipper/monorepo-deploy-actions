@@ -18,7 +18,7 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.2",
+    "@biomejs/biome": "2.5.3",
     "@octokit/webhooks-types": "7.6.1",
     "@tsconfig/node24": "24.0.4",
     "@types/js-yaml": "4.0.9",
