@@ -14,7 +14,7 @@
     "@octokit/action": "8.0.4",
     "@octokit/plugin-retry": "8.1.0",
     "js-yaml": "4.3.0",
-    "minimatch": "10.2.5",
+    "minimatch": "10.2.6",
     "zod": "4.4.3"
   },
   "devDependencies": {
