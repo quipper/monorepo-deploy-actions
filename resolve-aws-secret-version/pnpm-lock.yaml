@@ -18,8 +18,8 @@ importers:
         specifier: 3.1101.0
         version: 3.1101.0
       js-yaml:
-        specifier: 4.3.1
-        version: 4.3.1
+        specifier: 5.2.3
+        version: 5.2.3
     devDependencies:
       '@biomejs/biome':
         specifier: 2.5.6
@@ -446,8 +446,8 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  js-yaml@4.3.1:
-    resolution: {integrity: sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ==}
+  js-yaml@5.2.3:
+    resolution: {integrity: sha512-n+mUVyUX5bVv7G/G2zyIHOhdxfuU1dY2NOFzTQUWiMUbFss8b57NFlgCCaggU78wSw5KVS9cllzeLyzyR+n5nw==}
     hasBin: true
 
   just-extend@6.2.0:
@@ -1136,7 +1136,7 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  js-yaml@4.3.1:
+  js-yaml@5.2.3:
     dependencies:
       argparse: 2.0.1
 
