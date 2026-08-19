@@ -41,6 +41,16 @@
         "!@actions/*",
         "!pnpm"
       ]
+    },
+    {
+      "description": "Hold typescript major update: @vercel/ncc's ts-loader calls ts.sys.fileExists, which TypeScript 7 doesn't expose yet (no compiler API), so every build fails with 'Cannot read properties of undefined (reading fileExists)'",
+      "matchPackageNames": [
+        "typescript"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
     }
   ]
 }
