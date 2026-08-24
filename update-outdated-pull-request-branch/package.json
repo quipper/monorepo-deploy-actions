@@ -18,7 +18,7 @@
     "@octokit/webhooks-types": "7.6.1",
     "@tsconfig/node24": "24.0.4",
     "@types/node": "24.13.3",
-    "@vercel/ncc": "0.44.1",
+    "@vercel/ncc": "0.45.0",
     "msw": "2.15.0",
     "pnpm": "11.21.0",
     "typescript": "6.0.3",
