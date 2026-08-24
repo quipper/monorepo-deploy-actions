@@ -15,8 +15,8 @@ importers:
         specifier: 0.7.0
         version: 0.7.0
       '@aws-sdk/client-secrets-manager':
-        specifier: 3.1106.0
-        version: 3.1106.0
+        specifier: 3.1111.0
+        version: 3.1111.0
       js-yaml:
         specifier: 5.2.3
         version: 5.2.3
@@ -66,8 +66,8 @@ packages:
   '@actions/io@3.0.2':
     resolution: {integrity: sha512-nRBchcMM+QK1pdjO7/idu86rbJI5YHUKCvKs0KxnSYbVe3F51UfGxuZX4Qy/fWlp6l7gWFwIkrOzN+oUK03kfw==}
 
-  '@aws-sdk/client-secrets-manager@3.1106.0':
-    resolution: {integrity: sha512-tw2Wgn2U5JL8vPgyPfgPOOmz850+pB441EXEliAftVrBGMEV02ZgTvoGVHR2/DvCvtMl+UOLgxI2M76ZEiyLSg==}
+  '@aws-sdk/client-secrets-manager@3.1111.0':
+    resolution: {integrity: sha512-+OQYrSTkRJV826I4+PuXY+h6m1lqo5LTGtbPsJ5JWlpuYr+GY9vTyWO4qOoyUu+YnRqD5NTXSCQqmZXACJsYJg==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/core@3.977.8':
@@ -747,7 +747,7 @@ snapshots:
 
   '@actions/io@3.0.2': {}
 
-  '@aws-sdk/client-secrets-manager@3.1106.0':
+  '@aws-sdk/client-secrets-manager@3.1111.0':
     dependencies:
       '@aws-sdk/core': 3.977.8
       '@aws-sdk/credential-provider-node': 3.972.80
