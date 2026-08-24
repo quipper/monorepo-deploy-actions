@@ -15,7 +15,7 @@
     "js-yaml": "5.2.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.7",
+    "@biomejs/biome": "2.5.8",
     "@tsconfig/node24": "24.0.4",
     "@types/js-yaml": "4.0.9",
     "@types/node": "24.13.3",
