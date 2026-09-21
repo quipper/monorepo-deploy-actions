@@ -15,7 +15,7 @@
     "@octokit/plugin-retry": "8.1.1",
     "js-yaml": "4.3.2",
     "minimatch": "10.2.6",
-    "zod": "4.5.4"
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.12",
