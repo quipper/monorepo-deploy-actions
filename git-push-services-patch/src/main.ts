@@ -11,6 +11,7 @@ const main = async (): Promise<void> => {
       namespace: core.getInput('namespace', { required: true }),
       services: core.getMultilineInput('services'),
       excludeServices: core.getMultilineInput('exclude-services'),
+      sourceRepository: core.getInput('source-repository', { required: true }),
       destinationRepository: core.getInput('destination-repository', { required: true }),
       token: core.getInput('token', { required: true }),
     },

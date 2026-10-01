@@ -20,6 +20,10 @@ inputs:
   exclude-services:
     description: Services to exclude (optional)
     required: false
+  source-repository:
+    description: Source repository
+    required: true
+    default: ${{ github.repository }}
   destination-repository:
     description: Destination repository
     required: true
