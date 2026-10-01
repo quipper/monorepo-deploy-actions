@@ -1,7 +1,7 @@
 import assert from 'node:assert'
 import * as core from '@actions/core'
 import type { Octokit } from '@octokit/action'
-import type * as githubContext from './github.js'
+import type * as githubContext from './github.ts'
 
 type Inputs = {
   expirationDays: number

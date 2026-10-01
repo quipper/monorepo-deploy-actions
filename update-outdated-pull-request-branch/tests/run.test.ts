@@ -1,12 +1,13 @@
+import assert from 'node:assert'
+import { after, afterEach, before, describe, it } from 'node:test'
 import type { WebhookEvent } from '@octokit/webhooks-types'
 import { HttpResponse, http } from 'msw'
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
-import { isExpired, run } from '../src/run.js'
-import { getOctokit, server } from './github.js'
+import { isExpired, run } from '../src/run.ts'
+import { getOctokit, server } from './github.ts'
 
-beforeAll(() => server.listen())
+before(() => server.listen())
 afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
+after(() => server.close())
 
 describe('run', () => {
   it('should not update the branch if not expired', async () => {
@@ -35,7 +36,7 @@ describe('run', () => {
         },
       } as WebhookEvent,
     })
-    expect(updateBranchCalled).toBe(false)
+    assert.strictEqual(updateBranchCalled, false)
   })
 
   it('should update the branch if expired', async () => {
@@ -64,7 +65,7 @@ describe('run', () => {
         },
       } as WebhookEvent,
     })
-    expect(updateBranchCalled).toBe(true)
+    assert.strictEqual(updateBranchCalled, true)
   })
 })
 
@@ -74,12 +75,12 @@ describe('isExpired', () => {
   it('should return true if expired', () => {
     const headCommitDate = '2021-01-31T00:00:00Z'
     const expirationDays = 3
-    expect(isExpired(now, headCommitDate, expirationDays)).toBeTruthy()
+    assert.ok(isExpired(now, headCommitDate, expirationDays))
   })
 
   it('should return false if not expired', () => {
     const headCommitDate = '2021-02-02T00:00:00Z'
     const expirationDays = 3
-    expect(isExpired(now, headCommitDate, expirationDays)).toBeFalsy()
+    assert.ok(!isExpired(now, headCommitDate, expirationDays))
   })
 })
