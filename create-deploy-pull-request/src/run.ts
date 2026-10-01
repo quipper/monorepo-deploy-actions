@@ -1,8 +1,8 @@
 import * as core from '@actions/core'
 import type { Octokit } from '@octokit/action'
-import { checkIfBranchExists, createBranch } from './branch.js'
-import type { Context } from './github.js'
-import { createOrUpdatePull } from './pull.js'
+import { checkIfBranchExists, createBranch } from './branch.ts'
+import type { Context } from './github.ts'
+import { createOrUpdatePull } from './pull.ts'
 
 type Inputs = {
   head: string
