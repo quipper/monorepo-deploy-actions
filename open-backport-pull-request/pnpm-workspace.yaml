@@ -1,3 +1,2 @@
 allowBuilds:
-  msw: false
   pnpm: false
