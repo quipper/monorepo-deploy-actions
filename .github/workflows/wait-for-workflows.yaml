@@ -3,6 +3,10 @@ name: wait-for-workflows
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}--${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   wait-for-workflows:
     runs-on: ubuntu-slim

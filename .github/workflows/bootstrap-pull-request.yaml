@@ -16,6 +16,10 @@ on:
       - '*.yaml'
       - .github/workflows/bootstrap-pull-request.yaml
 
+concurrency:
+  group: ${{ github.workflow }}--${{ github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     working-directory: bootstrap-pull-request

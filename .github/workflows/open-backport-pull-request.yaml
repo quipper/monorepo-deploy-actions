@@ -16,6 +16,10 @@ on:
       - '*.yaml'
       - .github/workflows/open-backport-pull-request.yaml
 
+concurrency:
+  group: ${{ github.workflow }}--${{ github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     working-directory: open-backport-pull-request

@@ -8,6 +8,10 @@ on:
     paths:
       - .github/workflows/delete-outdated-deployments.yaml
 
+concurrency:
+  group: ${{ github.workflow }}--${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   delete:
     runs-on: ubuntu-slim
