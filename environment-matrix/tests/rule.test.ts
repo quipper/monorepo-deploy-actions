@@ -54,7 +54,7 @@ test('parse a valid YAML', () => {
 })
 
 test('parse an empty string', () => {
-  expect(() => parseRulesYAML('')).toThrow(`invalid_type`)
+  expect(() => parseRulesYAML('')).toThrow(`input is empty`)
 })
 
 describe('parse an invalid object', () => {
