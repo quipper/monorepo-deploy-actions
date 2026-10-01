@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import type { Octokit } from '@octokit/action'
-import * as git from './git.js'
-import { catchHttpStatus, retry } from './retry.js'
+import * as git from './git.ts'
+import { catchHttpStatus, retry } from './retry.ts'
 
 type Inputs = {
   owner: string
