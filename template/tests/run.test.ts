@@ -1,6 +1,7 @@
-import { expect, test } from 'vitest'
-import { run } from '../src/run.js'
+import assert from 'node:assert'
+import { test } from 'node:test'
+import { run } from '../src/run.ts'
 
 test('run successfully', async () => {
-  await expect(run({ name: 'foo' })).resolves.toBeUndefined()
+  assert.strictEqual(await run({ name: 'foo' }), undefined)
 })
