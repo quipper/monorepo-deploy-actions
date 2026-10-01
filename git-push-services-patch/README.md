@@ -4,16 +4,17 @@ This is an action to push a patch to services in a namespace.
 
 ## Inputs
 
-| Name                     | Type             | Description                              |
-| ------------------------ | ---------------- | ---------------------------------------- |
-| `patch`                  | string           | Path to a patch                          |
-| `operation`              | string           | Either `add` or `delete`                 |
-| `overlay`                | string           | Name of overlay                          |
-| `namespace`              | string           | Name of namespace                        |
-| `services`               | multiline string | Names of services to include (optional), If not specified, targets all services  |
-| `exclude-services`       | multiline string | Names of services to exclude (optional)  |
-| `destination-repository` | string           | Destination repository                   |
-| `token`                  | string           | GitHub token (default to `github.token`) |
+| Name                     | Type             | Description                                                                     |
+| ------------------------ | ---------------- | ------------------------------------------------------------------------------- |
+| `patch`                  | string           | Path to a patch                                                                 |
+| `operation`              | string           | Either `add` or `delete`                                                        |
+| `overlay`                | string           | Name of overlay                                                                 |
+| `namespace`              | string           | Name of namespace                                                               |
+| `services`               | multiline string | Names of services to include (optional), If not specified, targets all services |
+| `exclude-services`       | multiline string | Names of services to exclude (optional)                                         |
+| `source-repository`      | string           | Source repository                                                               |
+| `destination-repository` | string           | Destination repository                                                          |
+| `token`                  | string           | GitHub token (default to `github.token`)                                        |
 
 ### Note about `services` and `exclude-services`
 
@@ -36,7 +37,7 @@ name: scale-in-services-daily
 
 on:
   schedule:
-    - cron: '0 13 * * 1-5' # 22:00 JST weekday
+    - cron: "0 13 * * 1-5" # 22:00 JST weekday
 
 jobs:
   develop:
@@ -74,7 +75,7 @@ name: scale-in-services-daily
 
 on:
   schedule:
-    - cron: '0 23 * * 0-4' # 08:00 JST weekday
+    - cron: "0 23 * * 0-4" # 08:00 JST weekday
 
 jobs:
   develop:

@@ -14,6 +14,7 @@ type Inputs = {
   namespace: string
   services: string[]
   excludeServices: string[]
+  sourceRepository: string
   destinationRepository: string
   token: string
 }
@@ -41,7 +42,7 @@ const push = async (inputs: Inputs, context: github.Context): Promise<undefined 
   core.info(`created workspace at ${workspace}`)
 
   const [owner, repo] = inputs.destinationRepository.split('/')
-  const project = context.repo.repo
+  const [, project] = inputs.sourceRepository.split('/')
   const branch = `ns/${project}/${inputs.overlay}/${inputs.namespace}`
 
   core.startGroup(`checkout branch ${branch}`)
