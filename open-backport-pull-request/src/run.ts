@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import type { Octokit } from '@octokit/action'
-import * as format from './format.js'
-import type { Context } from './github.js'
+import * as format from './format.ts'
+import type { Context } from './github.ts'
 
 type Inputs = {
   headBranch: string

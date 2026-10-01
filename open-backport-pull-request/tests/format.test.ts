@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest'
-import { getCommitMessage, getPullRequestBody, getPullRequestTitle } from '../src/format.js'
-import type { Context } from '../src/github.js'
+import assert from 'node:assert'
+import { describe, it } from 'node:test'
+import { getCommitMessage, getPullRequestBody, getPullRequestTitle } from '../src/format.ts'
+import type { Context } from '../src/github.ts'
 
 const context: Context = {
   actor: 'octocat',
@@ -18,9 +19,12 @@ describe('getCommitMessage', () => {
       baseBranch: 'main',
       skipCI: false,
     }
-    expect(getCommitMessage(params, context)).toEqual(`Backport from production into main
+    assert.strictEqual(
+      getCommitMessage(params, context),
+      `Backport from production into main
 
-https://github.com/owner/repo/actions/runs/1`)
+https://github.com/owner/repo/actions/runs/1`,
+    )
   })
 
   it('should return the commit message with skip ci', () => {
@@ -29,9 +33,12 @@ https://github.com/owner/repo/actions/runs/1`)
       baseBranch: 'main',
       skipCI: true,
     }
-    expect(getCommitMessage(params, context)).toEqual(`Backport from production into main [skip ci]
+    assert.strictEqual(
+      getCommitMessage(params, context),
+      `Backport from production into main [skip ci]
 
-https://github.com/owner/repo/actions/runs/1`)
+https://github.com/owner/repo/actions/runs/1`,
+    )
   })
 })
 
@@ -43,7 +50,7 @@ describe('getPullRequestTitle', () => {
       pullRequestTitle: 'Backport from HEAD_BRANCH into BASE_BRANCH',
       pullRequestBody: '',
     }
-    expect(getPullRequestTitle(params)).toEqual('Backport from production into main')
+    assert.strictEqual(getPullRequestTitle(params), 'Backport from production into main')
   })
 })
 
@@ -55,9 +62,12 @@ describe('getPullRequestBody', () => {
       pullRequestTitle: '',
       pullRequestBody: 'This is a backport pull request from HEAD_BRANCH into BASE_BRANCH',
     }
-    expect(getPullRequestBody(params, context)).toEqual(`This is a backport pull request from production into main
+    assert.strictEqual(
+      getPullRequestBody(params, context),
+      `This is a backport pull request from production into main
 
 ----
-https://github.com/owner/repo/actions/runs/1`)
+https://github.com/owner/repo/actions/runs/1`,
+    )
   })
 })
