@@ -1,8 +1,8 @@
 import assert from 'node:assert'
 import * as core from '@actions/core'
 import type { Octokit } from '@octokit/action'
-import type { Context } from './github.js'
-import type { GitHubDeployment } from './rule.js'
+import type { Context } from './github.ts'
+import type { GitHubDeployment } from './rule.ts'
 
 export const createDeployment = async (octokit: Octokit, context: Context, deployment: GitHubDeployment) => {
   core.info(`Finding the old deployments for environment ${deployment.environment}`)
