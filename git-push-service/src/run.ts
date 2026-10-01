@@ -4,11 +4,11 @@ import * as path from 'node:path'
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 import type { Octokit } from '@octokit/action'
-import { writeManifests } from './arrange.js'
-import * as git from './git.js'
-import type * as github from './github.js'
-import { updateBranchByPullRequest } from './pull.js'
-import { retry } from './retry.js'
+import { writeManifests } from './arrange.ts'
+import * as git from './git.ts'
+import type * as github from './github.ts'
+import { updateBranchByPullRequest } from './pull.ts'
+import { retry } from './retry.ts'
 
 type Inputs = {
   manifests: string

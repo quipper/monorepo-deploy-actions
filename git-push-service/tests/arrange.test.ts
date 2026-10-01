@@ -1,8 +1,9 @@
+import assert from 'node:assert'
 import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { expect, it } from 'vitest'
-import { writeManifests } from '../src/arrange.js'
+import { it } from 'node:test'
+import { writeManifests } from '../src/arrange.ts'
 
 const readContent = async (f: string) => await fs.readFile(f, 'utf-8')
 
@@ -11,7 +12,7 @@ it('writes the service and application manifests', async () => {
 
   await writeManifests({
     workspace,
-    manifests: [path.join(__dirname, `fixtures/a/generated.yaml`)],
+    manifests: [path.join(import.meta.dirname, `fixtures/a/generated.yaml`)],
     branch: `ns/project/overlay/namespace`,
     namespace: 'namespace',
     service: 'a',
@@ -22,9 +23,10 @@ it('writes the service and application manifests', async () => {
     currentHeadSha: '1234567890abcdef',
   })
 
-  expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
-  expect(await readContent(path.join(workspace, `services/a/generated.yaml`))).toBe(
-    await readContent(path.join(__dirname, `fixtures/a/generated.yaml`)),
+  assert.strictEqual(await readContent(path.join(workspace, `applications/namespace--a.yaml`)), applicationA)
+  assert.strictEqual(
+    await readContent(path.join(workspace, `services/a/generated.yaml`)),
+    await readContent(path.join(import.meta.dirname, `fixtures/a/generated.yaml`)),
   )
 })
 
@@ -33,7 +35,10 @@ it('concatenates the service manifests if multiple are given', async () => {
 
   await writeManifests({
     workspace,
-    manifests: [path.join(__dirname, `fixtures/a/generated.yaml`), path.join(__dirname, `fixtures/b/generated.yaml`)],
+    manifests: [
+      path.join(import.meta.dirname, `fixtures/a/generated.yaml`),
+      path.join(import.meta.dirname, `fixtures/b/generated.yaml`),
+    ],
     branch: `ns/project/overlay/namespace`,
     namespace: 'namespace',
     service: 'service',
@@ -44,10 +49,13 @@ it('concatenates the service manifests if multiple are given', async () => {
     currentHeadSha: '1234567890abcdef',
   })
 
-  expect(await readContent(path.join(workspace, `services/service/generated.yaml`))).toBe(`\
-${await readContent(path.join(__dirname, `fixtures/a/generated.yaml`))}
+  assert.strictEqual(
+    await readContent(path.join(workspace, `services/service/generated.yaml`)),
+    `\
+${await readContent(path.join(import.meta.dirname, `fixtures/a/generated.yaml`))}
 ---
-${await readContent(path.join(__dirname, `fixtures/b/generated.yaml`))}`)
+${await readContent(path.join(import.meta.dirname, `fixtures/b/generated.yaml`))}`,
+  )
 })
 
 it('overwrites if a file exists', async () => {
@@ -62,7 +70,7 @@ it('overwrites if a file exists', async () => {
 
   await writeManifests({
     workspace,
-    manifests: [path.join(__dirname, `fixtures/a/generated.yaml`)],
+    manifests: [path.join(import.meta.dirname, `fixtures/a/generated.yaml`)],
     branch: `ns/project/overlay/namespace`,
     namespace: 'namespace',
     service: 'a',
@@ -73,9 +81,10 @@ it('overwrites if a file exists', async () => {
     currentHeadSha: '1234567890abcdef',
   })
 
-  expect(await readContent(path.join(workspace, `applications/namespace--a.yaml`))).toBe(applicationA)
-  expect(await readContent(path.join(workspace, `services/a/generated.yaml`))).toBe(
-    await readContent(path.join(__dirname, `fixtures/a/generated.yaml`)),
+  assert.strictEqual(await readContent(path.join(workspace, `applications/namespace--a.yaml`)), applicationA)
+  assert.strictEqual(
+    await readContent(path.join(workspace, `services/a/generated.yaml`)),
+    await readContent(path.join(import.meta.dirname, `fixtures/a/generated.yaml`)),
   )
 })
 
