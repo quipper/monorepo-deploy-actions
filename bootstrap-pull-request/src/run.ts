@@ -1,10 +1,10 @@
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 import * as core from '@actions/core'
-import * as git from './git.js'
-import type * as github from './github.js'
-import * as prebuilt from './prebuilt.js'
-import { retryExponential } from './retry.js'
+import * as git from './git.ts'
+import type * as github from './github.ts'
+import * as prebuilt from './prebuilt.ts'
+import { retryExponential } from './retry.ts'
 
 type Inputs = {
   overlay: string
