@@ -6,7 +6,7 @@
   "scripts": {
     "check": "biome check --fix",
     "build": "ncc build --source-map --license licenses.txt src/main.ts",
-    "test": "vitest"
+    "test": "node --test 'tests/**/*.test.ts'"
   },
   "dependencies": {
     "@actions/core": "3.0.1",
@@ -19,8 +19,7 @@
     "@types/node": "24.13.6",
     "@vercel/ncc": "0.45.0",
     "pnpm": "12.6.0",
-    "typescript": "6.0.3",
-    "vitest": "5.0.1"
+    "typescript": "6.0.3"
   },
   "packageManager": "pnpm@12.6.0"
 }
