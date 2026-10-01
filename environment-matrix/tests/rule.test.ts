@@ -1,5 +1,6 @@
-import { describe, expect, test } from 'vitest'
-import { parseRulesYAML, type Rules } from '../src/rule.js'
+import assert from 'node:assert'
+import { describe, test } from 'node:test'
+import { parseRulesYAML, type Rules } from '../src/rule.ts'
 
 test('parse a valid YAML', () => {
   const yaml = `
@@ -19,7 +20,7 @@ test('parse a valid YAML', () => {
         overlay: development
         namespace: development
 `
-  expect(parseRulesYAML(yaml)).toStrictEqual<Rules>([
+  assert.deepStrictEqual<Rules>(parseRulesYAML(yaml), [
     {
       pull_request: {
         base: '**',
@@ -54,7 +55,7 @@ test('parse a valid YAML', () => {
 })
 
 test('parse an empty string', () => {
-  expect(() => parseRulesYAML('')).toThrow(`input is empty`)
+  assert.throws(() => parseRulesYAML(''), { message: /input is empty/ })
 })
 
 describe('parse an invalid object', () => {
@@ -67,7 +68,7 @@ describe('parse an invalid object', () => {
         overlay: pr
         namespace: pr-1
 `
-    expect(() => parseRulesYAML(yaml)).toThrow(`invalid_type`)
+    assert.throws(() => parseRulesYAML(yaml), { message: /invalid_type/ })
   })
 
   test('missing field in environment', () => {
@@ -79,6 +80,6 @@ describe('parse an invalid object', () => {
     - overlay: pr
       namespace: pr-1
 `
-    expect(() => parseRulesYAML(yaml)).toThrow(`invalid_type`)
+    assert.throws(() => parseRulesYAML(yaml), { message: /invalid_type/ })
   })
 })

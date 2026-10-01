@@ -1,7 +1,7 @@
 import * as glob from '@actions/glob'
 import { minimatch } from 'minimatch'
-import type { Context } from './github.js'
-import type { Environment, Rule, Rules } from './rule.js'
+import type { Context } from './github.ts'
+import type { Environment, Rule, Rules } from './rule.ts'
 
 export const findEnvironmentsFromRules = async (rules: Rules, context: Context): Promise<Environment[] | undefined> => {
   for (const rule of rules) {

@@ -1,7 +1,8 @@
+import assert from 'node:assert'
+import { describe, it, test } from 'node:test'
 import type { WebhookEvent } from '@octokit/webhooks-types'
-import { describe, expect, it, test } from 'vitest'
-import { findEnvironmentsFromRules, matchEnvironment } from '../src/matcher.js'
-import type { Rules } from '../src/rule.js'
+import { findEnvironmentsFromRules, matchEnvironment } from '../src/matcher.ts'
+import type { Rules } from '../src/rule.ts'
 
 const rules: Rules = [
   {
@@ -60,7 +61,7 @@ test('pull_request with any branches', async () => {
     } as WebhookEvent,
     ref: 'refs/pull/1/merge',
   }
-  expect(await findEnvironmentsFromRules(rules, context)).toStrictEqual([
+  assert.deepStrictEqual(await findEnvironmentsFromRules(rules, context), [
     {
       outputs: {
         overlay: 'pr',
@@ -83,7 +84,7 @@ test('pull_request with patterns', async () => {
     } as WebhookEvent,
     ref: 'refs/pull/2/merge',
   }
-  expect(await findEnvironmentsFromRules(rules, context)).toStrictEqual([
+  assert.deepStrictEqual(await findEnvironmentsFromRules(rules, context), [
     {
       outputs: {
         overlay: 'pr',
@@ -100,7 +101,7 @@ test('push', async () => {
     payload: {} as WebhookEvent,
     ref: 'refs/heads/main',
   }
-  expect(await findEnvironmentsFromRules(rules, context)).toStrictEqual([
+  assert.deepStrictEqual(await findEnvironmentsFromRules(rules, context), [
     {
       outputs: {
         overlay: 'development',
@@ -117,7 +118,7 @@ test('push with no match', async () => {
     payload: {} as WebhookEvent,
     ref: 'refs/tags/v1.0.0',
   }
-  expect(await findEnvironmentsFromRules(rules, context)).toBeUndefined()
+  assert.strictEqual(await findEnvironmentsFromRules(rules, context), undefined)
 })
 
 describe('matchEnvironment', () => {
@@ -129,7 +130,7 @@ describe('matchEnvironment', () => {
         },
         'if-file-exists': 'tests/fixtures/*',
       }
-      expect(await matchEnvironment(environment)).toBeTruthy()
+      assert.ok(await matchEnvironment(environment))
     })
     it('returns false if the file does not exist', async () => {
       const environment = {
@@ -138,7 +139,7 @@ describe('matchEnvironment', () => {
         },
         'if-file-exists': 'tests/fixtures/not-found',
       }
-      expect(await matchEnvironment(environment)).toBeFalsy()
+      assert.ok(!(await matchEnvironment(environment)))
     })
   })
 })

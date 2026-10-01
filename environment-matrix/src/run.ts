@@ -1,9 +1,9 @@
 import * as core from '@actions/core'
 import type { Octokit } from '@octokit/action'
-import { createDeployment } from './deployment.js'
-import type * as github from './github.js'
-import { findEnvironmentsFromRules } from './matcher.js'
-import { parseRulesYAML, type Rules } from './rule.js'
+import { createDeployment } from './deployment.ts'
+import type * as github from './github.ts'
+import { findEnvironmentsFromRules } from './matcher.ts'
+import { parseRulesYAML, type Rules } from './rule.ts'
 
 type Inputs = {
   rules: string
