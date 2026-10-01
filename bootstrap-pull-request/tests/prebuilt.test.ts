@@ -1,8 +1,9 @@
+import assert from 'node:assert'
 import { promises as fs } from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { describe, expect, it } from 'vitest'
-import { type Service, syncServicesFromPrebuilt } from '../src/prebuilt.js'
+import { describe, it } from 'node:test'
+import { type Service, syncServicesFromPrebuilt } from '../src/prebuilt.ts'
 
 const readContent = async (filename: string) => await fs.readFile(filename, 'utf-8')
 
@@ -22,14 +23,14 @@ describe('syncServicesFromPrebuilt', () => {
       changedServices: [],
       prebuiltBranch: {
         name: 'prebuilt/source-repository/pr',
-        directory: `${__dirname}/fixtures/prebuilt`,
+        directory: `${import.meta.dirname}/fixtures/prebuilt`,
         aggregateToNamespaceDirectory: false,
       },
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(services).toStrictEqual<Service[]>([
+    assert.deepStrictEqual<Service[]>(services, [
       {
         service: 'a',
         builtFrom: {
@@ -58,16 +59,16 @@ describe('syncServicesFromPrebuilt', () => {
         },
       },
     ])
-    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual([
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/applications`), [
       'pr-123--a.yaml',
       'pr-123--b.yaml',
       'pr-123--c.yaml',
     ])
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--b.yaml`)).toBe(applicationB)
-    expect(await fs.readdir(`${namespaceDirectory}/services`)).toStrictEqual(['a', 'b', 'c'])
-    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe(serviceA)
-    expect(await readContent(`${namespaceDirectory}/services/b/generated.yaml`)).toBe(serviceB)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`), applicationA)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--b.yaml`), applicationB)
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/services`), ['a', 'b', 'c'])
+    assert.strictEqual(await readContent(`${namespaceDirectory}/services/a/generated.yaml`), serviceA)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/services/b/generated.yaml`), serviceB)
   })
 
   it('does not overwrite the changed services', async () => {
@@ -87,14 +88,14 @@ describe('syncServicesFromPrebuilt', () => {
       changedServices: ['a'],
       prebuiltBranch: {
         name: 'prebuilt/source-repository/pr',
-        directory: `${__dirname}/fixtures/prebuilt`,
+        directory: `${import.meta.dirname}/fixtures/prebuilt`,
         aggregateToNamespaceDirectory: false,
       },
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(services).toStrictEqual<Service[]>([
+    assert.deepStrictEqual<Service[]>(services, [
       {
         service: 'a',
         builtFrom: {
@@ -124,14 +125,14 @@ describe('syncServicesFromPrebuilt', () => {
       },
     ])
 
-    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual([
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/applications`), [
       'pr-123--a.yaml',
       'pr-123--b.yaml',
       'pr-123--c.yaml',
     ])
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(existingApplicationA)
-    expect(await fs.readdir(`${namespaceDirectory}/services`)).toStrictEqual(['a', 'b', 'c'])
-    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe('this-should-be-kept')
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`), existingApplicationA)
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/services`), ['a', 'b', 'c'])
+    assert.strictEqual(await readContent(`${namespaceDirectory}/services/a/generated.yaml`), 'this-should-be-kept')
   })
 
   it('deletes a service which does not exist in the prebuilt branch', async () => {
@@ -149,14 +150,14 @@ describe('syncServicesFromPrebuilt', () => {
       changedServices: [],
       prebuiltBranch: {
         name: 'prebuilt/source-repository/pr',
-        directory: `${__dirname}/fixtures/prebuilt`,
+        directory: `${import.meta.dirname}/fixtures/prebuilt`,
         aggregateToNamespaceDirectory: false,
       },
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(services).toStrictEqual<Service[]>([
+    assert.deepStrictEqual<Service[]>(services, [
       {
         service: 'a',
         builtFrom: {
@@ -185,15 +186,15 @@ describe('syncServicesFromPrebuilt', () => {
         },
       },
     ])
-    expect(await fs.readdir(`${namespaceDirectory}/applications`, { recursive: true })).toStrictEqual([
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/applications`, { recursive: true }), [
       'pr-123--a.yaml',
       'pr-123--b.yaml',
       'pr-123--c.yaml',
       // pr-123--outdated.yaml should not exist
     ])
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--b.yaml`)).toBe(applicationB)
-    expect(await fs.readdir(`${namespaceDirectory}/services`)).toStrictEqual(['a', 'b', 'c'])
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`), applicationA)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--b.yaml`), applicationB)
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/services`), ['a', 'b', 'c'])
   })
 
   it('copies the manifests from the overridden prebuilt branch', async () => {
@@ -209,21 +210,21 @@ describe('syncServicesFromPrebuilt', () => {
       changedServices: ['b'],
       prebuiltBranch: {
         name: 'prebuilt/source-repository/pr',
-        directory: `${__dirname}/fixtures/prebuilt`,
+        directory: `${import.meta.dirname}/fixtures/prebuilt`,
         aggregateToNamespaceDirectory: false,
       },
       override: {
         services: ['c'],
         prebuiltBranch: {
           name: 'prebuilt/source-repository/pr/override',
-          directory: `${__dirname}/fixtures/override-prebuilt`,
+          directory: `${import.meta.dirname}/fixtures/override-prebuilt`,
         },
       },
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(services).toStrictEqual<Service[]>([
+    assert.deepStrictEqual<Service[]>(services, [
       {
         service: 'a',
         builtFrom: {
@@ -244,16 +245,16 @@ describe('syncServicesFromPrebuilt', () => {
         },
       },
     ])
-    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual([
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/applications`), [
       'pr-123--a.yaml',
       // pr-123--b.yaml should not exist
       'pr-123--c.yaml',
     ])
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(applicationA)
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--c.yaml`)).toBe(applicationC)
-    expect(await fs.readdir(`${namespaceDirectory}/services`)).toStrictEqual(['a', 'c'])
-    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe(serviceA)
-    expect(await readContent(`${namespaceDirectory}/services/c/generated.yaml`)).toBe(serviceC)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`), applicationA)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--c.yaml`), applicationC)
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/services`), ['a', 'c'])
+    assert.strictEqual(await readContent(`${namespaceDirectory}/services/a/generated.yaml`), serviceA)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/services/c/generated.yaml`), serviceC)
   })
 })
 
@@ -271,25 +272,25 @@ describe('syncServicesFromPrebuilt with aggregateToNamespaceDirectory', () => {
       changedServices: [],
       prebuiltBranch: {
         name: 'prebuilt/source-repository/pr',
-        directory: `${__dirname}/fixtures/prebuilt`,
+        directory: `${import.meta.dirname}/fixtures/prebuilt`,
         aggregateToNamespaceDirectory: true,
       },
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(services).toStrictEqual<Service[]>([
+    assert.deepStrictEqual<Service[]>(services, [
       // No services. They will be put into the namespace branch.
     ])
 
-    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual([
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/applications`), [
       'pr-123--a--generated.yaml',
       'pr-123--b--generated.yaml',
       'pr-123--c--generated.yaml',
     ])
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--a--generated.yaml`)).toBe(serviceA)
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--b--generated.yaml`)).toBe(serviceB)
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--c--generated.yaml`)).toBe(serviceC)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--a--generated.yaml`), serviceA)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--b--generated.yaml`), serviceB)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--c--generated.yaml`), serviceC)
   })
 
   it('does not overwrite the changed services', async () => {
@@ -309,14 +310,14 @@ describe('syncServicesFromPrebuilt with aggregateToNamespaceDirectory', () => {
       changedServices: ['a'],
       prebuiltBranch: {
         name: 'prebuilt/source-repository/pr',
-        directory: `${__dirname}/fixtures/prebuilt`,
+        directory: `${import.meta.dirname}/fixtures/prebuilt`,
         aggregateToNamespaceDirectory: true,
       },
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(services).toStrictEqual<Service[]>([
+    assert.deepStrictEqual<Service[]>(services, [
       {
         service: 'a',
         builtFrom: {
@@ -329,15 +330,15 @@ describe('syncServicesFromPrebuilt with aggregateToNamespaceDirectory', () => {
       // Service b does not exist. It will be put into the namespace branch.
     ])
 
-    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual([
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/applications`), [
       'pr-123--a.yaml',
       'pr-123--b--generated.yaml',
       'pr-123--c--generated.yaml',
     ])
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`)).toBe(existingApplicationA)
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--b--generated.yaml`)).toBe(serviceB)
-    expect(await fs.readdir(`${namespaceDirectory}/services`)).toStrictEqual(['a'])
-    expect(await readContent(`${namespaceDirectory}/services/a/generated.yaml`)).toBe('this-should-be-kept')
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--a.yaml`), existingApplicationA)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--b--generated.yaml`), serviceB)
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/services`), ['a'])
+    assert.strictEqual(await readContent(`${namespaceDirectory}/services/a/generated.yaml`), 'this-should-be-kept')
   })
 
   it('copies the manifests from the overridden prebuilt branch', async () => {
@@ -353,21 +354,21 @@ describe('syncServicesFromPrebuilt with aggregateToNamespaceDirectory', () => {
       changedServices: ['b'],
       prebuiltBranch: {
         name: 'prebuilt/source-repository/pr',
-        directory: `${__dirname}/fixtures/prebuilt`,
+        directory: `${import.meta.dirname}/fixtures/prebuilt`,
         aggregateToNamespaceDirectory: true,
       },
       override: {
         services: ['c'],
         prebuiltBranch: {
           name: 'prebuilt/source-repository/pr/override',
-          directory: `${__dirname}/fixtures/override-prebuilt`,
+          directory: `${import.meta.dirname}/fixtures/override-prebuilt`,
         },
       },
       namespaceDirectory,
       substituteVariables: new Map<string, string>([['NAMESPACE', 'pr-123']]),
     })
 
-    expect(services).toStrictEqual<Service[]>([
+    assert.deepStrictEqual<Service[]>(services, [
       // Service a does not exist. It will be put into the namespace branch.
       // Service b does not exist. It will be deployed by another workflow.
       {
@@ -380,15 +381,15 @@ describe('syncServicesFromPrebuilt with aggregateToNamespaceDirectory', () => {
         },
       },
     ])
-    expect(await fs.readdir(`${namespaceDirectory}/applications`)).toStrictEqual([
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/applications`), [
       'pr-123--a--generated.yaml',
       // pr-123--b.yaml should not exist
       'pr-123--c.yaml',
     ])
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--a--generated.yaml`)).toBe(serviceA)
-    expect(await readContent(`${namespaceDirectory}/applications/pr-123--c.yaml`)).toBe(applicationC)
-    expect(await fs.readdir(`${namespaceDirectory}/services`)).toStrictEqual(['c'])
-    expect(await readContent(`${namespaceDirectory}/services/c/generated.yaml`)).toBe(serviceC)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--a--generated.yaml`), serviceA)
+    assert.strictEqual(await readContent(`${namespaceDirectory}/applications/pr-123--c.yaml`), applicationC)
+    assert.deepStrictEqual(await fs.readdir(`${namespaceDirectory}/services`), ['c'])
+    assert.strictEqual(await readContent(`${namespaceDirectory}/services/c/generated.yaml`), serviceC)
   })
 })
 

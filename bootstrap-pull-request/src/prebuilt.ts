@@ -5,7 +5,7 @@ import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 import * as io from '@actions/io'
 import * as yaml from 'js-yaml'
-import { parseApplicationManifest } from './application.js'
+import { parseApplicationManifest } from './application.ts'
 
 type ApplicationContext = {
   overlay: string
