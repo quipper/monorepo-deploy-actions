@@ -1,7 +1,8 @@
+import assert from 'node:assert'
+import { it } from 'node:test'
 import { ListSecretVersionIdsCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
 import { mockClient } from 'aws-sdk-client-mock'
-import { expect, it } from 'vitest'
-import * as awsSecretsManager from '../src/awsSecretsManager.js'
+import * as awsSecretsManager from '../src/awsSecretsManager.ts'
 
 const secretsManagerMock = mockClient(SecretsManagerClient)
 
@@ -30,5 +31,5 @@ it('returns the current version id', async () => {
   )
 
   const versionId = await awsSecretsManager.getCurrentVersionId('microservice/develop')
-  expect(versionId).toBe('cf06c560-f2c1-4150-a322-0d2120f7c12e')
+  assert.strictEqual(versionId, 'cf06c560-f2c1-4150-a322-0d2120f7c12e')
 })
