@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
-import * as github from './github.js'
-import { operationOf, run } from './run.js'
+import * as github from './github.ts'
+import { operationOf, run } from './run.ts'
 
 const main = async (): Promise<void> => {
   await run(

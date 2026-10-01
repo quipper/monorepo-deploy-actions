@@ -2,10 +2,10 @@ import { promises as fs } from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import * as core from '@actions/core'
-import * as git from './git.js'
-import type * as github from './github.js'
-import * as patch from './patch.js'
-import { retry } from './retry.js'
+import * as git from './git.ts'
+import type * as github from './github.ts'
+import * as patch from './patch.ts'
+import { retry } from './retry.ts'
 
 type Inputs = {
   patch: string

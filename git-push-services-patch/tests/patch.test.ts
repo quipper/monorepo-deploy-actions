@@ -1,10 +1,11 @@
+import assert from 'node:assert'
 import { promises as fs } from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { describe, expect, test } from 'vitest'
-import { addToServices, deleteFromServices } from '../src/patch.js'
+import { describe, test } from 'node:test'
+import { addToServices, deleteFromServices } from '../src/patch.ts'
 
-const patch = path.join(__dirname, 'fixtures/kustomization.yaml')
+const patch = path.join(import.meta.dirname, 'fixtures/kustomization.yaml')
 
 describe('addToServices', () => {
   test('if there are several services', async () => {
@@ -13,9 +14,10 @@ describe('addToServices', () => {
     await fs.mkdir(path.join(workspace, `services/a`))
     await fs.mkdir(path.join(workspace, `services/b`))
 
-    await expect(
-      addToServices({ workspace, patch, services: new Set(), excludeServices: new Set() }),
-    ).resolves.toBeUndefined()
+    assert.strictEqual(
+      await addToServices({ workspace, patch, services: new Set(), excludeServices: new Set() }),
+      undefined,
+    )
 
     await fs.access(path.join(workspace, `services/a/kustomization.yaml`))
     await fs.access(path.join(workspace, `services/b/kustomization.yaml`))
@@ -28,9 +30,9 @@ describe('addToServices', () => {
     await fs.mkdir(path.join(workspace, `services/a`))
     await fs.mkdir(path.join(workspace, `services/b`))
 
-    await expect(addToServices({ workspace, patch, services: new Set(), excludeServices })).resolves.toBeUndefined()
+    assert.strictEqual(await addToServices({ workspace, patch, services: new Set(), excludeServices }), undefined)
 
-    await expect(fs.access(path.join(workspace, `services/a/kustomization.yaml`))).rejects.toThrow()
+    await assert.rejects(fs.access(path.join(workspace, `services/a/kustomization.yaml`)))
     await fs.access(path.join(workspace, `services/b/kustomization.yaml`))
   })
 
@@ -41,10 +43,10 @@ describe('addToServices', () => {
     await fs.mkdir(path.join(workspace, `services/a`))
     await fs.mkdir(path.join(workspace, `services/b`))
 
-    await expect(addToServices({ workspace, patch, services, excludeServices: new Set() })).resolves.toBeUndefined()
+    assert.strictEqual(await addToServices({ workspace, patch, services, excludeServices: new Set() }), undefined)
 
     await fs.access(path.join(workspace, `services/a/kustomization.yaml`))
-    await expect(fs.access(path.join(workspace, `services/b/kustomization.yaml`))).rejects.toThrow()
+    await assert.rejects(fs.access(path.join(workspace, `services/b/kustomization.yaml`)))
   })
 
   test('specify and exclude services', async () => {
@@ -56,18 +58,19 @@ describe('addToServices', () => {
     await fs.mkdir(path.join(workspace, `services/b`))
     await fs.mkdir(path.join(workspace, `services/c`))
 
-    await expect(addToServices({ workspace, patch, services, excludeServices })).resolves.toBeUndefined()
+    assert.strictEqual(await addToServices({ workspace, patch, services, excludeServices }), undefined)
 
     await fs.access(path.join(workspace, `services/a/kustomization.yaml`))
-    await expect(fs.access(path.join(workspace, `services/b/kustomization.yaml`))).rejects.toThrow()
-    await expect(fs.access(path.join(workspace, `services/c/kustomization.yaml`))).rejects.toThrow()
+    await assert.rejects(fs.access(path.join(workspace, `services/b/kustomization.yaml`)))
+    await assert.rejects(fs.access(path.join(workspace, `services/c/kustomization.yaml`)))
   })
 
   test('if empty directory', async () => {
     const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-services-patch-'))
-    await expect(
-      addToServices({ workspace, patch, services: new Set(), excludeServices: new Set() }),
-    ).resolves.toBeUndefined()
+    assert.strictEqual(
+      await addToServices({ workspace, patch, services: new Set(), excludeServices: new Set() }),
+      undefined,
+    )
   })
 })
 
@@ -80,12 +83,13 @@ describe('deleteFromServices', () => {
     await fs.writeFile(path.join(workspace, `services/a/kustomization.yaml`), 'dummy')
     await fs.writeFile(path.join(workspace, `services/b/kustomization.yaml`), 'dummy')
 
-    await expect(
-      deleteFromServices({ workspace, patch, services: new Set(), excludeServices: new Set() }),
-    ).resolves.toBeUndefined()
+    assert.strictEqual(
+      await deleteFromServices({ workspace, patch, services: new Set(), excludeServices: new Set() }),
+      undefined,
+    )
 
-    await expect(fs.access(path.join(workspace, `services/a/kustomization.yaml`))).rejects.toThrow()
-    await expect(fs.access(path.join(workspace, `services/b/kustomization.yaml`))).rejects.toThrow()
+    await assert.rejects(fs.access(path.join(workspace, `services/a/kustomization.yaml`)))
+    await assert.rejects(fs.access(path.join(workspace, `services/b/kustomization.yaml`)))
   })
 
   test('exclude a service', async () => {
@@ -97,18 +101,17 @@ describe('deleteFromServices', () => {
     await fs.writeFile(path.join(workspace, `services/a/kustomization.yaml`), 'dummy')
     await fs.writeFile(path.join(workspace, `services/b/kustomization.yaml`), 'dummy')
 
-    await expect(
-      deleteFromServices({ workspace, patch, services: new Set(), excludeServices }),
-    ).resolves.toBeUndefined()
+    assert.strictEqual(await deleteFromServices({ workspace, patch, services: new Set(), excludeServices }), undefined)
 
-    await expect(fs.access(path.join(workspace, `services/a/kustomization.yaml`))).rejects.toThrow()
+    await assert.rejects(fs.access(path.join(workspace, `services/a/kustomization.yaml`)))
     await fs.access(path.join(workspace, `services/b/kustomization.yaml`))
   })
 
   test('if empty directory', async () => {
     const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'git-push-services-patch-'))
-    await expect(
-      deleteFromServices({ workspace, patch, services: new Set(), excludeServices: new Set() }),
-    ).resolves.toBeUndefined()
+    assert.strictEqual(
+      await deleteFromServices({ workspace, patch, services: new Set(), excludeServices: new Set() }),
+      undefined,
+    )
   })
 })
