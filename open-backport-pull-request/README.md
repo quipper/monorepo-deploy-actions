@@ -62,9 +62,10 @@ See [action.yaml](./action.yaml) for the default value.
 
 ### Outputs
 
-| Name               | Description                                   |
-| ------------------ | --------------------------------------------- |
-| `pull-request-url` | URL of the opened Pull Request                |
-| `base-branch`      | The base branch of the opened Pull Request    |
-| `head-branch`      | The head branch of the opened Pull Request    |
-| `merged`           | If the pull request is merged, returns `true` |
+| Name                  | Description                                   |
+| --------------------- | --------------------------------------------- |
+| `pull-request-url`    | URL of the opened pull request                |
+| `pull-request-number` | Number of the opened pull request             |
+| `base-branch`         | The base branch of the opened pull request    |
+| `head-branch`         | The head branch of the opened pull request    |
+| `merged`              | If the pull request is merged, returns `true` |

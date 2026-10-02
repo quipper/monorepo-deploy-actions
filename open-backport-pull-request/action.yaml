@@ -1,14 +1,14 @@
 name: open-backport-pull-request
-description: Open backport Pull Requests
+description: Open a pull request for backport
 inputs:
   github-token:
-    description: GitHub token used for opening a Pull Request
+    description: GitHub token used for opening a pull request
     default: ${{ github.token }}
   base-branch:
-    description: The base branch for a Pull Request
+    description: The base branch for a pull request
     required: true
   head-branch:
-    description: The head branch for a Pull Request
+    description: The head branch for a pull request
     required: true
     default: ${{ github.ref_name }}
   skip-ci:
@@ -20,20 +20,22 @@ inputs:
     required: true
     default: 'false'
   pull-request-title:
-    description: The title of the Pull Request
+    description: The title of the pull request
     required: true
     default: Backport from HEAD_BRANCH to BASE_BRANCH
   pull-request-body:
-    description: The body of the Pull Request
+    description: The body of the pull request
     required: true
     default: This is an automated backport from HEAD_BRANCH to BASE_BRANCH.
 outputs:
   pull-request-url:
-    description: The URL of the opened Pull Request
+    description: The URL of the opened pull request
+  pull-request-number:
+    description: The number of the opened pull request
   base-branch:
-    description: The base branch of the opened Pull Request
+    description: The base branch of the opened pull request
   head-branch:
-    description: The head branch of the opened Pull Request
+    description: The head branch of the opened pull request
   merged:
     description: If the pull request is merged, returns `true`
 runs:

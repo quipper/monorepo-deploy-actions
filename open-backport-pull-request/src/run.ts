@@ -14,6 +14,7 @@ type Inputs = {
 
 type Outputs = {
   pullRequestUrl: string
+  pullRequestNumber: number
   baseBranch: string
   headBranch: string
   merged: boolean
@@ -113,6 +114,7 @@ const openPullRequest = async (params: Backport, octokit: Octokit): Promise<Outp
       // If merged, return immediately without any reviewer or assignee.
       return {
         pullRequestUrl: pull.html_url,
+        pullRequestNumber: pull.number,
         baseBranch: params.baseBranch,
         headBranch: params.headBranch,
         merged: true,
@@ -148,6 +150,7 @@ const openPullRequest = async (params: Backport, octokit: Octokit): Promise<Outp
 
   return {
     pullRequestUrl: pull.html_url,
+    pullRequestNumber: pull.number,
     baseBranch: params.baseBranch,
     headBranch: params.headBranch,
     merged: false,
