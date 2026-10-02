@@ -18,6 +18,7 @@ const main = async (): Promise<void> => {
   )
   if (outputs) {
     core.setOutput('pull-request-url', outputs.pullRequestUrl)
+    core.setOutput('pull-request-number', outputs.pullRequestNumber)
     core.setOutput('base-branch', outputs.baseBranch)
     core.setOutput('head-branch', outputs.headBranch)
     core.setOutput('merged', outputs.merged)
