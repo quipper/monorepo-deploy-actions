@@ -39,7 +39,7 @@ jobs:
       - run: npm install -g pnpm@latest-10
       - run: pnpm i
       - run: pnpm check
-      - uses: int128/update-generated-files-action@835eef6e15a044354d9f4b403ad83a0fabe46b0e # v2.113.0
+      - uses: int128/update-generated-files-action@1d6d8fac356eabbd925f4c3cab43d871bab249cd # v2.114.0
 
   test:
     runs-on: ubuntu-latest
