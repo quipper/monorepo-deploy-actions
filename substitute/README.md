@@ -18,7 +18,7 @@ steps:
   - uses: int128/kustomize-action@v1
     id: kustomize
     with:
-      kustomization: '*/kubernetes/overlays/staging/kustomization.yaml'
+      kustomization: "*/kubernetes/overlays/staging/kustomization.yaml"
   - uses: quipper/monorepo-deploy-actions/substitute@v1
     with:
       files: ${{ steps.kustomize.outputs.directory }}
