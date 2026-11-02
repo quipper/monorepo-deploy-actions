@@ -18,7 +18,7 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: int128/label-action@6237d3910371000af252c1f6a4f42014f76e15fc # v1.49.0
+      - uses: int128/label-action@90503f6bb517c831a74fac7af3fad60b03d1fe96 # v1.50.0
         with:
           add-labels: |
             review-requested-team:${{ github.event.requested_team.name }}
