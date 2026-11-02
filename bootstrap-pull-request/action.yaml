@@ -24,7 +24,7 @@ inputs:
   aggregate-prebuilt-services-to-namespace-directory:
     description: If set to true, copy prebuilt manifests into the namespace directory instead of their service directories
     required: false
-    default: 'false'
+    default: "false"
   override-services:
     description: If set, copy these services from override-prebuilt-branch
     required: false
@@ -44,5 +44,5 @@ outputs:
     description: JSON string of services. See prebuilt.ts for the JSON schema
 
 runs:
-  using: 'node24'
-  main: 'dist/index.js'
+  using: "node24"
+  main: "dist/index.js"
