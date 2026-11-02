@@ -13,8 +13,8 @@ It can be descibed as the following rules:
 
 ```yaml
 - pull_request:
-    base: '**'
-    head: '**'
+    base: "**"
+    head: "**"
   environments:
     - outputs:
         overlay: pr
