@@ -12,8 +12,8 @@ To create a backport pull request when a branch is changed:
 on:
   push:
     branches:
-      - 'main'
-      - '*/main'
+      - "main"
+      - "*/main"
 
 jobs:
   backport:

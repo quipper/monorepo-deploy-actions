@@ -14,11 +14,11 @@ inputs:
   skip-ci:
     description: Add `[skip ci]` to the commit message
     required: true
-    default: 'false'
+    default: "false"
   merge-pull-request:
     description: Try to merge the pull request
     required: true
-    default: 'false'
+    default: "false"
   pull-request-title:
     description: The title of the pull request
     required: true
@@ -39,5 +39,5 @@ outputs:
   merged:
     description: If the pull request is merged, returns `true`
 runs:
-  using: 'node24'
-  main: 'dist/index.js'
+  using: "node24"
+  main: "dist/index.js"
