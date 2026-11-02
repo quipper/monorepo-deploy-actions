@@ -5,7 +5,7 @@ patchesJson6902:
       group: apps
       version: v1
       kind: Deployment
-      name: '.*'
+      name: ".*"
     patch: |
       - op: replace
         path: /spec/replicas
