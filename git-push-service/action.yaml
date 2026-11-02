@@ -26,7 +26,7 @@ inputs:
   update-via-pull-request:
     description: update a branch via a pull request
     required: true
-    default: 'false'
+    default: "false"
   token:
     description: GitHub token
     required: true
@@ -45,5 +45,5 @@ outputs:
     description: URL of pull request if created
 
 runs:
-  using: 'node24'
-  main: 'dist/index.js'
+  using: "node24"
+  main: "dist/index.js"
