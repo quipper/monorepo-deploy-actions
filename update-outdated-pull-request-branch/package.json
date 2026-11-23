@@ -19,7 +19,7 @@
     "@tsconfig/node24": "24.0.6",
     "@types/node": "24.19.2",
     "@vercel/ncc": "0.45.0",
-    "msw": "3.0.4",
+    "msw": "3.0.6",
     "pnpm": "12.18.0",
     "typescript": "6.0.3"
   },
